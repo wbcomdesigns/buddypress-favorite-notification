@@ -22,7 +22,7 @@ Shows live notifications of members on a BuddyPress based social network site. U
 This section describes how to install the plugin and get it working.
 
 1. Download the zip file and extract
-2. Upload `bp-live-notification` directory to the `/wp-content/plugins/` directory
+2. Upload `bp-favourite-notification-master` directory to the `/wp-content/plugins/` directory
 3. Activate the plugin through the \'Plugins\' menu.
 4. Alternatively you can use WordPress Plugin installer from Dashboard->Plugins->Add New to add this plugin
 5. Enjoy
