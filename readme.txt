@@ -1,4 +1,4 @@
-=== Buddypress Favorite Notification ===
+=== BP Favorite Notification ===
 Contributors: vapvarun
 Tags: buddypress, notification, buddypress like, buddypress notification, buddypress favourite notification
 Donate link: http://wbcomdesigns.com/
