@@ -1,8 +1,8 @@
 <?php
 /*
-Plugin Name: BP Favorite Notification
+Plugin Name: Bp Favorite Notification
 Plugin URI: https://wbcomdesigns.com/plugins/buddypress-favorite-notification/
-Description: Adds notification for the activity favorite for the activity user.
+Description: Adds notification for the activity Favorite for the activity user.
 Version: 1.0.0
 Text Domain: wb-bp-fav-notification
 Author: Wbcom Designs<admin@wbcomdesigns.com>
