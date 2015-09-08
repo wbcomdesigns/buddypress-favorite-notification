@@ -1,7 +1,7 @@
 === Buddypress Favorite Notification ===
 Contributors: vapvarun
 Tags: buddypress, notification, buddypress like, buddypress notification, buddypress favourite notification
-Donate link: http://wbcomdesigns.com/
+Donate link: https://wbcomdesigns.com/donate/
 Requires at least: 2.0
 Tested up to: 2.3.2.1
 Stable tag: 2.4
@@ -12,6 +12,7 @@ BuddyPress Favourite Notification  adds a notification for buddypress activity.
 
 == Description ==
 BuddyPress Favourite Notification  adds a notification for buddypress activity.
+If you need additional help you can contact us for [Custom Development](https://wbcomdesigns.com/plugins/buddypress-favorite-notification/).
 
 = How it works:- =
 Shows live notifications of members on a BuddyPress based social network site. User will get notified after any buddypress activity by users.
