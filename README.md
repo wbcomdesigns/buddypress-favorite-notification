@@ -3,7 +3,7 @@ Contributors: vapvarun
 Tags: buddypress, notification, buddypress like, buddypress notification, buddypress favourite notification
 Donate link: http://wbcomdesigns.com/
 Requires at least: 2.0
-Tested up to: 2.3.2.1
+Tested up to: 2.8.2
 Stable tag: 2.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -40,3 +40,6 @@ Please visit [buddydesk] (]http://buddydesk.in/) for any query related to plugin
 == Changelog ==
 = 1.0.0 =
 * first version.
+
+= 1.0.1 =
+* Fixed self notification issue.
