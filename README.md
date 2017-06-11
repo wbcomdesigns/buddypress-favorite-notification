@@ -32,7 +32,7 @@ This section describes how to install the plugin and get it working.
 No, It needs you to have BuddyPress installed and activated and the BuddyPress notifications component must be enabled
 
 = Where Do I Ask for support? =
-Please visit [buddydesk] (]http://buddydesk.in/) for any query related to plugin and Buddypress.
+Please visit [Wbcom Designs] (]http://wbcomdesigns.com/contact/) for any query related to plugin and Buddypress.
 
 == Screenshots ==
 1. It is displaying live notification message in bar screenshot-1.png
