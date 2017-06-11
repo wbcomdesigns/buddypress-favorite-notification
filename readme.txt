@@ -47,3 +47,4 @@ Please visit [Wbcom Designs](http://wbcomdesigns.com/contact) for any query rela
 
 = 1.0.2 =
 * Stable tag update
+* Will mark read to activity notification in one click
