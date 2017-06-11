@@ -2,9 +2,9 @@
 Contributors: vapvarun,wbcomdesigns
 Tags: buddypress, notification, buddypress like, buddypress notification, buddypress favourite notification
 Donate link: http://wbcomdesigns.com/donate
-Requires at least: 2.0
-Tested up to: 4.7.5
-Stable tag: 2.4
+Requires at least: 3.5
+Tested up to: 4.8
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
