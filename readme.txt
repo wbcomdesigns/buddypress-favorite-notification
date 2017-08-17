@@ -1,10 +1,10 @@
-=== BP Favorite Notification ===
+=== BuddyPress Favorite Notification ===
 Contributors: vapvarun,wbcomdesigns
 Tags: buddypress, notification, buddypress like, buddypress notification, buddypress favourite notification
 Donate link: http://wbcomdesigns.com/donate
 Requires at least: 3.5
 Tested up to: 4.8
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -48,3 +48,7 @@ Please visit [Wbcom Designs](http://wbcomdesigns.com/contact) for any query rela
 = 1.0.2 =
 * Stable tag update
 * Will mark read to activity notification in one click
+
+= 1.0.2 =
+* updated language file
+* Self notification are removed
