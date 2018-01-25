@@ -1,76 +1,79 @@
 <?php
 /**
-  *	Plugin Name: BuddyPress Favorite Notification
-  *	Plugin URI: http://www.wbcomdesigns.com/
-  *	Description: Adds notification for the activity Favorite for the activity user.
-  *	Version: 1.0.3
-  *	Text Domain: wb-bp-fav-notification
-  * Author: Wbcom Designs<admin@wbcomdesigns.com>
-  * Author URI: http://www.wbcomdesigns.com/
-  * License: GPL2
-  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Plugin Name: BuddyPress Favorite Notification
+ * Plugin URI: http://www.wbcomdesigns.com/
+ * Description: Adds notification for the activity Favorite for the activity user.
+ * Version: 1.0.3
+ * Text Domain: bp-fav-notification
+ * Author: Wbcom Designs<admin@wbcomdesigns.com>
+ * Author URI: http://www.wbcomdesigns.com/
+ * License: GPL2
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
 
-	if ( !defined('ABSPATH') ) exit; // Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
 
-	define('WB_BP_FAV_NOTIFICATION_NAME', 'Buddypress Favorite Notification');
-	define('WB_BP_FAV_NOTIFICATION_VERSION', '1.0.3');
-	define('WB_BP_FAV_NOTIFICATION_SLUG', 'wb-bp-fav-notification');
-	define('WB_BP_FAV_NOTIFICATION_PLUGIN_PATH', plugin_dir_path(__FILE__));
-	define('WB_BP_FAV_NOTIFICATION_PLUGIN_URL', plugin_dir_url(__FILE__));
-	define('WB_BP_FAV_NOTIFICATION_UPDATER_ID', 200);
+	define( 'WB_BP_FAV_NOTIFICATION_NAME', 'Buddypress Favorite Notification' );
+	define( 'WB_BP_FAV_NOTIFICATION_VERSION', '1.0.3' );
+	define( 'WB_BP_FAV_NOTIFICATION_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
+	define( 'WB_BP_FAV_NOTIFICATION_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+	define( 'WB_BP_FAV_NOTIFICATION_UPDATER_ID', 200 );
 
 	// Activation Hook
-	register_activation_hook(__FILE__, 'wb_bp_fav_notify_activate' );
+	register_activation_hook( __FILE__, 'wb_bp_fav_notify_activate' );
 	// Deactivation Hook
-	register_deactivation_hook(__FILE__, 'wb_bp_fav_notify_deactivate' );
-	
-	/**
-	* Activation Hook to add default option values
-	*
-	* @author 	Wbcom Designs
-	* @since    1.0.0
-	*/
-	
-	function wb_bp_fav_notify_activate() {
-			if ( !in_array('buddypress/bp-loader.php', apply_filters('active_plugins', get_option('active_plugins') ) ) ) {
-				// Buddypress Plugin is inactive, hence deactivate this plugin
-				deactivate_plugins( plugin_basename(__FILE__) );
-			} else {
-				update_option('wb-bp-fav-notification-version', WB_BP_FAV_NOTIFICATION_VERSION );
-				update_option('wb-bp-fav-notification-updater-id', WB_BP_FAV_NOTIFICATION_UPDATER_ID );
-			}
-	}
+	register_deactivation_hook( __FILE__, 'wb_bp_fav_notify_deactivate' );
 
 	/**
-	* Deactivation Hook to remove default option values if user has marked to delete them
-	*
-	* @author 	Wbcom Designs
-	* @since    1.0.0
-	*/
-	
-	function wb_bp_fav_notify_deactivate() {
-		delete_option('wb-bp-fav-notification-version');
-		delete_option('wb-bp-fav-notification-updater-id');
+	 * Activation Hook to add default option values
+	 *
+	 * @author   Wbcom Designs
+	 * @since    1.0.0
+	 */
+
+function wb_bp_fav_notify_activate() {
+	if ( ! in_array( 'buddypress/bp-loader.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
+		// Buddypress Plugin is inactive, hence deactivate this plugin
+		deactivate_plugins( plugin_basename( __FILE__ ) );
+	} else {
+		update_option( 'wb-bp-fav-notification-version', WB_BP_FAV_NOTIFICATION_VERSION );
+		update_option( 'wb-bp-fav-notification-updater-id', WB_BP_FAV_NOTIFICATION_UPDATER_ID );
 	}
+}
 
-	if ( !function_exists( 'bp_fav_noti_plugin_files' ) ) {
-		add_action( 'plugins_loaded', 'bp_fav_noti_plugin_files' );
+	/**
+	 * Deactivation Hook to remove default option values if user has marked to delete them
+	 *
+	 * @author   Wbcom Designs
+	 * @since    1.0.0
+	 */
 
-			/**
-			* Include require files
-			*
-			* @author 	Wbcom Designs
-			* @since    1.0.0
-			*/
-		
-			function bp_fav_noti_plugin_files() {
-				if ( in_array('buddypress/bp-loader.php', apply_filters('active_plugins', get_option('active_plugins') ) ) ) {
-					$include_files = array(
-						'include/bpfn-notification.php',
-						'include/bpfn-functions.php'	
-					);
-					foreach( $include_files as $include_file ) include $include_file;                                
-				}
+function wb_bp_fav_notify_deactivate() {
+	delete_option( 'wb-bp-fav-notification-version' );
+	delete_option( 'wb-bp-fav-notification-updater-id' );
+}
+
+if ( ! function_exists( 'bp_fav_noti_plugin_files' ) ) {
+	add_action( 'plugins_loaded', 'bp_fav_noti_plugin_files' );
+
+		/**
+		 * Include require files
+		 *
+		 * @author   Wbcom Designs
+		 * @since    1.0.0
+		 */
+
+	function bp_fav_noti_plugin_files() {
+		if ( in_array( 'buddypress/bp-loader.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
+			$include_files = array(
+				'include/bpfn-notification.php',
+				'include/bpfn-functions.php',
+			);
+			foreach ( $include_files as $include_file ) {
+				include $include_file;
 			}
+		}
 	}
+}
