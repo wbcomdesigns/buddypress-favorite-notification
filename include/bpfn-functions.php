@@ -1,5 +1,12 @@
 <?php
-// Exit if accessed directly
+/**
+ * Class to add reviews shortcode.
+ *
+ * @since    1.0.0
+ * @author   Wbcom Designs
+ * @package  BuddyPress Favorite Notification
+ */
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -24,13 +31,12 @@ if ( ! class_exists( 'BPFN_Functions' ) ) {
 			add_filter( 'the_content', array( $this, 'wp_bp_activity_post_notification_mark' ) );
 		}
 
-		 /**
-		  * Mark at-mention notifications as read when users visit their Mentions page.
-		  *
-		  * @since 1.0.0
-		  * @author   Wbcom Designs
-		  */
-
+		/**
+		 * Mark at-mention notifications as read when users visit their Mentions page.
+		 *
+		 * @since 1.0.0
+		 * @author   Wbcom Designs
+		 */
 		function wb_bp_fav_activity_remove_screen_notifications( $activity ) {
 			global $bp;
 			// Only mark read if the current user is looking at his own mentions.
@@ -47,13 +53,12 @@ if ( ! class_exists( 'BPFN_Functions' ) ) {
 			}
 		}
 
-		 /**
-		  * Mark notifications as read when users visit their post activity page.
-		  *
-		  * @since 1.0.0
-		  * @author   Wbcom Designs
-		  */
-
+		/**
+		 * Mark notifications as read when users visit their post activity page.
+		 *
+		 * @since 1.0.0
+		 * @author   Wbcom Designs
+		 */
 		function wp_bp_activity_post_notification_mark( $content ) {
 			if ( is_single() ) {
 				// Only mark read if the current user is looking at his own mentions.

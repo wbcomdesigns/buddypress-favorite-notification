@@ -5,13 +5,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	add_action( 'bp_setup_globals', 'favorite_notifier_setup_globals' );
 
-	 /**
-	  * Setup new global notification object for the menu
-	  *
-	  * @since 1.0.0
-	  * @author   Wbcom Designs
-	  */
-
+	/**
+	 * Setup new global notification object for the menu
+	 *
+	 * @since 1.0.0
+	 * @author   Wbcom Designs
+	 */
 function favorite_notifier_setup_globals() {
 	global $bp;
 	$bp->favorite_notifier                        = new stdClass();
@@ -25,12 +24,12 @@ function favorite_notifier_setup_globals() {
 
 	add_action( 'bp_activity_add_user_favorite', 'add_notification_mark_fav', 0, 2 );
 
-	 /**
-	  * Add the notification on marking activity as favorite use "bp_activity_add_user_favorite" hook
-	  *
-	  * @since 1.0.0
-	  * @author   Wbcom Designs
-	  */
+	/**
+	 * Add the notification on marking activity as favorite use "bp_activity_add_user_favorite" hook
+	 *
+	 * @since 1.0.0
+	 * @author   Wbcom Designs
+	 */
 
 function add_notification_mark_fav( $activity_id, $user_id ) {
 	global $bp;
@@ -51,13 +50,12 @@ function add_notification_mark_fav( $activity_id, $user_id ) {
 	}
 }
 
-	 /**
-	  * Function to display text and link in the top notification and in the notification area
-	  *
-	  * @since 1.0.0
-	  * @author   Wbcom Designs
-	  */
-
+	/**
+	 * Function to display text and link in the top notification and in the notification area
+	 *
+	 * @since 1.0.0
+	 * @author   Wbcom Designs
+	 */
 function favorite_notifier_format_notifications( $action, $item_id, $secondary_item_id, $total_items, $format = 'string' ) {
 	global $bp;
 	$link      = bp_activity_get_permalink( $item_id );

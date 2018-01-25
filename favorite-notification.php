@@ -12,7 +12,7 @@
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
 
 	define( 'WB_BP_FAV_NOTIFICATION_NAME', 'Buddypress Favorite Notification' );
@@ -21,21 +21,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 	define( 'WB_BP_FAV_NOTIFICATION_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 	define( 'WB_BP_FAV_NOTIFICATION_UPDATER_ID', 200 );
 
-	// Activation Hook
+	// Activation Hook.
 	register_activation_hook( __FILE__, 'wb_bp_fav_notify_activate' );
-	// Deactivation Hook
+	// Deactivation Hook.
 	register_deactivation_hook( __FILE__, 'wb_bp_fav_notify_deactivate' );
 
 	/**
 	 * Activation Hook to add default option values
 	 *
 	 * @author   Wbcom Designs
+	 * @package   BuddyPress Add Notification
 	 * @since    1.0.0
 	 */
-
 function wb_bp_fav_notify_activate() {
-	if ( ! in_array( 'buddypress/bp-loader.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
-		// Buddypress Plugin is inactive, hence deactivate this plugin
+	if ( ! in_array( 'buddypress/bp-loader.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true ) ) {
+		// Buddypress Plugin is inactive, hence deactivate this plugin.
 		deactivate_plugins( plugin_basename( __FILE__ ) );
 	} else {
 		update_option( 'wb-bp-fav-notification-version', WB_BP_FAV_NOTIFICATION_VERSION );
@@ -48,8 +48,8 @@ function wb_bp_fav_notify_activate() {
 	 *
 	 * @author   Wbcom Designs
 	 * @since    1.0.0
+	 * @package   BuddyPress Add Notification
 	 */
-
 function wb_bp_fav_notify_deactivate() {
 	delete_option( 'wb-bp-fav-notification-version' );
 	delete_option( 'wb-bp-fav-notification-updater-id' );
@@ -63,10 +63,10 @@ if ( ! function_exists( 'bp_fav_noti_plugin_files' ) ) {
 		 *
 		 * @author   Wbcom Designs
 		 * @since    1.0.0
+		 * @package   BuddyPress Add Notification
 		 */
-
 	function bp_fav_noti_plugin_files() {
-		if ( in_array( 'buddypress/bp-loader.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
+		if ( in_array( 'buddypress/bp-loader.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true ) ) {
 			$include_files = array(
 				'include/bpfn-notification.php',
 				'include/bpfn-functions.php',
