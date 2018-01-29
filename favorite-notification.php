@@ -9,6 +9,8 @@
  * Author URI: http://www.wbcomdesigns.com/
  * License: GPL2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ *
+ * @package BuddyPress_Favorite_Notification
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -69,7 +71,7 @@ if ( ! function_exists( 'bp_fav_noti_plugin_files' ) ) {
 		if ( in_array( 'buddypress/bp-loader.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true ) ) {
 			$include_files = array(
 				'include/bpfn-notification.php',
-				'include/bpfn-functions.php',
+				'include/class-bpfn-functions.php',
 			);
 			foreach ( $include_files as $include_file ) {
 				include $include_file;
