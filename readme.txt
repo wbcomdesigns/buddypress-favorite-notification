@@ -3,8 +3,8 @@ Contributors: vapvarun,wbcomdesigns
 Tags: buddypress, notification, buddypress like, buddypress notification, buddypress favorite notification
 Donate link: http://wbcomdesigns.com/donate
 Requires at least: 3.5
-Tested up to: 4.8.1
-Stable tag: 1.0.3
+Tested up to: 4.9.6
+Stable tag: 1.0.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,3 +54,6 @@ Please visit [Wbcom Designs](http://wbcomdesigns.com/contact) for any query rela
 = 1.0.3 =
 * updated language file
 * Self notification are removed
+
+= 1.0.4 =
+* Compatibility with BuddyPress 3.1.0
