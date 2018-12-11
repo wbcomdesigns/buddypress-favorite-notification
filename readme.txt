@@ -3,8 +3,8 @@ Contributors: vapvarun,wbcomdesigns
 Tags: buddypress, notification, buddypress like, buddypress notification, buddypress favorite notification
 Donate link: http://wbcomdesigns.com/donate
 Requires at least: 3.5
-Tested up to: 4.9.6
-Stable tag: 1.0.4
+Tested up to: 5.0
+Stable tag: 1.0.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -41,19 +41,30 @@ Please visit [Wbcom Designs](http://wbcomdesigns.com/contact) for any query rela
 1. It is displaying live notification message in bar screenshot-1.png
 
 == Changelog ==
-= 1.0.0 =
-* first version.
+= 1.0.5 =
+* Fix - Compatibility with BuddyPress 4.1.0. #2
 
-= 1.0.1 =
-* Fixed self notification issue.
-
-= 1.0.2 =
-* Stable tag update
-* Will mark read to activity notification in one click
+= 1.0.4 =
+* Compatibility with BuddyPress 3.1.0
 
 = 1.0.3 =
 * updated language file
 * Self notification are removed
 
-= 1.0.4 =
-* Compatibility with BuddyPress 3.1.0
+= 1.0.2 =
+* Stable tag update
+* Will mark read to activity notification in one click
+
+= 1.0.1 =
+* Fixed self notification issue.
+
+= 1.0.0 =
+* first version.
+
+
+
+
+
+
+
+
