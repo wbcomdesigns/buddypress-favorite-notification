@@ -3,7 +3,7 @@
  * Plugin Name: BuddyPress Favorite Notification
  * Plugin URI: http://www.wbcomdesigns.com/
  * Description: Adds notification for the activity Favorite for the activity user.
- * Version: 1.0.5
+ * Version: 1.0.6
  * Text Domain: bp-fav-notification
  * Author: Wbcom Designs<admin@wbcomdesigns.com>
  * Author URI: http://www.wbcomdesigns.com/
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 	define( 'WB_BP_FAV_NOTIFICATION_NAME', 'Buddypress Favorite Notification' );
-	define( 'WB_BP_FAV_NOTIFICATION_VERSION', '1.0.5' );
+	define( 'WB_BP_FAV_NOTIFICATION_VERSION', '1.0.6' );
 	define( 'WB_BP_FAV_NOTIFICATION_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 	define( 'WB_BP_FAV_NOTIFICATION_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 	define( 'WB_BP_FAV_NOTIFICATION_UPDATER_ID', 200 );
