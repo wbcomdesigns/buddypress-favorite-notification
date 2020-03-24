@@ -80,3 +80,37 @@ if ( ! function_exists( 'bp_fav_noti_plugin_files' ) ) {
 		}
 	}
 }
+
+
+if ( ! function_exists( 'bp_fav_noti_check_requre_plugin' ) ) {
+	add_action( 'admin_init', 'bp_fav_noti_check_requre_plugin' );
+
+	/**
+	 * This function check if buddypress is activated or not and print a notice for admin.
+	 */
+	function bp_fav_noti_check_requre_plugin() {
+		if ( ! class_exists( 'BuddyPress' ) ) {
+			deactivate_plugins( plugin_basename( __FILE__ ) );
+			add_action( 'admin_notices', 'bp_fav_noti_admin_notice' );
+		}
+	}
+}
+
+
+/**
+ * Message print as admin notice.
+ */
+if ( ! function_exists( 'bp_fav_noti_admin_notice' ) ) {
+	function bp_fav_noti_admin_notice() {
+		$plugin            = esc_html__( 'BuddyPress Favorite Notification', 'bp-fav-notification' );
+		$buddypress_plugin = esc_html__( 'BuddyPress', 'bp-fav-notification' );
+
+		echo '<div class="error"><p>';
+		echo sprintf( esc_html__( '%1$s is ineffective now as it requires %2$s to be installed and active.', 'bp-fav-notification' ), '<strong>' . esc_html( $plugin ) . '</strong>', '<strong>' . esc_html( $buddypress_plugin ) . '</strong>' );
+		echo '</p></div>';
+		if ( isset( $_GET['activate'] ) ) {
+			unset( $_GET['activate'] );
+		}
+
+	}
+}
