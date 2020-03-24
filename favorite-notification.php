@@ -68,10 +68,11 @@ if ( ! function_exists( 'bp_fav_noti_plugin_files' ) ) {
 		 * @package   BuddyPress Add Notification
 		 */
 	function bp_fav_noti_plugin_files() {
-		if ( in_array( 'buddypress/bp-loader.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true ) ) {
+		if ( class_exists( 'BuddyPress' ) ) {
 			$include_files = array(
 				'include/bpfn-notification.php',
 				'include/class-bpfn-functions.php',
+				'include/class-bpfn-admin-feedback.php',
 			);
 			foreach ( $include_files as $include_file ) {
 				include $include_file;
