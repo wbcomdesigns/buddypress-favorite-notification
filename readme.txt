@@ -3,16 +3,14 @@ Contributors: vapvarun,wbcomdesigns
 Tags: buddypress, notification, buddypress like, buddypress notification, buddypress favorite notification
 Donate link: http://wbcomdesigns.com/donate
 Requires at least: 3.5
-Tested up to: 5.2
-Stable tag: 1.0.6
+Tested up to: 5.4.0
+Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 BuddyPress Favorite Notification  adds a notification for BuddyPress activity.
 
 == Description ==
-	* [Plugin Homepage](https://wbcomdesigns.com/downloads/buddypress-favourite-notification/)
-	* [FAQ](https://wbcomdesigns.com/helpdesk/article-categories/bp-favorite-notification/)
 BuddyPress Favorite Notification  adds a notification for BuddyPress activity.
 
 = How it works:- =
@@ -28,7 +26,6 @@ This section describes how to install the plugin and get it working.
 3. Activate the plugin through the \'Plugins\' menu.
 4. Alternatively you can use WordPress Plugin installer from Dashboard->Plugins->Add New to add this plugin
 5. Enjoy
-If you need additional help you can contact us for [Custom Development](https://wbcomdesigns.com/hire-us/) .
 
 == Frequently Asked Questions ==
 = Does This plugin requires BuddyPress =
@@ -41,6 +38,10 @@ Please visit [Wbcom Designs](http://wbcomdesigns.com/contact) for any query rela
 1. It is displaying live notification message in bar screenshot-1.png
 
 == Changelog ==
+
+= 1.1.0 =
+* Fix - (#2) Add admin notice for required plugin
+* Fix - (#1) Add a review admin notice
 
 = 1.0.6 =
 * Fix - Compatibility with BuddyPress 4.3.0 #4
@@ -64,11 +65,3 @@ Please visit [Wbcom Designs](http://wbcomdesigns.com/contact) for any query rela
 
 = 1.0.0 =
 * first version.
-
-
-
-
-
-
-
-
