@@ -17,11 +17,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
+if ( ! defined( 'WB_BP_FAV_NOTIFICATION_NAME' ) ) {
 	define( 'WB_BP_FAV_NOTIFICATION_NAME', 'Buddypress Favorite Notification' );
+}
+if ( ! defined( 'WB_BP_FAV_NOTIFICATION_VERSION' ) ) {
 	define( 'WB_BP_FAV_NOTIFICATION_VERSION', '1.1.0' );
+}
+if ( ! defined( 'WB_BP_FAV_NOTIFICATION_PLUGIN_PATH' ) ) {
 	define( 'WB_BP_FAV_NOTIFICATION_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
+}
+if ( ! defined( 'WB_BP_FAV_NOTIFICATION_PLUGIN_URL' ) ) {
 	define( 'WB_BP_FAV_NOTIFICATION_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+}
+if ( ! defined( 'WB_BP_FAV_NOTIFICATION_UPDATER_ID' ) ) {
 	define( 'WB_BP_FAV_NOTIFICATION_UPDATER_ID', 200 );
+}
 
 	// Activation Hook.
 	register_activation_hook( __FILE__, 'wb_bp_fav_notify_activate' );
