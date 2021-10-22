@@ -107,15 +107,18 @@ if ( ! function_exists( 'bp_fav_noti_check_requre_plugin' ) ) {
 }
 
 
-/**
- * Message print as admin notice.
- */
 if ( ! function_exists( 'bp_fav_noti_admin_notice' ) ) {
+	/**
+	 * Message print as admin notice.
+	 *
+	 * @return void
+	 */
 	function bp_fav_noti_admin_notice() {
 		$plugin            = esc_html__( 'BuddyPress Favorite Notification', 'bp-fav-notification' );
 		$buddypress_plugin = esc_html__( 'BuddyPress', 'bp-fav-notification' );
 
 		echo '<div class="error"><p>';
+		/* translators: %s: */
 		echo sprintf( esc_html__( '%1$s is ineffective now as it requires %2$s to be installed and active.', 'bp-fav-notification' ), '<strong>' . esc_html( $plugin ) . '</strong>', '<strong>' . esc_html( $buddypress_plugin ) . '</strong>' );
 		echo '</p></div>';
 		if ( isset( $_GET['activate'] ) ) {

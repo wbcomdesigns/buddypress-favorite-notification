@@ -24,7 +24,7 @@ function favorite_notifier_setup_globals() {
 	$bp->favorite_notifier                        = new stdClass();
 	$bp->favorite_notifier->id                    = 'favorite_notifier'; // I asume others are not going to use this is.
 	$bp->favorite_notifier->slug                  = 'favorite_notification';
-	$bp->favorite_notifier->notification_callback = 'favorite_notifier_format_notifications'; // show the notification
+	$bp->favorite_notifier->notification_callback = 'favorite_notifier_format_notifications'; // show the notification.
 	/* Register this in the active components array */
 	$bp->active_components[ $bp->favorite_notifier->id ] = $bp->favorite_notifier->id;
 	do_action( 'favorite_notifier_setup_globals' );
@@ -77,29 +77,43 @@ function favorite_notifier_format_notifications( $action, $item_id, $secondary_i
 	$ac_action = 'fav_notify_' . $item_id;
 	if ( $action === $ac_action ) {
 		if ( (int) $total_items > 1 ) {
+			/* translators: %s: */
 				$text   = sprintf( __( '%1$d members added your activity to favorite', 'bp-fav-notification' ), (int) $total_items );
 				$amount = 'multiple';
 			if ( 'string' === $format ) {
 				return apply_filters( 'bp_favorite_' . $amount . '_' . $ac_action . 's_notification', '<a href="' . $link . '" title="' . __( 'Activity added to favorite', 'bp-fav-notification' ) . '">' . $text . '</a>', $link, $total_items, $text, $item_id, $secondary_item_id );
 			} else {
 				return apply_filters(
-					'bp_favorite_' . $amount . '_' . $ac_action . '_notification', array(
+					'bp_favorite_' . $amount . '_' . $ac_action . '_notification',
+					array(
 						'link' => $link,
 						'text' => $text,
-					), $link, $total_items, $text, $item_id, $secondary_item_id
+					),
+					$link,
+					$total_items,
+					$text,
+					$item_id,
+					$secondary_item_id
 				);
 			}
 		} else {
 				$user_fullname = bp_core_get_user_displayname( $secondary_item_id );
-				$text          = sprintf( __( '%s added your activity to favorite', 'bp-fav-notification' ), $user_fullname );
+				/* translators: %s: */
+				$text = sprintf( __( '%s added your activity to favorite', 'bp-fav-notification' ), $user_fullname );
 			if ( 'string' === $format ) {
 				return apply_filters( 'bp_favorite_' . $amount . '_' . $ac_action . 's_notification', '<a href="' . $link . '" title="' . __( 'Activity Added To Favorite', 'bp-fav-notification' ) . '">' . $text . '</a>', $link, $total_items, $text, $item_id, $secondary_item_id );
 			} else {
 				return apply_filters(
-					'bp_favorite_' . $amount . '_' . $ac_action . '_notification', array(
+					'bp_favorite_' . $amount . '_' . $ac_action . '_notification',
+					array(
 						'link' => $link,
 						'text' => $text,
-					), $link, $total_items, $text, $item_id, $secondary_item_id
+					),
+					$link,
+					$total_items,
+					$text,
+					$item_id,
+					$secondary_item_id
 				);
 			}
 		}
