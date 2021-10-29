@@ -68,10 +68,7 @@ if ( ! class_exists( 'BPFN_Functions' ) ) {
 					$notification = bp_notifications_get_notifications_for_user( bp_loggedin_user_id(), 'object' );
 					if ( ! empty( $notification ) ) {
 						foreach ( $notification as $key => $value ) {
-							$href              = bp_activity_get_permalink( $value->item_id );
-							$pobj              = wp_parse_url( $href );
-							$current_component = bp_current_component();
-							$action            = bp_current_action();
+							$action = bp_current_action();
 							// Get the activity details.
 							if ( '' !== $action && $action === $value->item_id ) {
 								bp_notifications_mark_notifications_by_type( bp_loggedin_user_id(), $value->component_name, $value->component_action, false );
