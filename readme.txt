@@ -4,7 +4,7 @@ Tags: buddypress, notification, buddypress like, buddypress notification, buddyp
 Donate link: http://wbcomdesigns.com/donate
 Requires at least: 3.5
 Tested up to: 5.8.2
-Stable tag: trunk
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -38,6 +38,9 @@ Please visit [Wbcom Designs](http://wbcomdesigns.com/contact) for any query rela
 1. It is displaying live notification message in bar screenshot-1.png
 
 == Changelog ==
+= 1.2.1 =
+* Fix - Compatibility with BuddyPress 10.6.0
+
 = 1.2.0 =
 * Fix - Removed unused code
 * Fix - Fixed clear notification on activity visit issue
