@@ -35,7 +35,8 @@ Yes, It needs you to have BuddyPress installed and activated and the BuddyPress 
 Please visit [Wbcom Designs](http://wbcomdesigns.com/contact) for any query related to plugin and BuddyPress.
 
 == Screenshots ==
-1. It is displaying live notification message in bar screenshot-1.png
+1. It is displaying live notification message in header notification icon screenshot-1.png
+2. Displaying single profile notification menu screenshot-2.png
 
 == Changelog ==
 = 1.2.1 =
