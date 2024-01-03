@@ -3,8 +3,8 @@ Contributors: vapvarun,wbcomdesigns
 Tags: buddypress, notification, buddypress like, buddypress notification, buddypress favorite notification
 Donate link: http://wbcomdesigns.com/donate
 Requires at least: 3.5
-Tested up to: 5.8.2
-Stable tag: 1.2.1
+Tested up to: 6.4.2
+Stable tag: 1.2.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -14,9 +14,7 @@ BuddyPress Favorite Notification  adds a notification for BuddyPress activity.
 BuddyPress Favorite Notification  adds a notification for BuddyPress activity.
 
 = How it works:- =
-It shows live notifications of members on a BuddyPress based social network site. User will get notified after any like or favorite BuddyPress activity by users.
-
-
+Live notifications of BuddyPress activities notify the user of likes and favorites.
 
 == Installation ==
 This section describes how to install the plugin and get it working.
@@ -24,21 +22,24 @@ This section describes how to install the plugin and get it working.
 1. Download the zip file and extract
 2. Upload `bp-favourite-notification` directory to the `/wp-content/plugins/` directory
 3. Activate the plugin through the \'Plugins\' menu.
-4. Alternatively you can use WordPress Plugin installer from Dashboard->Plugins->Add New to add this plugin
+4. Alternatively, you can use the WordPress Plugins installer from Dashboard->Plugins->Add New to add this plugin
 5. Enjoy
 
 == Frequently Asked Questions ==
-= Does This plugin requires BuddyPress =
-Yes, It needs you to have BuddyPress installed and activated and the BuddyPress notifications component must be enabled
+= Does This plugin require BuddyPress =
+Yes, needs you to have BuddyPress installed and activated, and the BuddyPress notifications component must be enabled
 
-= Where Do I Ask for support? =
-Please visit [Wbcom Designs](http://wbcomdesigns.com/contact) for any query related to plugin and BuddyPress.
+= Where Do I Ask for Support? =
+Please visit [Wbcom Designs](http://wbcomdesigns.com/contact) for any query related to plugins and BuddyPress.
 
 == Screenshots ==
-1. It is displaying live notification message in header notification icon screenshot-1.png
+1. It is displaying a live notification message in the header notification icon screenshot-1.png
 2. Displaying single profile notification menu screenshot-2.png
 
 == Changelog ==
+= 1.2.2 =
+* Fix - Compatibility with BuddyPress 12.0.0
+
 = 1.2.1 =
 * Fix - Compatibility with BuddyPress 10.6.0
 
