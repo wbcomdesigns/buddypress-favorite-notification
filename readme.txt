@@ -3,8 +3,8 @@ Contributors: vapvarun,wbcomdesigns
 Tags: buddypress, notification, buddypress like, buddypress notification, buddypress favorite notification
 Donate link: http://wbcomdesigns.com/donate
 Requires at least: 3.5
-Tested up to: 6.4.2
-Stable tag: 1.2.2
+Tested up to: 6.7.2
+Stable tag: 1.2.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -37,6 +37,11 @@ Please visit [Wbcom Designs](http://wbcomdesigns.com/contact) for any query rela
 2. Displaying single profile notification menu screenshot-2.png
 
 == Changelog ==
+= 1.2.3 =
+* Fix: Resolved a PHP warning encountered while accessing the activity timeline with BuddyBoss.
+* Fix: Addressed a fatal error occurring when the BuddyPress notifications component is disabled.
+* Update: Removed an unused function that was unnecessarily hooked to filter the content.
+
 = 1.2.2 =
 * Fix - Compatibility with BuddyPress 12.0.0
 
