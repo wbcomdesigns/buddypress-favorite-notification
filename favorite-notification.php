@@ -33,9 +33,6 @@ if ( ! defined( 'WB_BP_FAV_NOTIFICATION_UPDATER_ID' ) ) {
 	define( 'WB_BP_FAV_NOTIFICATION_UPDATER_ID', 200 );
 }
 
-	require_once __DIR__ . '/vendor/autoload.php';
-	HardG\BuddyPress120URLPolyfills\Loader::init();
-
 	// Activation Hook.
 	register_activation_hook( __FILE__, 'wb_bp_fav_notify_activate' );
 	// Deactivation Hook.
