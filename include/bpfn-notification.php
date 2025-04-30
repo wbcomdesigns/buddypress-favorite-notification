@@ -78,10 +78,10 @@ function favorite_notifier_format_notifications( $action, $item_id, $secondary_i
 	if ( $action === $ac_action ) {
 		if ( (int) $total_items > 1 ) {
 			/* translators: %s: */
-				$text   = sprintf( __( '%1$d members added your activity to favorite', 'bp-fav-notification' ), (int) $total_items );
+				$text   = sprintf( __( '%1$d members favorited your activity', 'bp-fav-notification' ), (int) $total_items );
 				$amount = 'multiple';
 			if ( 'string' === $format ) {
-				return apply_filters( 'bp_favorite_' . $amount . '_' . $ac_action . 's_notification', '<a href="' . $link . '" title="' . __( 'Activity added to favorite', 'bp-fav-notification' ) . '">' . $text . '</a>', $link, $total_items, $text, $item_id, $secondary_item_id );
+				return apply_filters( 'bp_favorite_' . $amount . '_' . $ac_action . 's_notification', '<a href="' . $link . '" title="' . __( 'Activity favorited', 'bp-fav-notification' ) . '">' . $text . '</a>', $link, $total_items, $text, $item_id, $secondary_item_id );
 			} else {
 				return apply_filters(
 					'bp_favorite_' . $amount . '_' . $ac_action . '_notification',
@@ -99,9 +99,9 @@ function favorite_notifier_format_notifications( $action, $item_id, $secondary_i
 		} else {
 				$user_fullname = bp_core_get_user_displayname( $secondary_item_id );
 				/* translators: %s: */
-				$text = sprintf( __( '%s added your activity to favorite', 'bp-fav-notification' ), $user_fullname );
+				$text = sprintf( __( '%s favorited your activity', 'bp-fav-notification' ), $user_fullname );
 			if ( 'string' === $format ) {
-				return apply_filters( 'bp_favorite_' . $amount . '_' . $ac_action . 's_notification', '<a href="' . $link . '" title="' . __( 'Activity Added To Favorite', 'bp-fav-notification' ) . '">' . $text . '</a>', $link, $total_items, $text, $item_id, $secondary_item_id );
+				return apply_filters( 'bp_favorite_' . $amount . '_' . $ac_action . 's_notification', '<a href="' . $link . '" title="' . __( 'Activity favorited', 'bp-fav-notification' ) . '">' . $text . '</a>', $link, $total_items, $text, $item_id, $secondary_item_id );
 			} else {
 				return apply_filters(
 					'bp_favorite_' . $amount . '_' . $ac_action . '_notification',

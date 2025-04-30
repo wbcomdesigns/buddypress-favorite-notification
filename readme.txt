@@ -8,26 +8,26 @@ Stable tag: 1.2.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-BuddyPress Favorite Notification  adds a notification for BuddyPress activity.
+BuddyPress Favorite Notification adds notifications when users favorite BuddyPress activities.
 
 == Description ==
-BuddyPress Favorite Notification  adds a notification for BuddyPress activity.
+BuddyPress Favorite Notification adds notifications when users favorite BuddyPress activities.
 
 = How it works:- =
-Live notifications of BuddyPress activities notify the user of likes and favorites.
+This plugin provides live notifications to users when their activities receive likes or are added to favorites.
 
 == Installation ==
 This section describes how to install the plugin and get it working.
 
 1. Download the zip file and extract
-2. Upload `bp-favourite-notification` directory to the `/wp-content/plugins/` directory
+2. Upload `bp-favorite-notification` directory to the `/wp-content/plugins/` directory
 3. Activate the plugin through the \'Plugins\' menu.
 4. Alternatively, you can use the WordPress Plugins installer from Dashboard->Plugins->Add New to add this plugin
 5. Enjoy
 
 == Frequently Asked Questions ==
-= Does This plugin require BuddyPress =
-Yes, needs you to have BuddyPress installed and activated, and the BuddyPress notifications component must be enabled
+= Does this plugin require BuddyPress? =
+Yes, this plugin requires BuddyPress to be installed and activated, and the BuddyPress notifications component must be enabled.
 
 = Where Do I Ask for Support? =
 Please visit [Wbcom Designs](http://wbcomdesigns.com/contact) for any query related to plugins and BuddyPress.

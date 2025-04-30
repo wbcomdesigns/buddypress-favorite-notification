@@ -274,12 +274,12 @@ if ( ! class_exists( 'Bpfn_Admin_Feedback' ) ) :
 						<h3><?php echo esc_html__( 'Are you enjoying BuddyPress Favorite Notification?', 'bp-fav-notification' ); ?></h3>
 						<p>
 							<?php /* translators: 1. Name */ ?>
-							<?php printf( esc_html__( 'We hope you\'re enjoying %1$s! Could you please do us a BIG favor and give it a 5-star rating on WordPress to help us spread the word and boost our motivation?', 'bp-fav-notification' ), esc_html( $this->name ) ); ?>
+							<?php printf( esc_html__( 'We hope you\'re enjoying %1$s! Would you consider giving us a 5-star rating on WordPress? It helps us spread the word and motivates our team to continue improving.', 'bp-fav-notification' ), esc_html( $this->name ) ); ?>
 						</p>
 					</div>
 					<div class="bp-fav-notification-install-now">
 						<?php printf( '<a href="%1$s" class="button button-primary bp-fav-notification-install-button" target="_blank">%2$s</a>', esc_url( 'https://wordpress.org/support/plugin/bp-favorite-notification/reviews/#new-post' ), esc_html__( 'Leave a Review', 'bp-fav-notification' ) ); ?>
-						<a href="<?php echo esc_url( $no_bug_url ); ?>" class="no-thanks"><?php echo esc_html__( 'No thanks / I already have', 'bp-fav-notification' ); ?></a>
+						<a href="<?php echo esc_url( $no_bug_url ); ?>" class="no-thanks"><?php echo esc_html__( 'No thanks / I already did', 'bp-fav-notification' ); ?></a>
 					</div>
 				</div>
 			</div>

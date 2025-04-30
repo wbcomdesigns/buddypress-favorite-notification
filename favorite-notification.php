@@ -119,7 +119,7 @@ if ( ! function_exists( 'bp_fav_noti_admin_notice' ) ) {
 
 		echo '<div class="error"><p>';
 		/* translators: %s: */
-		echo sprintf( esc_html__( '%1$s is ineffective now as it requires %2$s to be installed and active.', 'bp-fav-notification' ), '<strong>' . esc_html( $plugin ) . '</strong>', '<strong>' . esc_html( $buddypress_plugin ) . '</strong>' );
+		echo sprintf( esc_html__( '%1$s is currently inactive because it requires %2$s to be installed and activated.', 'bp-fav-notification' ), '<strong>' . esc_html( $plugin ) . '</strong>', '<strong>' . esc_html( $buddypress_plugin ) . '</strong>' );
 		echo '</p></div>';
 
 	}
