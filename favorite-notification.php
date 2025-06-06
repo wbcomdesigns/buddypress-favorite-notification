@@ -53,6 +53,33 @@ function wb_bp_fav_notify_activate() {
 		update_option( 'wb-bp-fav-notification-version', WB_BP_FAV_NOTIFICATION_VERSION );
 		update_option( 'wb-bp-fav-notification-updater-id', WB_BP_FAV_NOTIFICATION_UPDATER_ID );
 	}
+	bpfn_create_notification_preferences_table();
+}
+
+	/**
+	 * Create user notification preferences table on plugin activation
+	 */
+function bpfn_create_notification_preferences_table() {
+	global $wpdb;
+	$table_name = $wpdb->prefix . 'bp_favorite_notification_prefs';
+	
+	if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) {
+		$charset_collate = $wpdb->get_charset_collate();
+		
+		$sql = "CREATE TABLE $table_name (
+			id bigint(20) NOT NULL AUTO_INCREMENT,
+			user_id bigint(20) NOT NULL,
+			notification_type varchar(50) NOT NULL,
+			is_enabled tinyint(1) DEFAULT 1,
+			email_enabled tinyint(1) DEFAULT 1,
+			realtime_enabled tinyint(1) DEFAULT 1,
+			PRIMARY KEY (id),
+			UNIQUE KEY user_notification_type (user_id, notification_type)
+		) $charset_collate;";
+		
+		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+		dbDelta($sql);
+	}
 }
 
 	/**
