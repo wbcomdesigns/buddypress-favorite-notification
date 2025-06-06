@@ -268,7 +268,7 @@ if ( ! class_exists( 'Bpfn_Admin_Feedback' ) ) :
 			<div class="notice updated bp-fav-notification-notice">
 				<div class="bp-fav-notification-notice-inner">
 					<div class="bp-fav-notification-notice-icon">
-						<img src="<?php echo esc_url( WB_BP_FAV_NOTIFICATION_PLUGIN_URL ) . '/assest/images/bp_fav_notification.png'; ?>" alt="<?php echo esc_attr__( 'BuddyPress Favorite Notification', 'bp-fav-notification' ); ?>" />
+						<img src="<?php echo esc_url( WB_BP_FAV_NOTIFICATION_PLUGIN_URL ) . '/assets/images/bp_fav_notification.png'; ?>" alt="<?php echo esc_attr__( 'BuddyPress Favorite Notification', 'bp-fav-notification' ); ?>" />
 					</div>
 					<div class="bp-fav-notification-notice-content">
 						<h3><?php echo esc_html__( 'Are you enjoying BuddyPress Favorite Notification?', 'bp-fav-notification' ); ?></h3>
