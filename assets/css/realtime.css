@@ -1,0 +1,338 @@
+/**
+ * BuddyPress Favorite Notification - Realtime Styles
+ * Version: 1.2.3
+ */
+
+/* ========================================
+   Realtime Notification Container
+   ======================================== */
+#bpfn-realtime-container {
+    position: fixed;
+    z-index: var(--bpfn-z-index-notification, 9999);
+    pointer-events: none;
+}
+
+/* Position variants */
+#bpfn-realtime-container.bpfn-position-top-right {
+    top: 20px;
+    right: 20px;
+}
+
+#bpfn-realtime-container.bpfn-position-top-left {
+    top: 20px;
+    left: 20px;
+}
+
+#bpfn-realtime-container.bpfn-position-bottom-right {
+    bottom: 20px;
+    right: 20px;
+}
+
+#bpfn-realtime-container.bpfn-position-bottom-left {
+    bottom: 20px;
+    left: 20px;
+}
+
+/* ========================================
+   Realtime Notification Item
+   ======================================== */
+.bpfn-realtime-notification {
+    width: 320px;
+    margin-bottom: 15px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateX(120%);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    pointer-events: all;
+    overflow: hidden;
+}
+
+/* Show state */
+.bpfn-realtime-notification.show {
+    transform: translateX(0);
+}
+
+/* Position adjustments */
+.bpfn-position-top-left .bpfn-realtime-notification,
+.bpfn-position-bottom-left .bpfn-realtime-notification {
+    transform: translateX(-120%);
+}
+
+.bpfn-position-top-left .bpfn-realtime-notification.show,
+.bpfn-position-bottom-left .bpfn-realtime-notification.show {
+    transform: translateX(0);
+}
+
+/* ========================================
+   Notification Header
+   ======================================== */
+.bpfn-realtime-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 15px;
+    background-color: var(--bpfn-primary-color, #ff7b00);
+    color: #ffffff;
+}
+
+.bpfn-realtime-title {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.bpfn-realtime-title i {
+    margin-right: 8px;
+    font-size: 16px;
+}
+
+.bpfn-realtime-close {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+    padding: 0;
+}
+
+.bpfn-realtime-close:hover {
+    opacity: 1;
+}
+
+/* ========================================
+   Notification Body
+   ======================================== */
+.bpfn-realtime-body {
+    padding: 15px;
+}
+
+.bpfn-realtime-content {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.bpfn-realtime-avatar {
+    flex-shrink: 0;
+    margin-right: 12px;
+}
+
+.bpfn-realtime-avatar img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: block;
+}
+
+.bpfn-realtime-message {
+    flex: 1;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333333;
+}
+
+.bpfn-realtime-message strong {
+    font-weight: 600;
+    color: var(--bpfn-primary-color, #ff7b00);
+}
+
+.bpfn-realtime-time {
+    font-size: 12px;
+    color: #999999;
+    margin-top: 5px;
+}
+
+/* ========================================
+   Notification Actions
+   ======================================== */
+.bpfn-realtime-actions {
+    display: flex;
+    gap: 10px;
+    padding: 12px 15px;
+    background-color: #f8f8f8;
+    border-top: 1px solid #eeeeee;
+}
+
+.bpfn-realtime-action {
+    flex: 1;
+    padding: 8px 12px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.bpfn-realtime-action.primary {
+    background-color: var(--bpfn-secondary-color, #1d84b5);
+    color: #ffffff;
+}
+
+.bpfn-realtime-action.primary:hover {
+    background-color: var(--bpfn-secondary-hover, #166b94);
+}
+
+.bpfn-realtime-action.secondary {
+    background-color: #ffffff;
+    color: #666666;
+    border: 1px solid #dddddd;
+}
+
+.bpfn-realtime-action.secondary:hover {
+    background-color: #f5f5f5;
+}
+
+/* ========================================
+   Notification Types
+   ======================================== */
+.bpfn-realtime-notification.type-favorite .bpfn-realtime-header {
+    background-color: var(--bpfn-primary-color, #ff7b00);
+}
+
+.bpfn-realtime-notification.type-comment .bpfn-realtime-header {
+    background-color: var(--bpfn-secondary-color, #1d84b5);
+}
+
+.bpfn-realtime-notification.type-mention .bpfn-realtime-header {
+    background-color: #8b5cf6;
+}
+
+/* ========================================
+   Loading State
+   ======================================== */
+.bpfn-realtime-notification.loading .bpfn-realtime-body {
+    opacity: 0.6;
+}
+
+.bpfn-realtime-notification.loading:after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid var(--bpfn-primary-color);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: bpfn-spin 0.8s linear infinite;
+}
+
+/* ========================================
+   Sound Indicator
+   ======================================== */
+.bpfn-sound-indicator {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #ffffff;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s;
+    pointer-events: none;
+}
+
+.bpfn-sound-indicator.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ========================================
+   Stacking Animations
+   ======================================== */
+.bpfn-realtime-notification:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.bpfn-realtime-notification:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.bpfn-realtime-notification:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+@media screen and (max-width: 480px) {
+    #bpfn-realtime-container {
+        left: 10px !important;
+        right: 10px !important;
+    }
+    
+    .bpfn-realtime-notification {
+        width: auto;
+    }
+    
+    .bpfn-realtime-notification {
+        transform: translateY(-120%);
+    }
+    
+    .bpfn-realtime-notification.show {
+        transform: translateY(0);
+    }
+}
+
+/* ========================================
+   Dark Mode Support
+   ======================================== */
+@media (prefers-color-scheme: dark) {
+    .bpfn-realtime-notification {
+        background-color: #2a2a2a;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+    
+    .bpfn-realtime-message {
+        color: #f0f0f0;
+    }
+    
+    .bpfn-realtime-actions {
+        background-color: #1a1a1a;
+        border-top-color: #444444;
+    }
+    
+    .bpfn-realtime-action.secondary {
+        background-color: #333333;
+        color: #cccccc;
+        border-color: #555555;
+    }
+    
+    .bpfn-realtime-action.secondary:hover {
+        background-color: #444444;
+    }
+}
+
+/* ========================================
+   Accessibility
+   ======================================== */
+.bpfn-realtime-notification:focus-within {
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+}
+
+.bpfn-realtime-close:focus {
+    outline: 2px solid #ffffff;
+    outline-offset: 2px;
+}
+
+/* ========================================
+   Print Styles
+   ======================================== */
+@media print {
+    #bpfn-realtime-container {
+        display: none !important;
+    }
+}

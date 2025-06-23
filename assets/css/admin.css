@@ -1,0 +1,428 @@
+/**
+ * BuddyPress Favorite Notification - Admin Styles
+ * Version: 1.2.3
+ */
+
+/* ========================================
+   Admin Container Layout
+   ======================================== */
+.bpfn-admin-container {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.bpfn-admin-main {
+    flex: 1;
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #ccd0d4;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.bpfn-admin-sidebar {
+    width: 300px;
+}
+
+@media (max-width: 782px) {
+    .bpfn-admin-container {
+        flex-direction: column;
+    }
+    
+    .bpfn-admin-sidebar {
+        width: 100%;
+    }
+}
+
+/* ========================================
+   Admin Widgets
+   ======================================== */
+.bpfn-admin-widget {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+    margin-bottom: 20px;
+}
+
+.bpfn-admin-widget h3 {
+    margin: 0;
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+    font-weight: 600;
+    color: #23282d;
+}
+
+.bpfn-admin-widget ul {
+    margin: 0;
+    padding: 15px;
+}
+
+.bpfn-admin-widget li {
+    margin-bottom: 8px;
+    padding-left: 20px;
+    position: relative;
+}
+
+.bpfn-admin-widget li:before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: #ff7b00;
+}
+
+/* ========================================
+   Stats Widget
+   ======================================== */
+.bpfn-stats {
+    display: flex;
+    padding: 15px;
+    margin: 0;
+    list-style: none;
+}
+
+.bpfn-stats li {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    margin: 0;
+}
+
+.bpfn-stats li:before {
+    display: none;
+}
+
+.bpfn-stats li:not(:last-child) {
+    border-right: 1px solid #eee;
+}
+
+.bpfn-stat-value {
+    display: block;
+    font-size: 32px;
+    font-weight: 600;
+    color: #ff7b00;
+    line-height: 1;
+    margin-bottom: 5px;
+}
+
+.bpfn-stat-label {
+    display: block;
+    font-size: 12px;
+    color: #666;
+    text-transform: uppercase;
+}
+
+/* ========================================
+   Settings Sections
+   ======================================== */
+.form-table th {
+    width: 200px;
+}
+
+.bpfn-settings-section {
+    margin-bottom: 30px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid #eee;
+}
+
+.bpfn-settings-section:last-child {
+    border-bottom: none;
+}
+
+/* ========================================
+   Tools Page
+   ======================================== */
+.bpfn-tools-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.bpfn-tool-box {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    padding: 20px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.bpfn-tool-box h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #23282d;
+}
+
+.bpfn-tool-box p {
+    margin-bottom: 20px;
+    color: #666;
+}
+
+.bpfn-tool-box .button {
+    margin-right: 10px;
+}
+
+#bpfn-test-result {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 3px;
+    display: none;
+}
+
+#bpfn-test-result.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    display: block;
+}
+
+#bpfn-test-result.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    display: block;
+}
+
+/* ========================================
+   Help Page
+   ======================================== */
+.bpfn-help-container {
+    background: #fff;
+    padding: 30px;
+    margin-top: 20px;
+    border: 1px solid #ccd0d4;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.bpfn-help-section {
+    margin-bottom: 40px;
+}
+
+.bpfn-help-section h2 {
+    color: #23282d;
+    border-bottom: 2px solid #ff7b00;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.bpfn-faq {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #f9f9f9;
+    border-left: 4px solid #ff7b00;
+}
+
+.bpfn-faq h3 {
+    margin-top: 0;
+    color: #23282d;
+}
+
+.bpfn-faq code {
+    background: #fff;
+    padding: 2px 5px;
+    border: 1px solid #ddd;
+}
+
+.bpfn-faq pre {
+    background: #23282d;
+    color: #fff;
+    padding: 15px;
+    overflow-x: auto;
+    margin: 15px 0;
+}
+
+.bpfn-faq pre code {
+    background: none;
+    border: none;
+    color: #fff;
+    padding: 0;
+}
+
+/* ========================================
+   Admin Notices
+   ======================================== */
+.notice.bpfn-notice {
+    border-left-color: #ff7b00;
+}
+
+.notice.bpfn-notice .bpfn-notice-content {
+    display: flex;
+    align-items: center;
+}
+
+.notice.bpfn-notice .bpfn-notice-icon {
+    margin-right: 15px;
+    font-size: 40px;
+    color: #ff7b00;
+}
+
+/* ========================================
+   Form Elements
+   ======================================== */
+.bpfn-checkbox-list {
+    margin: 0;
+}
+
+.bpfn-checkbox-list li {
+    margin-bottom: 10px;
+}
+
+.bpfn-checkbox-list label {
+    display: inline-block;
+    margin-left: 5px;
+}
+
+/* Number input */
+input[type="number"].bpfn-number {
+    width: 80px;
+}
+
+/* Select */
+select.bpfn-select {
+    min-width: 200px;
+}
+
+/* ========================================
+   Tabs
+   ======================================== */
+.bpfn-tabs {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ccd0d4;
+}
+
+.bpfn-tab {
+    display: inline-block;
+    padding: 10px 20px;
+    margin-bottom: -1px;
+    background: #f3f4f5;
+    border: 1px solid #ccd0d4;
+    border-bottom: none;
+    color: #555;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.bpfn-tab:hover {
+    background: #fff;
+    color: #333;
+}
+
+.bpfn-tab.active {
+    background: #fff;
+    color: #333;
+    font-weight: 600;
+}
+
+.bpfn-tab-content {
+    display: none;
+    padding: 20px 0;
+}
+
+.bpfn-tab-content.active {
+    display: block;
+}
+
+/* ========================================
+   Loading States
+   ======================================== */
+.bpfn-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #ff7b00;
+    border-radius: 50%;
+    animation: bpfn-spin 1s linear infinite;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+@keyframes bpfn-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.bpfn-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+/* ========================================
+   Responsive Tables
+   ======================================== */
+@media (max-width: 782px) {
+    .bpfn-admin-table {
+        border: 0;
+    }
+    
+    .bpfn-admin-table thead {
+        display: none;
+    }
+    
+    .bpfn-admin-table tr {
+        display: block;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+    }
+    
+    .bpfn-admin-table td {
+        display: block;
+        text-align: right;
+        padding-left: 50%;
+        position: relative;
+    }
+    
+    .bpfn-admin-table td:before {
+        content: attr(data-label);
+        position: absolute;
+        left: 6px;
+        width: 45%;
+        text-align: left;
+        font-weight: 600;
+    }
+}
+
+/* ========================================
+   Color Scheme Support
+   ======================================== */
+.admin-color-fresh .bpfn-admin-widget h3,
+.admin-color-fresh .bpfn-tab.active {
+    border-bottom-color: #0073aa;
+}
+
+.admin-color-light .bpfn-admin-widget h3,
+.admin-color-light .bpfn-tab.active {
+    border-bottom-color: #04a4cc;
+}
+
+.admin-color-modern .bpfn-admin-widget h3,
+.admin-color-modern .bpfn-tab.active {
+    border-bottom-color: #3858e9;
+}
+
+/* ========================================
+   Buttons
+   ======================================== */
+.bpfn-button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.button.bpfn-button-danger {
+    color: #a00;
+    border-color: #a00;
+}
+
+.button.bpfn-button-danger:hover {
+    color: #fff;
+    background: #a00;
+    border-color: #a00;
+}

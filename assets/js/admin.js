@@ -1,0 +1,685 @@
+/**
+ * BuddyPress Favorite Notification - Admin Scripts
+ * Version: 1.2.3
+ */
+
+(function($, window, document) {
+    'use strict';
+
+    // Check if bpfnAdmin is defined
+    if (typeof bpfnAdmin === 'undefined') {
+        return;
+    }
+
+    /**
+     * Admin handler
+     */
+    var BPFNAdmin = {
+        
+        /**
+         * Initialize
+         */
+        init: function() {
+            this.bindEvents();
+            this.initTabs();
+            this.initTooltips();
+            this.initColorPicker();
+        },
+
+        /**
+         * Bind events
+         */
+        bindEvents: function() {
+            var self = this;
+            
+            // Test notification button
+            $('#bpfn-send-test-notification').on('click', function(e) {
+                e.preventDefault();
+                self.sendTestNotification($(this));
+            });
+            
+            // Clear old notifications
+            $('#bpfn-clear-old-notifications').on('click', function(e) {
+                e.preventDefault();
+                self.clearOldNotifications($(this));
+            });
+            
+            // Export settings
+            $('#bpfn-export-settings').on('click', function(e) {
+                e.preventDefault();
+                self.exportSettings($(this));
+            });
+            
+            // Import settings
+            $('#bpfn-import-settings-file').on('change', function(e) {
+                self.importSettings($(this));
+            });
+            
+            // Dismiss notices
+            $(document).on('click', '.bpfn-dismiss-notice', function(e) {
+                e.preventDefault();
+                self.dismissNotice($(this));
+            });
+            
+            // Settings form validation
+            $('#bpfn-settings-form').on('submit', function(e) {
+                return self.validateSettings($(this));
+            });
+            
+            // Toggle all checkboxes
+            $('.bpfn-toggle-all').on('change', function() {
+                var $checkboxes = $(this).closest('table').find('tbody input[type="checkbox"]');
+                $checkboxes.prop('checked', $(this).prop('checked'));
+            });
+            
+            // Live preview
+            $('input[name="bpfn_options[primary_color]"]').on('change', function() {
+                self.updateLivePreview();
+            });
+        },
+
+        /**
+         * Send test notification
+         */
+        sendTestNotification: function($button) {
+            var self = this;
+            var $result = $('#bpfn-test-result');
+            var originalText = $button.text();
+            
+            // Disable button and show loading
+            $button.prop('disabled', true);
+            $button.text(bpfnAdmin.strings.testing);
+            
+            // Clear previous results
+            $result.removeClass('success error').hide();
+            
+            $.ajax({
+                url: bpfnAdmin.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'bpfn_send_test_notification',
+                    nonce: bpfnAdmin.nonce
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $result.addClass('success').html('<strong>' + bpfnAdmin.strings.test_success + '</strong>').show();
+                        
+                        // Show notification types sent
+                        if (response.data && response.data.details) {
+                            var details = '<ul style="margin-top: 10px; margin-bottom: 0;">';
+                            if (response.data.details.web) {
+                                details += '<li>✓ Web notification created</li>';
+                            }
+                            if (response.data.details.email) {
+                                details += '<li>✓ Email sent to ' + response.data.details.email + '</li>';
+                            }
+                            if (response.data.details.realtime) {
+                                details += '<li>✓ Real-time notification queued</li>';
+                            }
+                            details += '</ul>';
+                            $result.append(details);
+                        }
+                    } else {
+                        $result.addClass('error').text(response.data.message || bpfnAdmin.strings.test_error).show();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $result.addClass('error').text(bpfnAdmin.strings.test_error + ' (' + error + ')').show();
+                },
+                complete: function() {
+                    // Re-enable button
+                    $button.prop('disabled', false);
+                    $button.text(originalText);
+                }
+            });
+        },
+
+        /**
+         * Clear old notifications
+         */
+        clearOldNotifications: function($button) {
+            var self = this;
+            var originalText = $button.text();
+            
+            if (!confirm('Are you sure you want to clear all read notifications older than 30 days? This cannot be undone.')) {
+                return;
+            }
+            
+            $button.prop('disabled', true);
+            $button.html('<span class="bpfn-spinner"></span> Clearing...');
+            
+            $.ajax({
+                url: bpfnAdmin.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'bpfn_clear_old_notifications',
+                    nonce: bpfnAdmin.nonce
+                },
+                success: function(response) {
+                    if (response.success) {
+                        var message = 'Successfully cleared ' + response.data.count + ' old notifications.';
+                        if (response.data.remaining !== undefined) {
+                            message += ' (' + response.data.remaining + ' notifications remaining)';
+                        }
+                        self.showNotice(message, 'success');
+                        
+                        // Refresh stats if available
+                        if (self.refreshStats) {
+                            self.refreshStats();
+                        }
+                    } else {
+                        self.showNotice(response.data.message || 'Failed to clear notifications.', 'error');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    self.showNotice('An error occurred: ' + error, 'error');
+                },
+                complete: function() {
+                    $button.prop('disabled', false);
+                    $button.text(originalText);
+                }
+            });
+        },
+
+        /**
+         * Export settings
+         */
+        exportSettings: function($button) {
+            var self = this;
+            var originalText = $button.text();
+            
+            $button.prop('disabled', true).text('Preparing export...');
+            
+            $.ajax({
+                url: bpfnAdmin.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'bpfn_export_settings',
+                    nonce: bpfnAdmin.nonce
+                },
+                success: function(response) {
+                    if (response.success && response.data) {
+                        // Create download link
+                        var blob = new Blob([JSON.stringify(response.data, null, 2)], {type: 'application/json'});
+                        var url = window.URL.createObjectURL(blob);
+                        var filename = 'bpfn-settings-' + self.getDateString() + '.json';
+                        var a = document.createElement('a');
+                        a.style.display = 'none';
+                        a.href = url;
+                        a.download = filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        window.URL.revokeObjectURL(url);
+                        
+                        self.showNotice('Settings exported successfully!', 'success');
+                    } else {
+                        self.showNotice('Failed to export settings.', 'error');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    self.showNotice('Export failed: ' + error, 'error');
+                },
+                complete: function() {
+                    $button.prop('disabled', false).text(originalText);
+                }
+            });
+        },
+
+        /**
+         * Import settings
+         */
+        importSettings: function($input) {
+            var self = this;
+            var file = $input[0].files[0];
+            
+            if (!file) {
+                return;
+            }
+            
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    var settings = JSON.parse(e.target.result);
+                    
+                    $.ajax({
+                        url: bpfnAdmin.ajax_url,
+                        type: 'POST',
+                        data: {
+                            action: 'bpfn_import_settings',
+                            nonce: bpfnAdmin.nonce,
+                            settings: settings
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                self.showNotice('Settings imported successfully. Page will reload...', 'success');
+                                setTimeout(function() {
+                                    window.location.reload();
+                                }, 2000);
+                            } else {
+                                self.showNotice(response.data.message || 'Failed to import settings.', 'error');
+                            }
+                        },
+                        error: function() {
+                            self.showNotice('An error occurred while importing settings.', 'error');
+                        }
+                    });
+                } catch (error) {
+                    self.showNotice('Invalid settings file format.', 'error');
+                }
+            };
+            reader.readAsText(file);
+            
+            // Reset input
+            $input.val('');
+        },
+
+        /**
+         * Dismiss notice
+         */
+        dismissNotice: function($button) {
+            var $notice = $button.closest('.notice');
+            var noticeId = $notice.data('notice-id');
+            
+            $notice.fadeOut();
+            
+            if (noticeId) {
+                $.ajax({
+                    url: bpfnAdmin.ajax_url,
+                    type: 'POST',
+                    data: {
+                        action: 'bpfn_dismiss_notice',
+                        nonce: bpfnAdmin.nonce,
+                        notice_id: noticeId
+                    }
+                });
+            }
+        },
+
+        /**
+         * Validate settings form
+         */
+        validateSettings: function($form) {
+            var valid = true;
+            var errors = [];
+            
+            // Validate number inputs
+            $form.find('input[type="number"]').each(function() {
+                var $input = $(this);
+                var val = parseInt($input.val());
+                var min = parseInt($input.attr('min'));
+                var max = parseInt($input.attr('max'));
+                
+                if (isNaN(val) || val < min || val > max) {
+                    valid = false;
+                    errors.push($input.attr('name') + ' must be between ' + min + ' and ' + max);
+                    $input.addClass('error');
+                } else {
+                    $input.removeClass('error');
+                }
+            });
+            
+            // Validate required fields
+            $form.find('[required]').each(function() {
+                var $input = $(this);
+                if (!$input.val()) {
+                    valid = false;
+                    errors.push($input.attr('name') + ' is required');
+                    $input.addClass('error');
+                } else {
+                    $input.removeClass('error');
+                }
+            });
+            
+            if (!valid) {
+                this.showNotice('Please fix the following errors:<br>' + errors.join('<br>'), 'error');
+                return false;
+            }
+            
+            return true;
+        },
+
+        /**
+         * Initialize tabs
+         */
+        initTabs: function() {
+            $('.bpfn-tab').on('click', function(e) {
+                e.preventDefault();
+                
+                var $tab = $(this);
+                var target = $tab.data('tab');
+                
+                // Update active states
+                $('.bpfn-tab').removeClass('active');
+                $tab.addClass('active');
+                
+                // Show/hide content
+                $('.bpfn-tab-content').removeClass('active');
+                $('#' + target).addClass('active');
+                
+                // Update URL
+                if (history.pushState) {
+                    var url = new URL(window.location);
+                    url.searchParams.set('tab', target);
+                    history.pushState({tab: target}, '', url);
+                }
+            });
+            
+            // Handle browser back/forward
+            window.addEventListener('popstate', function(e) {
+                if (e.state && e.state.tab) {
+                    $('.bpfn-tab[data-tab="' + e.state.tab + '"]').trigger('click');
+                }
+            });
+        },
+
+        /**
+         * Initialize tooltips
+         */
+        initTooltips: function() {
+            $('.bpfn-tooltip').each(function() {
+                var $el = $(this);
+                var content = $el.data('tooltip');
+                
+                $el.on('mouseenter', function() {
+                    var $tooltip = $('<div class="bpfn-tooltip-content">' + content + '</div>');
+                    $('body').append($tooltip);
+                    
+                    var offset = $el.offset();
+                    $tooltip.css({
+                        top: offset.top - $tooltip.outerHeight() - 10,
+                        left: offset.left + ($el.outerWidth() / 2) - ($tooltip.outerWidth() / 2)
+                    });
+                }).on('mouseleave', function() {
+                    $('.bpfn-tooltip-content').remove();
+                });
+            });
+        },
+
+        /**
+         * Initialize color picker
+         */
+        initColorPicker: function() {
+            if ($.fn.wpColorPicker) {
+                $('.bpfn-color-picker').wpColorPicker({
+                    change: function(event, ui) {
+                        $(event.target).trigger('change');
+                    }
+                });
+            }
+        },
+
+        /**
+         * Update live preview
+         */
+        updateLivePreview: function() {
+            var primaryColor = $('input[name="bpfn_options[primary_color]"]').val();
+            var $preview = $('#bpfn-preview');
+            
+            if ($preview.length) {
+                $preview.find('.bpfn-preview-primary').css('color', primaryColor);
+                $preview.find('.bpfn-preview-bg').css('background-color', primaryColor);
+            }
+        },
+
+        /**
+         * Show admin notice
+         */
+        showNotice: function(message, type) {
+            var $notice = $('<div class="notice notice-' + type + ' is-dismissible"><p>' + message + '</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button></div>');
+            
+            $('.wrap h1').first().after($notice);
+            
+            // Trigger WordPress notice dismiss handler
+            $notice.find('.notice-dismiss').on('click', function() {
+                $notice.fadeOut(function() {
+                    $(this).remove();
+                });
+            });
+            
+            // Auto dismiss success after 5 seconds
+            if (type === 'success') {
+                setTimeout(function() {
+                    $notice.find('.notice-dismiss').trigger('click');
+                }, 5000);
+            }
+        },
+
+        /**
+         * Get formatted date string
+         */
+        getDateString: function() {
+            var date = new Date();
+            var year = date.getFullYear();
+            var month = ('0' + (date.getMonth() + 1)).slice(-2);
+            var day = ('0' + date.getDate()).slice(-2);
+            var hours = ('0' + date.getHours()).slice(-2);
+            var minutes = ('0' + date.getMinutes()).slice(-2);
+            
+            return year + month + day + '-' + hours + minutes;
+        },
+
+        /**
+         * Refresh statistics
+         */
+        refreshStats: function() {
+            var self = this;
+            
+            // Refresh stats widget if present
+            var $statsWidget = $('.bpfn-stats');
+            if ($statsWidget.length) {
+                $statsWidget.css('opacity', '0.5');
+                
+                $.ajax({
+                    url: bpfnAdmin.ajax_url,
+                    type: 'POST',
+                    data: {
+                        action: 'bpfn_get_stats',
+                        nonce: bpfnAdmin.nonce
+                    },
+                    success: function(response) {
+                        if (response.success && response.data) {
+                            // Update notification count
+                            if (response.data.total_notifications !== undefined) {
+                                $statsWidget.find('.bpfn-stat-value').first().text(
+                                    self.formatNumber(response.data.total_notifications)
+                                );
+                            }
+                            // Update active users count
+                            if (response.data.active_users !== undefined) {
+                                $statsWidget.find('.bpfn-stat-value').last().text(
+                                    self.formatNumber(response.data.active_users)
+                                );
+                            }
+                        }
+                    },
+                    complete: function() {
+                        $statsWidget.css('opacity', '1');
+                    }
+                });
+            }
+            
+            // Refresh chart if present
+            if (BPFNStats && BPFNStats.loadChart) {
+                BPFNStats.loadChart();
+            }
+        },
+
+        /**
+         * Format number with thousands separator
+         */
+        formatNumber: function(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+    };
+
+    /**
+     * Statistics Chart Module
+     */
+    var BPFNStats = {
+        init: function() {
+            if ($('#bpfn-stats-chart').length && window.Chart) {
+                this.loadChart();
+            }
+        },
+
+        loadChart: function() {
+            var self = this;
+            
+            // Show loading state
+            $('#bpfn-stats-chart').parent().append('<div class="bpfn-loading-overlay"><span class="bpfn-spinner"></span></div>');
+            
+            $.ajax({
+                url: bpfnAdmin.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'bpfn_get_stats',
+                    nonce: bpfnAdmin.nonce
+                },
+                success: function(response) {
+                    if (response.success && response.data.chart) {
+                        self.renderChart(response.data.chart);
+                    }
+                },
+                complete: function() {
+                    $('.bpfn-loading-overlay').remove();
+                }
+            });
+        },
+
+        renderChart: function(data) {
+            var ctx = document.getElementById('bpfn-stats-chart').getContext('2d');
+            
+            // Destroy existing chart if present
+            if (window.bpfnChart) {
+                window.bpfnChart.destroy();
+            }
+            
+            window.bpfnChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Notifications',
+                        data: data.values,
+                        borderColor: '#ff7b00',
+                        backgroundColor: 'rgba(255, 123, 0, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    };
+
+    /**
+     * Diagnostic Tools Module
+     */
+    var BPFNDiagnostics = {
+        
+        init: function() {
+            var self = this;
+            var $button = $('#bpfn-run-diagnostics');
+            
+            if (!$button.length) return;
+            
+            $button.on('click', function(e) {
+                e.preventDefault();
+                self.run($(this));
+            });
+        },
+        
+        run: function($button) {
+            var self = this;
+            var $results = $('#bpfn-diagnostics-results');
+            
+            $button.prop('disabled', true).text('Running diagnostics...');
+            $results.html('<div class="bpfn-loading">Running system checks...</div>');
+            
+            $.ajax({
+                url: bpfnAdmin.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'bpfn_run_diagnostics',
+                    nonce: bpfnAdmin.nonce
+                },
+                success: function(response) {
+                    if (response.success && response.data) {
+                        self.displayResults(response.data, $results);
+                    } else {
+                        $results.html('<div class="notice notice-error"><p>Failed to run diagnostics.</p></div>');
+                    }
+                },
+                error: function() {
+                    $results.html('<div class="notice notice-error"><p>An error occurred while running diagnostics.</p></div>');
+                },
+                complete: function() {
+                    $button.prop('disabled', false).text('Run Diagnostics');
+                }
+            });
+        },
+
+        displayResults: function(data, $container) {
+            var html = '<div class="bpfn-diagnostics-report">';
+            
+            // System info
+            html += '<h3>System Information</h3>';
+            html += '<table class="widefat striped">';
+            html += '<tr><td><strong>PHP Version:</strong></td><td>' + data.php_version + '</td></tr>';
+            html += '<tr><td><strong>WordPress Version:</strong></td><td>' + data.wp_version + '</td></tr>';
+            html += '<tr><td><strong>BuddyPress Version:</strong></td><td>' + data.bp_version + '</td></tr>';
+            html += '<tr><td><strong>Plugin Version:</strong></td><td>' + data.plugin_version + '</td></tr>';
+            html += '</table>';
+            
+            // Database info
+            html += '<h3>Database Status</h3>';
+            html += '<table class="widefat striped">';
+            html += '<tr><td><strong>Notifications Table:</strong></td><td>' + (data.tables.notifications ? '<span style="color:green;">✓ Exists</span>' : '<span style="color:red;">✗ Missing</span>') + '</td></tr>';
+            html += '<tr><td><strong>Preferences Table:</strong></td><td>' + (data.tables.preferences ? '<span style="color:green;">✓ Exists</span>' : '<span style="color:red;">✗ Missing</span>') + '</td></tr>';
+            html += '<tr><td><strong>Total Notifications:</strong></td><td>' + data.stats.total_notifications + '</td></tr>';
+            html += '<tr><td><strong>Unread Notifications:</strong></td><td>' + data.stats.unread_notifications + '</td></tr>';
+            html += '</table>';
+            
+            // Component status
+            html += '<h3>Component Status</h3>';
+            html += '<table class="widefat striped">';
+            $.each(data.components, function(component, status) {
+                var statusText = status ? '<span style="color: green;">✓ Active</span>' : '<span style="color: red;">✗ Inactive</span>';
+                html += '<tr><td><strong>' + component.charAt(0).toUpperCase() + component.slice(1) + ':</strong></td><td>' + statusText + '</td></tr>';
+            });
+            html += '</table>';
+            
+            html += '</div>';
+            
+            $container.html(html);
+        }
+    };
+
+    // Initialize when ready
+    $(document).ready(function() {
+        BPFNAdmin.init();
+        BPFNStats.init();
+        BPFNDiagnostics.init();
+    });
+
+    // Expose to global scope for external access
+    window.BPFNAdmin = BPFNAdmin;
+    window.BPFNStats = BPFNStats;
+
+})(jQuery, window, document);
