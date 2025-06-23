@@ -209,69 +209,6 @@ function bpfn_get_notifications( $user_id = 0, $args = array() ) {
 }
 
 /**
- * Send test notification
- *
- * @param int $user_id User ID to send to
- * @param string $type Notification type
- * @return bool Success status
- */
-function bpfn_send_test_notification( $user_id, $type = 'favorite' ) {
-	if ( ! $user_id || ! bp_is_active( 'notifications' ) ) {
-		return false;
-	}
-	
-	// Create a test activity for the user
-	$activity_args = array(
-		'user_id' => $user_id,
-		'content' => sprintf( __( 'Test activity for notification testing created at %s', 'bp-fav-notification' ), current_time( 'mysql' ) ),
-		'type' => 'activity_update',
-		'recorded_time' => bp_core_current_time(),
-		'hide_sitewide' => false, // Make sure it's not hidden
-	);
-	
-	$activity_id = bp_activity_add( $activity_args );
-	
-	if ( ! $activity_id ) {
-		error_log( 'BPFN: Failed to create test activity' );
-		return false;
-	}
-	
-	// Add the notification directly
-	global $bp;
-	
-	$notification_args = array(
-		'user_id'           => $user_id,
-		'item_id'           => $activity_id,
-		'secondary_item_id' => get_current_user_id(),
-		'component_name'    => isset( $bp->favorite_notifier ) ? $bp->favorite_notifier->id : 'favorite_notifier',
-		'component_action'  => 'fav_notify_' . $activity_id,
-		'date_notified'     => bp_core_current_time(),
-		'is_new'            => 1,
-	);
-	
-	$notification_id = bp_notifications_add_notification( $notification_args );
-	
-	if ( ! $notification_id ) {
-		error_log( 'BPFN: Failed to create notification' );
-		// Clean up the activity
-		bp_activity_delete( array( 'id' => $activity_id ) );
-		return false;
-	}
-	
-	// Trigger email if enabled
-	$email_enabled = bpfn_is_notification_enabled( $user_id, 'activity_post', 'email' );
-	if ( $email_enabled ) {
-		$activity = new BP_Activity_Activity( $activity_id );
-		do_action( 'bpfn_after_add_notification', $notification_id, $notification_args, $activity, get_current_user_id() );
-	}
-	
-	// Clean up - delete the test activity after a short delay
-	wp_schedule_single_event( time() + 60, 'bpfn_cleanup_test_activity', array( $activity_id ) );
-	
-	return true;
-}
-
-/**
  * Get module instance
  *
  * @param string $module_name Module name

@@ -102,6 +102,7 @@ class BPFN_Module_Email {
 				'settings_link' => $this->get_settings_link( $activity->user_id ),
 				'favorited_by' => $sender->display_name,
 				'favorited_by_link' => bp_core_get_user_domain( $user_id ),
+				'secondary_item_id' => $user_id, // Add this for avatar in template
 			),
 		);
 		
@@ -110,6 +111,30 @@ class BPFN_Module_Email {
 		
 		// Send email
 		$this->send_email( $email_data );
+	}
+
+	/**
+	 * Send test email (public method for testing)
+	 * 
+	 * @param array $email_data Email data
+	 * @return bool Success status
+	 */
+	public function send_test_email( $email_data ) {
+		// Add test flag
+		$email_data['is_test'] = true;
+		
+		// Ensure we have all required data
+		$defaults = array(
+			'to' => '',
+			'subject' => '[Test] Favorite Notification',
+			'template' => 'emails/activity-favorited.php',
+			'tokens' => array(),
+		);
+		
+		$email_data = wp_parse_args( $email_data, $defaults );
+		
+		// Send the email
+		return $this->send_email( $email_data );
 	}
 
 	/**
@@ -137,6 +162,7 @@ class BPFN_Module_Email {
 			'to' => $email_data['to'],
 			'subject' => $subject,
 			'sent' => $sent,
+			'is_test' => ! empty( $email_data['is_test'] ),
 		) );
 		
 		// Trigger action
@@ -161,11 +187,20 @@ class BPFN_Module_Email {
 		$template_path = apply_filters( 'bpfn_email_template_path', $template_path, $template );
 		
 		if ( ! file_exists( $template_path ) ) {
-			return '';
+			// If template doesn't exist, use a simple fallback
+			return $this->get_fallback_email_message( $tokens );
 		}
 		
-		// Extract tokens as variables
+		// Extract tokens as variables for use in template
 		extract( $tokens );
+		
+		// Set default values for commonly used variables
+		$email_subject = ! empty( $tokens['subject'] ) ? $tokens['subject'] : '';
+		$header_color = '#ff7b00';
+		$accent_color = '#ff7b00';
+		$button_color = '#ff7b00';
+		$button_hover_color = '#ff9a33';
+		$link_color = '#1d84b5';
 		
 		// Start output buffering
 		ob_start();
@@ -176,6 +211,58 @@ class BPFN_Module_Email {
 		$message = $this->parse_email_tokens( $message, $tokens );
 		
 		return $message;
+	}
+
+	/**
+	 * Get fallback email message when template is not found
+	 * 
+	 * @param array $tokens Email tokens
+	 * @return string HTML email content
+	 */
+	private function get_fallback_email_message( $tokens ) {
+		$html = '<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<style>
+		body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background: #f4f4f4; margin: 0; padding: 0; }
+		.container { max-width: 600px; margin: 20px auto; background: #fff; }
+		.header { background: #ff7b00; color: white; padding: 20px; text-align: center; }
+		.content { padding: 30px; }
+		.button { display: inline-block; padding: 12px 30px; background: #ff7b00; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+		.footer { background: #f4f4f4; padding: 20px; text-align: center; font-size: 12px; }
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="header">
+			<h1>' . esc_html( $tokens['site_name'] ?? get_bloginfo( 'name' ) ) . '</h1>
+		</div>
+		<div class="content">
+			<h2>' . sprintf( __( 'Hi %s!', 'bp-fav-notification' ), esc_html( $tokens['recipient_name'] ?? 'there' ) ) . '</h2>
+			<p>' . sprintf( __( '%s favorited your activity.', 'bp-fav-notification' ), esc_html( $tokens['favorited_by'] ?? 'Someone' ) ) . '</p>';
+		
+		if ( ! empty( $tokens['activity_content'] ) ) {
+			$html .= '<blockquote style="background: #f8f9fa; border-left: 4px solid #ff7b00; padding: 15px; margin: 20px 0;">' . 
+					 esc_html( $tokens['activity_content'] ) . 
+					 '</blockquote>';
+		}
+		
+		$html .= '<p style="text-align: center;">
+				<a href="' . esc_url( $tokens['activity_link'] ?? home_url() ) . '" class="button">' . 
+				__( 'View Activity', 'bp-fav-notification' ) . '</a>
+			</p>
+		</div>
+		<div class="footer">
+			<p>' . __( 'You received this email because you have notifications enabled.', 'bp-fav-notification' ) . '</p>
+			<p><a href="' . esc_url( $tokens['settings_link'] ?? home_url() ) . '">' . 
+			   __( 'Manage Notifications', 'bp-fav-notification' ) . '</a></p>
+		</div>
+	</div>
+</body>
+</html>';
+		
+		return $html;
 	}
 
 	/**
@@ -207,7 +294,7 @@ class BPFN_Module_Email {
 	 */
 	private function get_settings_link( $user_id ) {
 		if ( ! bp_is_active( 'settings' ) ) {
-			return '';
+			return home_url();
 		}
 		
 		return trailingslashit( bp_core_get_user_domain( $user_id ) . bp_get_settings_slug() ) . 'notifications/';

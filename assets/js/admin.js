@@ -130,19 +130,19 @@
                         
                         // Show notification types sent
                         if (response.data && response.data.details) {
-                            var details = '<ul style="margin-top: 10px; margin-bottom: 0;">';
-                            if (response.data.details.web) {
-                                details += '<li>✓ Web notification created</li>';
-                            }
-                            if (response.data.details.email) {
-                                details += '<li>✓ Email sent to ' + response.data.details.email + '</li>';
-                            }
-                            if (response.data.details.realtime) {
-                                details += '<li>✓ Real-time notification queued</li>';
-                            }
-                            details += '</ul>';
-                            $result.append(details);
-                        }
+							var details = '<ul style="margin-top: 10px; margin-bottom: 0;">';
+							if (response.data.details.web) {
+								details += '<li>✓ Web notification created</li>';
+							}
+							if (response.data.details.email) {
+								details += '<li>✓ Email sent to ' + response.data.details.email + '</li>';
+							}
+							if (response.data.details.realtime) {
+								details += '<li>✓ Real-time notification queued</li>';
+							}
+							details += '</ul>';
+							$result.append(details);
+						}
                     } else {
                         $result.addClass('error').text(response.data.message || bpfnAdmin.strings.test_error).show();
                     }

@@ -781,9 +781,12 @@ class BPFN_Module_Admin {
 		$result = bpfn_send_test_notification( $user_id );
 		
 		if ( $result ) {
+			$user = get_userdata( $user_id );
+			$email_enabled = bpfn_is_notification_enabled( $user_id, 'activity_post', 'email' );
+			
 			$details = array(
 				'web' => true,
-				'email' => bpfn_is_notification_enabled( $user_id, 'activity_post', 'email' ),
+				'email' => $email_enabled ? $user->user_email : false,
 				'realtime' => bpfn_is_notification_enabled( $user_id, 'activity_post', 'realtime' ),
 			);
 			
