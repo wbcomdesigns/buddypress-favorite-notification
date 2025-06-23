@@ -29,8 +29,11 @@ class BPFN_Module_Assets {
 		// Frontend assets
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_assets' ) );
 		
-		// Admin assets
+		// Admin assets - this needs to be on admin_enqueue_scripts
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
+		
+		// Also add a specific hook for our menu pages as a fallback
+		add_action( 'admin_head', array( $this, 'enqueue_admin_assets_fallback' ) );
 		
 		// Login page assets
 		add_action( 'login_enqueue_scripts', array( $this, 'enqueue_login_assets' ) );
@@ -139,10 +142,54 @@ class BPFN_Module_Assets {
 	 * Enqueue admin assets
 	 */
 	public function enqueue_admin_assets( $hook ) {
-		// Only on our admin pages
-		if ( strpos( $hook, 'bpfn' ) === false ) {
+		// Debug: Log the current hook
+		error_log( 'BPFN Admin Hook: ' . $hook );
+		
+		// Check if we're on any of our admin pages
+		$is_our_page = false;
+		
+		// Check main menu pages - more flexible checking
+		if ( strpos( $hook, 'bpfn' ) !== false ) {
+			$is_our_page = true;
+		}
+		
+		// Check if it's the main menu page or subpages
+		// The actual hooks might be different depending on menu position
+		$our_pages = array(
+			'toplevel_page_bpfn-settings',
+			'bp-favorites_page_bpfn-tools', 
+			'bp-favorites_page_bpfn-help',
+			// Alternative possible hooks
+			'admin_page_bpfn-tools',
+			'admin_page_bpfn-help',
+			'bpfn-settings_page_bpfn-tools',
+			'bpfn-settings_page_bpfn-help',
+			// Check for variations
+			'toplevel_page_bp-favorite-notification',
+			'bp-favorite-notification_page_bpfn-tools',
+			'bp-favorite-notification_page_bpfn-help',
+		);
+		
+		if ( in_array( $hook, $our_pages ) ) {
+			$is_our_page = true;
+		}
+		
+		// Also check for options page if added there
+		if ( $hook === 'settings_page_bpfn-settings' ) {
+			$is_our_page = true;
+		}
+		
+		// More flexible check - if the page parameter contains our slug
+		if ( isset( $_GET['page'] ) && strpos( $_GET['page'], 'bpfn' ) !== false ) {
+			$is_our_page = true;
+		}
+		
+		if ( ! $is_our_page ) {
 			return;
 		}
+		
+		// Debug: Log if we're loading assets
+		error_log( 'BPFN Loading admin assets for hook: ' . $hook );
 		
 		// Admin styles
 		wp_enqueue_style(
@@ -160,6 +207,38 @@ class BPFN_Module_Assets {
 			BPFN_VERSION,
 			true
 		);
+		
+		// Localize admin script
+		wp_localize_script( 'bpfn-admin', 'bpfnAdmin', array(
+			'ajax_url' => admin_url( 'admin-ajax.php' ),
+			'nonce' => wp_create_nonce( 'bpfn-admin-nonce' ),
+			'strings' => array(
+				'testing' => __( 'Sending test notification...', 'bp-fav-notification' ),
+				'test_success' => __( 'Test notification sent successfully!', 'bp-fav-notification' ),
+				'test_error' => __( 'Failed to send test notification.', 'bp-fav-notification' ),
+				'confirm_clear' => __( 'Are you sure you want to clear old notifications?', 'bp-fav-notification' ),
+				'clearing' => __( 'Clearing...', 'bp-fav-notification' ),
+				'clear_success' => __( 'Notifications cleared successfully.', 'bp-fav-notification' ),
+				'clear_error' => __( 'Failed to clear notifications.', 'bp-fav-notification' ),
+			),
+		) );
+		
+		// Add color picker if needed
+		if ( $hook === 'toplevel_page_bpfn-settings' || $hook === 'settings_page_bpfn-settings' ) {
+			wp_enqueue_style( 'wp-color-picker' );
+			wp_enqueue_script( 'wp-color-picker' );
+		}
+		
+		// Add Chart.js for stats
+		if ( $hook === 'toplevel_page_bpfn-settings' ) {
+			wp_enqueue_script(
+				'chart-js',
+				'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js',
+				array(),
+				'3.9.1',
+				true
+			);
+		}
 		
 		// Allow additional admin assets
 		do_action( 'bpfn_enqueue_admin_assets', $hook );
@@ -233,7 +312,7 @@ class BPFN_Module_Assets {
 			'ajax_url' => admin_url( 'admin-ajax.php' ),
 			'nonce' => wp_create_nonce( 'bpfn-nonce' ),
 			'user_id' => get_current_user_id(),
-			'component_id' => $bp->favorite_notifier->id,
+			'component_id' => isset( $bp->favorite_notifier ) ? $bp->favorite_notifier->id : '',
 			'settings' => array(
 				'refresh_interval' => apply_filters( 'bpfn_refresh_interval', 60000 ),
 				'animation_duration' => apply_filters( 'bpfn_animation_duration', 2000 ),
@@ -241,9 +320,20 @@ class BPFN_Module_Assets {
 			'strings' => array(
 				'loading' => __( 'Loading...', 'bp-fav-notification' ),
 				'error' => __( 'An error occurred', 'bp-fav-notification' ),
-				'favorited' => __( 'Favorited', 'bp-fav-notification' ),
-				'unfavorited' => __( 'Unfavorited', 'bp-fav-notification' ),
+				'favoriting' => __( 'Adding to favorites...', 'bp-fav-notification' ),
+				'unfavoriting' => __( 'Removing from favorites...', 'bp-fav-notification' ),
+				'favorited' => __( 'Added to favorites!', 'bp-fav-notification' ),
+				'unfavorited' => __( 'Removed from favorites!', 'bp-fav-notification' ),
 			),
+		);
+		
+		// Initialize config properly
+		$data['config'] = array(
+			'debug' => defined( 'WP_DEBUG' ) && WP_DEBUG,
+			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+			'nonce' => wp_create_nonce( 'bpfn-nonce' ),
+			'userId' => get_current_user_id(),
+			'componentId' => isset( $bp->favorite_notifier ) ? $bp->favorite_notifier->id : '',
 		);
 		
 		return apply_filters( 'bpfn_localized_data', $data );
@@ -265,5 +355,24 @@ class BPFN_Module_Assets {
 		if ( ! empty( $script ) ) {
 			wp_add_inline_script( 'bpfn-notifications', $script, $position );
 		}
+	}
+	
+	/**
+	 * Fallback method to ensure admin assets are loaded
+	 */
+	public function enqueue_admin_assets_fallback() {
+		// Only run if we're on our admin pages and assets haven't been loaded
+		if ( ! isset( $_GET['page'] ) || strpos( $_GET['page'], 'bpfn' ) === false ) {
+			return;
+		}
+		
+		// Check if assets are already enqueued
+		if ( wp_style_is( 'bpfn-admin', 'enqueued' ) ) {
+			return;
+		}
+		
+		// If we're here, assets haven't been loaded, so load them
+		global $hook_suffix;
+		$this->enqueue_admin_assets( $hook_suffix );
 	}
 }

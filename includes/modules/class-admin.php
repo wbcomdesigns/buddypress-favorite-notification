@@ -46,6 +46,9 @@ class BPFN_Module_Admin {
 		// Admin init - for settings registration
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 		
+		// Ensure admin assets are loaded
+		add_action( 'admin_enqueue_scripts', array( $this, 'ensure_admin_assets' ), 20 );
+		
 		// AJAX handlers
 		$this->register_ajax_handlers();
 		
@@ -83,7 +86,7 @@ class BPFN_Module_Admin {
 	 */
 	public function add_admin_menu() {
 		// Main menu
-		$main_page = add_menu_page(
+		add_menu_page(
 			__( 'BP Favorite Notification', 'bp-fav-notification' ),
 			__( 'BP Favorites', 'bp-fav-notification' ),
 			'manage_options',
@@ -120,9 +123,67 @@ class BPFN_Module_Admin {
 			'bpfn-help',
 			array( $this, 'help_page' )
 		);
+	}
+
+	/**
+	 * Ensure admin assets are loaded on our pages
+	 */
+	public function ensure_admin_assets() {
+		$screen = get_current_screen();
 		
-		// Hook for page specific scripts
-		add_action( 'admin_print_scripts-' . $main_page, array( $this, 'enqueue_admin_scripts' ) );
+		// Check if we're on one of our admin pages
+		if ( ! $screen || strpos( $screen->id, 'bpfn' ) === false ) {
+			return;
+		}
+		
+		// Load admin CSS
+		wp_enqueue_style(
+			'bpfn-admin',
+			BPFN_ASSETS_URL . 'css/admin.css',
+			array(),
+			BPFN_VERSION
+		);
+		
+		// Load admin JS
+		wp_enqueue_script(
+			'bpfn-admin',
+			BPFN_ASSETS_URL . 'js/admin.js',
+			array( 'jquery' ),
+			BPFN_VERSION,
+			true
+		);
+		
+		// Localize script
+		wp_localize_script( 'bpfn-admin', 'bpfnAdmin', array(
+			'ajax_url' => admin_url( 'admin-ajax.php' ),
+			'nonce' => wp_create_nonce( 'bpfn-admin-nonce' ),
+			'strings' => array(
+				'testing' => __( 'Sending test notification...', 'bp-fav-notification' ),
+				'test_success' => __( 'Test notification sent successfully!', 'bp-fav-notification' ),
+				'test_error' => __( 'Failed to send test notification.', 'bp-fav-notification' ),
+				'confirm_clear' => __( 'Are you sure you want to clear old notifications?', 'bp-fav-notification' ),
+				'clearing' => __( 'Clearing...', 'bp-fav-notification' ),
+				'clear_success' => __( 'Notifications cleared successfully.', 'bp-fav-notification' ),
+				'clear_error' => __( 'Failed to clear notifications.', 'bp-fav-notification' ),
+			),
+		) );
+		
+		// Add Chart.js for stats if on settings page
+		if ( strpos( $screen->id, 'bpfn-settings' ) !== false ) {
+			wp_enqueue_script(
+				'chart-js',
+				'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js',
+				array(),
+				'3.9.1',
+				true
+			);
+		}
+		
+		// Add color picker if needed
+		if ( strpos( $screen->id, 'bpfn-settings' ) !== false ) {
+			wp_enqueue_style( 'wp-color-picker' );
+			wp_enqueue_script( 'wp-color-picker' );
+		}
 	}
 
 	/**
@@ -610,28 +671,6 @@ class BPFN_Module_Admin {
 		);
 		
 		return array_merge( $links, $meta_links );
-	}
-
-	/**
-	 * Enqueue admin scripts
-	 */
-	public function enqueue_admin_scripts() {
-		// Enqueue admin scripts with all tools functionality included
-		wp_enqueue_script( 'bpfn-admin', BPFN_ASSETS_URL . 'js/admin.js', array( 'jquery' ), BPFN_VERSION, true );
-		
-		wp_localize_script( 'bpfn-admin', 'bpfnAdmin', array(
-			'ajax_url' => admin_url( 'admin-ajax.php' ),
-			'nonce' => wp_create_nonce( 'bpfn-admin-nonce' ),
-			'strings' => array(
-				'testing' => __( 'Sending test notification...', 'bp-fav-notification' ),
-				'test_success' => __( 'Test notification sent successfully!', 'bp-fav-notification' ),
-				'test_error' => __( 'Failed to send test notification.', 'bp-fav-notification' ),
-				'confirm_clear' => __( 'Are you sure you want to clear old notifications?', 'bp-fav-notification' ),
-				'clearing' => __( 'Clearing...', 'bp-fav-notification' ),
-				'clear_success' => __( 'Notifications cleared successfully.', 'bp-fav-notification' ),
-				'clear_error' => __( 'Failed to clear notifications.', 'bp-fav-notification' ),
-			),
-		) );
 	}
 
 	/**
