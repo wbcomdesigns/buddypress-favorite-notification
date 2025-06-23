@@ -141,21 +141,35 @@ function bpfn_get_activity_type( $activity_id ) {
  * @return bool
  */
 function bpfn_is_notification_enabled( $user_id, $type, $channel = 'web' ) {
+	// During initial setup or testing, default to enabled
+	if ( defined( 'DOING_AJAX' ) || defined( 'WP_SETUP_CONFIG' ) ) {
+		return true;
+	}
+	
 	$settings = bpfn_get_user_settings( $user_id );
 	
+	// If no settings exist for this type, default to enabled
 	if ( ! isset( $settings[ $type ] ) ) {
-		return true; // Default to enabled if not set
+		error_log( 'BPFN: No settings found for user ' . $user_id . ' type ' . $type . ', defaulting to enabled' );
+		return true;
 	}
 	
 	switch ( $channel ) {
 		case 'email':
-			return ! empty( $settings[ $type ]['email_enabled'] );
+			$enabled = ! empty( $settings[ $type ]['email_enabled'] );
+			break;
 		case 'realtime':
-			return ! empty( $settings[ $type ]['realtime_enabled'] );
+			$enabled = ! empty( $settings[ $type ]['realtime_enabled'] );
+			break;
 		case 'web':
 		default:
-			return ! empty( $settings[ $type ]['is_enabled'] );
+			$enabled = ! empty( $settings[ $type ]['is_enabled'] );
+			break;
 	}
+	
+	error_log( 'BPFN: Notification enabled check - User: ' . $user_id . ', Type: ' . $type . ', Channel: ' . $channel . ', Enabled: ' . ( $enabled ? 'yes' : 'no' ) );
+	
+	return $enabled;
 }
 
 /**

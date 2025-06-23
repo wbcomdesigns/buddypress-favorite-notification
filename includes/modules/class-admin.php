@@ -400,6 +400,31 @@ class BPFN_Module_Admin {
 		</div>
 		
 		<div class="bpfn-tool-box">
+			<h3><?php _e( 'Test Real-time Notifications', 'bp-fav-notification' ); ?></h3>
+			<p><?php _e( 'Test if real-time notifications are working properly.', 'bp-fav-notification' ); ?></p>
+			<button class="button" id="bpfn-test-realtime-notification">
+				<?php _e( 'Show Test Real-time Notification', 'bp-fav-notification' ); ?>
+			</button>
+			<div id="bpfn-realtime-test-result"></div>
+			<script>
+			jQuery(document).ready(function($) {
+				$('#bpfn-test-realtime-notification').on('click', function(e) {
+					e.preventDefault();
+					
+					// Check if realtime module is loaded
+					if (typeof BPFN !== 'undefined' && BPFN.Realtime) {
+						// Show a test notification
+						BPFN.Realtime.showTestNotification();
+						$('#bpfn-realtime-test-result').html('<div style="color: green; margin-top: 10px;">Test notification triggered. Check bottom-right corner of your screen.</div>');
+					} else {
+						$('#bpfn-realtime-test-result').html('<div style="color: red; margin-top: 10px;">Real-time module not loaded. Make sure you have real-time notifications enabled in your user settings.</div>');
+					}
+				});
+			});
+			</script>
+		</div>
+		
+		<div class="bpfn-tool-box">
 			<h3><?php _e( 'Clear Old Notifications', 'bp-fav-notification' ); ?></h3>
 			<p><?php _e( 'Remove read notifications older than 30 days.', 'bp-fav-notification' ); ?></p>
 			<button class="button" id="bpfn-clear-old-notifications">

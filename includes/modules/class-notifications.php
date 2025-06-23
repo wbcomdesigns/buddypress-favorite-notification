@@ -24,7 +24,9 @@ class BPFN_Module_Notifications {
 	 * Constructor
 	 */
 	public function __construct() {
+		// Register notification types first
 		$this->register_notification_types();
+		// Then setup hooks
 		$this->setup_hooks();
 	}
 
@@ -32,8 +34,13 @@ class BPFN_Module_Notifications {
 	 * Register notification types
 	 */
 	private function register_notification_types() {
+		// Load text domain if not loaded
+		if ( ! is_textdomain_loaded( 'bp-fav-notification' ) ) {
+			load_plugin_textdomain( 'bp-fav-notification', false, dirname( plugin_basename( BPFN_PLUGIN_FILE ) ) . '/languages/' );
+		}
+		
 		// Default notification types
-		$this->notification_types = apply_filters( 'bpfn_notification_types', array(
+		$this->notification_types = array(
 			'favorite' => array(
 				'action_prefix' => 'fav_notify',
 				'labels' => array(
@@ -48,7 +55,10 @@ class BPFN_Module_Notifications {
 					'multiple' => __( '%d members favorited your comment', 'bp-fav-notification' ),
 				),
 			),
-		) );
+		);
+		
+		// Allow filtering after types are set
+		$this->notification_types = apply_filters( 'bpfn_notification_types', $this->notification_types );
 	}
 
 	/**
@@ -63,15 +73,34 @@ class BPFN_Module_Notifications {
 		// Notification display filters
 		add_filter( 'bp_notifications_get_notifications_for_user', array( $this, 'filter_notification_content' ), 20, 8 );
 		
+		// Add filter to handle our component's notifications
+		add_filter( 'bp_notifications_get_registered_components', array( $this, 'register_component' ) );
+		
 		// Custom hooks
 		do_action( 'bpfn_notifications_setup_hooks', $this );
+	}
+
+	/**
+	 * Register our component with BuddyPress notifications
+	 */
+	public function register_component( $components ) {
+		global $bp;
+		
+		if ( isset( $bp->favorite_notifier ) ) {
+			$components[] = $bp->favorite_notifier->id;
+		}
+		
+		return $components;
 	}
 
 	/**
 	 * Add favorite notification
 	 */
 	public function add_favorite_notification( $activity_id, $user_id ) {
+		error_log( 'BPFN: add_favorite_notification called - Activity: ' . $activity_id . ', User: ' . $user_id );
+		
 		if ( ! bp_is_active( 'notifications' ) ) {
+			error_log( 'BPFN: Notifications component not active' );
 			return;
 		}
 
@@ -80,23 +109,42 @@ class BPFN_Module_Notifications {
 		// Ensure component is initialized
 		if ( ! isset( $bp->favorite_notifier ) ) {
 			error_log( 'BPFN: Component not initialized in add_favorite_notification' );
-			return;
+			// Try to initialize it
+			if ( function_exists( 'bpfn' ) ) {
+				$main = bpfn();
+				$main->setup_globals();
+			}
+			// Check again
+			if ( ! isset( $bp->favorite_notifier ) ) {
+				error_log( 'BPFN: Failed to initialize component' );
+				return;
+			}
 		}
 		
 		// Get activity
 		$activity = new BP_Activity_Activity( $activity_id );
-		if ( empty( $activity->id ) || $activity->user_id == $user_id ) {
+		if ( empty( $activity->id ) ) {
+			error_log( 'BPFN: Activity not found for ID: ' . $activity_id );
+			return;
+		}
+		
+		error_log( 'BPFN: Activity found - User ID: ' . $activity->user_id . ', Type: ' . $activity->type );
+		
+		// Don't notify yourself
+		if ( $activity->user_id == $user_id ) {
+			error_log( 'BPFN: User favoriting own activity - no notification' );
 			return;
 		}
 
 		// Check if notifications are enabled
 		$activity_type = bpfn_get_activity_type( $activity_id );
 		if ( ! bpfn_is_notification_enabled( $activity->user_id, $activity_type, 'web' ) ) {
+			error_log( 'BPFN: Notifications disabled for user ' . $activity->user_id );
 			return;
 		}
 
 		// Prepare notification data
-		$notification_data = apply_filters( 'bpfn_favorite_notification_data', array(
+		$notification_data = array(
 			'user_id'           => $activity->user_id,
 			'item_id'           => $activity_id,
 			'secondary_item_id' => $user_id,
@@ -104,10 +152,21 @@ class BPFN_Module_Notifications {
 			'component_action'  => $this->get_component_action( $activity ),
 			'date_notified'     => bp_core_current_time(),
 			'is_new'            => 1,
-		), $activity, $user_id );
+		);
+		
+		error_log( 'BPFN: Notification data: ' . print_r( $notification_data, true ) );
+		
+		// Allow filtering
+		$notification_data = apply_filters( 'bpfn_favorite_notification_data', $notification_data, $activity, $user_id );
 
 		// Add notification
 		$notification_id = bp_notifications_add_notification( $notification_data );
+		
+		if ( $notification_id ) {
+			error_log( 'BPFN: Notification created with ID: ' . $notification_id );
+		} else {
+			error_log( 'BPFN: Failed to create notification' );
+		}
 		
 		// Log event
 		bpfn_log_event( 'notification_added', array(
@@ -177,24 +236,39 @@ class BPFN_Module_Notifications {
 		// Get activity and check if it exists
 		$activity = new BP_Activity_Activity( $item_id );
 		if ( empty( $activity->id ) ) {
-			return false;
+			// Return a basic message if activity not found
+			return __( 'Someone favorited your activity', 'bp-fav-notification' );
+		}
+		
+		// Ensure notification types are loaded
+		if ( empty( $this->notification_types ) ) {
+			$this->register_notification_types();
 		}
 		
 		// Get notification labels
 		$labels = isset( $this->notification_types[ $type ]['labels'] ) 
 			? $this->notification_types[ $type ]['labels'] 
-			: $this->notification_types['favorite']['labels'];
+			: array(
+				'single' => __( '%s favorited your activity', 'bp-fav-notification' ),
+				'multiple' => __( '%d members favorited your activity', 'bp-fav-notification' ),
+			);
 		
 		// Format notification text
 		if ( $total_items > 1 ) {
 			$text = sprintf( $labels['multiple'], $total_items );
 		} else {
 			$user_name = bp_core_get_user_displayname( $secondary_item_id );
+			if ( empty( $user_name ) ) {
+				$user_name = __( 'Someone', 'bp-fav-notification' );
+			}
 			$text = sprintf( $labels['single'], $user_name );
 		}
 		
 		// Get link
 		$link = bp_activity_get_permalink( $item_id );
+		if ( empty( $link ) ) {
+			$link = bp_get_activity_directory_permalink();
+		}
 		
 		// Apply filters
 		$text = apply_filters( 'bpfn_notification_text', $text, $item_id, $secondary_item_id, $total_items, $type );

@@ -41,7 +41,7 @@
             var self = this;
             
             // Merge options
-            self.config = $.extend(true, {}, self.config, BPFNRealtime || {}, options || {});
+            self.config = $.extend(true, {}, self.config, window.BPFNRealtime || {}, options || {});
             
             // Set last checked time
             self.config.lastChecked = Math.floor(Date.now() / 1000);
@@ -85,6 +85,12 @@
         setupHeartbeat: function() {
             var self = this;
             
+            // Check if heartbeat is available
+            if (!window.wp || !window.wp.heartbeat) {
+                self.log('WordPress Heartbeat API not available');
+                return;
+            }
+            
             // Hook into heartbeat-send
             $(document).on('heartbeat-send', function(e, data) {
                 if (!self.state.initialized || self.state.isChecking) {
@@ -94,11 +100,11 @@
                 // Add our data to heartbeat
                 data.bpfn_realtime_check = {
                     last_checked: self.config.lastChecked,
-                    nonce: BPFNRealtime.nonce
+                    nonce: self.config.nonce || (window.BPFNRealtime && window.BPFNRealtime.nonce)
                 };
                 
                 self.state.isChecking = true;
-                self.log('Sending heartbeat check');
+                self.log('Sending heartbeat check with last_checked: ' + self.config.lastChecked);
             });
             
             // Hook into heartbeat-tick
@@ -106,14 +112,21 @@
                 self.state.isChecking = false;
                 
                 if (data.bpfn_realtime_notifications) {
+                    self.log('Received heartbeat response', data.bpfn_realtime_notifications);
                     self.handleHeartbeatResponse(data.bpfn_realtime_notifications);
                 }
             });
             
+            // Hook into heartbeat-error
+            $(document).on('heartbeat-error', function(e, jqXHR, textStatus, error) {
+                self.state.isChecking = false;
+                self.log('Heartbeat error: ' + textStatus + ' - ' + error);
+            });
+            
             // Configure heartbeat interval
-            if (wp && wp.heartbeat) {
-                wp.heartbeat.interval(self.config.checkInterval / 1000);
-            }
+            wp.heartbeat.interval(self.config.checkInterval / 1000);
+            
+            self.log('Heartbeat configured with interval: ' + (self.config.checkInterval / 1000) + ' seconds');
         },
 
         /**
@@ -154,6 +167,12 @@
             $(document).on('bpfn:notification:new', function(e, data) {
                 self.showNotification(data);
             });
+            
+            // Test button for debugging
+            $(document).on('click', '#bpfn-test-realtime', function(e) {
+                e.preventDefault();
+                self.showTestNotification();
+            });
         },
 
         /**
@@ -188,6 +207,8 @@
          */
         showNotification: function(data) {
             var self = this;
+            
+            self.log('Showing notification', data);
             
             // Check max notifications
             if (self.state.notifications.length >= self.config.maxNotifications) {
@@ -225,7 +246,9 @@
             }, 10);
             
             // Trigger event
-            BPFN.Core.trigger('realtime:notification:shown', data);
+            if (window.BPFN && window.BPFN.Core) {
+                window.BPFN.Core.trigger('realtime:notification:shown', data);
+            }
         },
 
         /**
@@ -234,15 +257,16 @@
         createNotificationElement: function(data) {
             var type = data.notification_type || 'favorite';
             var timeAgo = data.time_ago || 'just now';
+            var strings = window.BPFNRealtime && window.BPFNRealtime.strings || {};
             
             var html = 
                 '<div class="bpfn-realtime-notification type-' + type + '" data-id="' + (data.notification_id || '') + '">' +
                     '<div class="bpfn-realtime-header">' +
                         '<span class="bpfn-realtime-title">' +
                             '<i class="dashicons dashicons-heart"></i>' +
-                            BPFNRealtime.strings.new_notification +
+                            (strings.new_notification || 'New notification') +
                         '</span>' +
-                        '<button class="bpfn-realtime-close" aria-label="' + BPFNRealtime.strings.dismiss + '">&times;</button>' +
+                        '<button class="bpfn-realtime-close" aria-label="' + (strings.dismiss || 'Dismiss') + '">&times;</button>' +
                     '</div>' +
                     '<div class="bpfn-realtime-body">' +
                         '<div class="bpfn-realtime-content">';
@@ -253,7 +277,7 @@
             }
             
             html += '<div class="bpfn-realtime-message">' +
-                        data.text +
+                        (data.text || 'Someone favorited your activity') +
                         '<div class="bpfn-realtime-time">' + timeAgo + '</div>' +
                     '</div>' +
                 '</div>' +
@@ -261,17 +285,35 @@
             
             // Add actions
             html += '<div class="bpfn-realtime-actions">' +
-                '<a href="' + data.link + '" class="bpfn-realtime-action primary">' +
-                    BPFNRealtime.strings.view_activity +
+                '<a href="' + (data.link || '#') + '" class="bpfn-realtime-action primary">' +
+                    (strings.view_activity || 'View Activity') +
                 '</a>' +
                 '<a href="#" class="bpfn-realtime-action secondary dismiss">' +
-                    BPFNRealtime.strings.dismiss +
+                    (strings.dismiss || 'Dismiss') +
                 '</a>' +
             '</div>';
             
             html += '</div>';
             
             return $(html);
+        },
+
+        /**
+         * Show test notification
+         */
+        showTestNotification: function() {
+            var self = this;
+            
+            var testData = {
+                notification_id: 'test-' + Date.now(),
+                notification_type: 'favorite',
+                text: '<strong>Test User</strong> favorited your activity',
+                link: '#',
+                time_ago: 'just now',
+                user_avatar: '<img src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&s=60" width="60" height="60" />'
+            };
+            
+            self.showNotification(testData);
         },
 
         /**
@@ -294,13 +336,15 @@
                 });
                 
                 // Mark as read if has ID
-                if (notificationId) {
+                if (notificationId && !notificationId.toString().startsWith('test-')) {
                     self.markAsRead(notificationId);
                 }
             }, 300);
             
             // Trigger event
-            BPFN.Core.trigger('realtime:notification:dismissed', { id: notificationId });
+            if (window.BPFN && window.BPFN.Core) {
+                window.BPFN.Core.trigger('realtime:notification:dismissed', { id: notificationId });
+            }
         },
 
         /**
@@ -319,9 +363,9 @@
          * Mark notification as read
          */
         markAsRead: function(notificationId) {
-            if (!notificationId) return;
+            if (!notificationId || !window.BPFN || !window.BPFN.Ajax) return;
             
-            BPFN.Ajax.post('dismiss_notification', {
+            window.BPFN.Ajax.post('dismiss_notification', {
                 notification_id: notificationId
             });
         },
@@ -345,7 +389,9 @@
             $('.bpfn-count').text(count);
             
             // Trigger event
-            BPFN.Core.trigger('realtime:count:updated', { count: count });
+            if (window.BPFN && window.BPFN.Core) {
+                window.BPFN.Core.trigger('realtime:count:updated', { count: count });
+            }
         },
 
         /**
@@ -390,4 +436,55 @@
             var self = this;
             
             self.state.soundEnabled = !self.state.soundEnabled;
-            localStorage.setItem('bpfn_sound_
+            localStorage.setItem('bpfn_sound_enabled', self.state.soundEnabled);
+            
+            // Show indicator
+            var indicatorText = self.state.soundEnabled ? 'Sound enabled' : 'Sound disabled';
+            self.showSoundIndicator(indicatorText);
+        },
+
+        /**
+         * Show sound indicator
+         */
+        showSoundIndicator: function(text) {
+            var $indicator = $('<div class="bpfn-sound-indicator">' + text + '</div>');
+            $('body').append($indicator);
+            
+            setTimeout(function() {
+                $indicator.addClass('show');
+            }, 10);
+            
+            setTimeout(function() {
+                $indicator.removeClass('show');
+                setTimeout(function() {
+                    $indicator.remove();
+                }, 300);
+            }, 2000);
+        },
+
+        /**
+         * Log debug messages
+         */
+        log: function(message, data) {
+            if (this.config.debug && window.console) {
+                console.log('[BPFN Realtime] ' + message, data || '');
+            }
+        }
+    };
+
+    /**
+     * Initialize when document is ready
+     */
+    $(document).ready(function() {
+        // Check if realtime config exists
+        if (window.BPFNRealtime && window.BPFNRealtime.nonce) {
+            BPFN.Realtime.init();
+            
+            // Add test button if in debug mode
+            if (window.BPFNRealtime.debug || (window.location.search.indexOf('bpfn_debug=1') !== -1)) {
+                $('body').append('<button id="bpfn-test-realtime" style="position:fixed;bottom:20px;right:20px;z-index:99999;">Test Realtime</button>');
+            }
+        }
+    });
+
+})(jQuery, window, document);

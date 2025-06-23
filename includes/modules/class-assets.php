@@ -120,19 +120,46 @@ class BPFN_Module_Assets {
 		
 		// Get realtime module
 		$realtime_module = bpfn()->get_module( 'realtime' );
-		$polling_config = $realtime_module ? $realtime_module->get_polling_config() : array();
+		$polling_config = $realtime_module ? $realtime_module->get_polling_config() : array(
+			'enabled' => true,
+			'interval' => 15000,
+			'max_notifications' => 5,
+			'auto_dismiss_time' => 5000,
+			'position' => 'bottom-right'
+		);
+		
+		// Get plugin options for interval
+		$options = get_option( 'bpfn_options', array() );
+		if ( ! empty( $options['realtime_interval'] ) ) {
+			$polling_config['interval'] = intval( $options['realtime_interval'] ) * 1000; // Convert to milliseconds
+		}
 		
 		// Localize real-time script
 		wp_localize_script( 'bpfn-realtime', 'BPFNRealtime', array(
 			'ajax_url' => admin_url( 'admin-ajax.php' ),
 			'nonce' => wp_create_nonce( 'bpfn_realtime_nonce' ),
 			'polling' => $polling_config,
+			'checkInterval' => $polling_config['interval'],
+			'position' => $polling_config['position'],
+			'maxNotifications' => $polling_config['max_notifications'],
+			'autoDismiss' => $polling_config['auto_dismiss_time'],
+			'debug' => defined( 'WP_DEBUG' ) && WP_DEBUG,
 			'strings' => array(
 				'new_notification' => __( 'New notification', 'bp-fav-notification' ),
 				'view_activity' => __( 'View Activity', 'bp-fav-notification' ),
 				'dismiss' => __( 'Dismiss', 'bp-fav-notification' ),
 			),
 		) );
+		
+		// Initialize real-time after localization
+		wp_add_inline_script( 'bpfn-realtime', '
+			jQuery(document).ready(function($) {
+				// Initialize realtime if not already initialized
+				if (window.BPFN && window.BPFN.Realtime && !window.BPFN.Realtime.state.initialized) {
+					window.BPFN.Realtime.init();
+				}
+			});
+		', 'after' );
 	}
 
 	/**

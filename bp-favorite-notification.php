@@ -141,11 +141,11 @@ class BP_Favorite_Notification {
 		// Load textdomain - now at the proper time
 		$this->load_textdomain();
 		
+		// Setup BuddyPress integration immediately
+		add_action( 'bp_loaded', array( $this, 'setup_globals' ), 5 );
+		
 		// Initialize modules after BuddyPress loads
 		add_action( 'bp_include', array( $this, 'load_modules' ) );
-		
-		// Setup BuddyPress integration
-		add_action( 'bp_setup_globals', array( $this, 'setup_globals' ) );
 		
 		// Allow developers to hook into initialization
 		do_action( 'bpfn_init', $this );
