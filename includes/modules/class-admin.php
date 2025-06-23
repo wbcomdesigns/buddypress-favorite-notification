@@ -31,7 +31,7 @@ class BPFN_Module_Admin {
 	 * Setup hooks
 	 */
 	private function setup_hooks() {
-		// Admin menu
+		// Admin menu - needs to be early
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
 		
 		// Admin notices
@@ -43,17 +43,39 @@ class BPFN_Module_Admin {
 		// Plugin meta links
 		add_filter( 'plugin_row_meta', array( $this, 'add_meta_links' ), 10, 2 );
 		
-		// Admin init
+		// Admin init - for settings registration
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 		
 		// AJAX handlers
-		add_action( 'wp_ajax_bpfn_dismiss_notice', array( $this, 'ajax_dismiss_notice' ) );
+		$this->register_ajax_handlers();
 		
-		// Review notice
-		$this->maybe_show_review_notice();
+		// Review notice - delay until translations are ready
+		add_action( 'init', array( $this, 'maybe_show_review_notice' ) );
 		
 		// Custom hooks
 		do_action( 'bpfn_admin_setup_hooks', $this );
+	}
+
+	/**
+	 * Register AJAX handlers
+	 */
+	private function register_ajax_handlers() {
+		$ajax_actions = array(
+			'dismiss_notice',
+			'send_test_notification',
+			'send_test_email',
+			'clear_old_notifications',
+			'repair_tables',
+			'bulk_update_settings',
+			'export_settings',
+			'import_settings',
+			'get_stats',
+			'run_diagnostics'
+		);
+		
+		foreach ( $ajax_actions as $action ) {
+			add_action( 'wp_ajax_bpfn_' . $action, array( $this, 'ajax_' . $action ) );
+		}
 	}
 
 	/**
@@ -194,28 +216,20 @@ class BPFN_Module_Admin {
 	 * Render stats
 	 */
 	private function render_stats() {
-		global $wpdb, $bp;
+		if ( ! function_exists( 'bpfn_get_notification_stats' ) ) {
+			echo '<p>' . __( 'Stats not available', 'bp-fav-notification' ) . '</p>';
+			return;
+		}
 		
-		// Get notification count
-		$table_name = $bp->notifications->table_name;
-		$total_notifications = $wpdb->get_var( $wpdb->prepare(
-			"SELECT COUNT(*) FROM {$table_name} WHERE component_name = %s",
-			$bp->favorite_notifier->id
-		) );
-		
-		// Get active users count
-		$active_users = $wpdb->get_var( 
-			"SELECT COUNT(DISTINCT user_id) FROM {$wpdb->prefix}bp_favorite_notification_prefs"
-		);
-		
+		$stats = bpfn_get_notification_stats( 'all' );
 		?>
 		<ul class="bpfn-stats">
 			<li>
-				<span class="bpfn-stat-value"><?php echo number_format_i18n( $total_notifications ); ?></span>
+				<span class="bpfn-stat-value"><?php echo number_format_i18n( $stats['total_notifications'] ); ?></span>
 				<span class="bpfn-stat-label"><?php _e( 'Total Notifications', 'bp-fav-notification' ); ?></span>
 			</li>
 			<li>
-				<span class="bpfn-stat-value"><?php echo number_format_i18n( $active_users ); ?></span>
+				<span class="bpfn-stat-value"><?php echo number_format_i18n( $stats['active_users'] ); ?></span>
 				<span class="bpfn-stat-label"><?php _e( 'Active Users', 'bp-fav-notification' ); ?></span>
 			</li>
 		</ul>
@@ -237,6 +251,39 @@ class BPFN_Module_Admin {
 		</div>
 		
 		<div class="bpfn-tool-box">
+			<h3><?php _e( 'Test Email Template', 'bp-fav-notification' ); ?></h3>
+			<p><?php _e( 'Send a test email to preview the email template.', 'bp-fav-notification' ); ?></p>
+			<select id="bpfn-test-email-type">
+				<option value="activity_favorited"><?php _e( 'Activity Favorited', 'bp-fav-notification' ); ?></option>
+				<option value="comment_favorited"><?php _e( 'Comment Favorited', 'bp-fav-notification' ); ?></option>
+			</select>
+			<button class="button" id="bpfn-send-test-email">
+				<?php _e( 'Send Test Email', 'bp-fav-notification' ); ?>
+			</button>
+		</div>
+		
+		<div class="bpfn-tool-box">
+			<h3><?php _e( 'Database Maintenance', 'bp-fav-notification' ); ?></h3>
+			<p><?php _e( 'Check and repair database tables.', 'bp-fav-notification' ); ?></p>
+			<?php
+			if ( function_exists( 'bpfn_check_tables' ) ) {
+				$tables = bpfn_check_tables();
+				foreach ( $tables as $table => $exists ) {
+					echo '<p>';
+					echo ucfirst( $table ) . ' table: ';
+					echo $exists ? '<span style="color:green;">✓ OK</span>' : '<span style="color:red;">✗ Missing</span>';
+					echo '</p>';
+				}
+				?>
+				<button class="button" id="bpfn-repair-tables" <?php echo ! in_array( false, $tables ) ? 'disabled' : ''; ?>>
+					<?php _e( 'Repair Tables', 'bp-fav-notification' ); ?>
+				</button>
+				<?php
+			}
+			?>
+		</div>
+		
+		<div class="bpfn-tool-box">
 			<h3><?php _e( 'Clear Old Notifications', 'bp-fav-notification' ); ?></h3>
 			<p><?php _e( 'Remove read notifications older than 30 days.', 'bp-fav-notification' ); ?></p>
 			<button class="button" id="bpfn-clear-old-notifications">
@@ -245,11 +292,40 @@ class BPFN_Module_Admin {
 		</div>
 		
 		<div class="bpfn-tool-box">
-			<h3><?php _e( 'Export Settings', 'bp-fav-notification' ); ?></h3>
+			<h3><?php _e( 'Bulk Settings Update', 'bp-fav-notification' ); ?></h3>
+			<p><?php _e( 'Apply default notification settings to all users.', 'bp-fav-notification' ); ?></p>
+			<label>
+				<input type="checkbox" id="bpfn-bulk-web" checked> <?php _e( 'Web Notifications', 'bp-fav-notification' ); ?>
+			</label><br>
+			<label>
+				<input type="checkbox" id="bpfn-bulk-email" checked> <?php _e( 'Email Notifications', 'bp-fav-notification' ); ?>
+			</label><br>
+			<label>
+				<input type="checkbox" id="bpfn-bulk-realtime" checked> <?php _e( 'Real-time Notifications', 'bp-fav-notification' ); ?>
+			</label><br><br>
+			<button class="button" id="bpfn-bulk-update">
+				<?php _e( 'Update All Users', 'bp-fav-notification' ); ?>
+			</button>
+		</div>
+		
+		<div class="bpfn-tool-box">
+			<h3><?php _e( 'Export/Import Settings', 'bp-fav-notification' ); ?></h3>
 			<p><?php _e( 'Export your plugin settings for backup or migration.', 'bp-fav-notification' ); ?></p>
 			<button class="button" id="bpfn-export-settings">
 				<?php _e( 'Export Settings', 'bp-fav-notification' ); ?>
 			</button>
+			<br><br>
+			<label for="bpfn-import-file"><?php _e( 'Import Settings:', 'bp-fav-notification' ); ?></label><br>
+			<input type="file" id="bpfn-import-settings-file" accept=".json">
+		</div>
+		
+		<div class="bpfn-tool-box">
+			<h3><?php _e( 'System Diagnostics', 'bp-fav-notification' ); ?></h3>
+			<p><?php _e( 'Run system diagnostics to check plugin health.', 'bp-fav-notification' ); ?></p>
+			<button class="button" id="bpfn-run-diagnostics">
+				<?php _e( 'Run Diagnostics', 'bp-fav-notification' ); ?>
+			</button>
+			<div id="bpfn-diagnostics-results"></div>
 		</div>
 		<?php
 	}
@@ -371,6 +447,30 @@ class BPFN_Module_Admin {
 				'default' => 15,
 			)
 		);
+		
+		// Email settings section
+		add_settings_section(
+			'bpfn_email',
+			__( 'Email Settings', 'bp-fav-notification' ),
+			array( $this, 'section_email' ),
+			'bpfn-settings'
+		);
+		
+		// Social links fields
+		$social_networks = array( 'facebook', 'twitter', 'instagram', 'linkedin' );
+		foreach ( $social_networks as $network ) {
+			add_settings_field(
+				'social_' . $network,
+				ucfirst( $network ) . ' URL',
+				array( $this, 'field_text' ),
+				'bpfn-settings',
+				'bpfn_email',
+				array(
+					'name' => 'social_links][' . $network,
+					'placeholder' => 'https://' . $network . '.com/yourpage',
+				)
+			);
+		}
 	}
 
 	/**
@@ -388,12 +488,18 @@ class BPFN_Module_Admin {
 	}
 
 	/**
+	 * Email section
+	 */
+	public function section_email() {
+		echo '<p>' . __( 'Configure email notification settings and social links for email footers.', 'bp-fav-notification' ) . '</p>';
+	}
+
+	/**
 	 * Checkbox field
 	 */
 	public function field_checkbox( $args ) {
 		$options = get_option( 'bpfn_options', array() );
 		$value = isset( $options[ $args['name'] ] ) ? $options[ $args['name'] ] : 0;
-		
 		?>
 		<label>
 			<input type="checkbox" 
@@ -403,7 +509,6 @@ class BPFN_Module_Admin {
 			<?php echo esc_html( $args['label'] ); ?>
 		</label>
 		<?php
-		
 		if ( ! empty( $args['description'] ) ) {
 			echo '<p class="description">' . esc_html( $args['description'] ) . '</p>';
 		}
@@ -415,7 +520,6 @@ class BPFN_Module_Admin {
 	public function field_number( $args ) {
 		$options = get_option( 'bpfn_options', array() );
 		$value = isset( $options[ $args['name'] ] ) ? $options[ $args['name'] ] : $args['default'];
-		
 		?>
 		<input type="number" 
 			   name="bpfn_options[<?php echo esc_attr( $args['name'] ); ?>]" 
@@ -424,7 +528,30 @@ class BPFN_Module_Admin {
 			   max="<?php echo esc_attr( $args['max'] ); ?>"
 			   class="small-text" />
 		<?php
+		if ( ! empty( $args['description'] ) ) {
+			echo '<p class="description">' . esc_html( $args['description'] ) . '</p>';
+		}
+	}
+
+	/**
+	 * Text field
+	 */
+	public function field_text( $args ) {
+		$options = get_option( 'bpfn_options', array() );
+		$name_parts = explode( '][', $args['name'] );
+		$value = $options;
 		
+		foreach ( $name_parts as $part ) {
+			$part = trim( $part, ']' );
+			$value = isset( $value[ $part ] ) ? $value[ $part ] : '';
+		}
+		?>
+		<input type="text" 
+			   name="bpfn_options[<?php echo esc_attr( $args['name'] ); ?>]" 
+			   value="<?php echo esc_attr( $value ); ?>"
+			   placeholder="<?php echo esc_attr( $args['placeholder'] ?? '' ); ?>"
+			   class="regular-text" />
+		<?php
 		if ( ! empty( $args['description'] ) ) {
 			echo '<p class="description">' . esc_html( $args['description'] ) . '</p>';
 		}
@@ -445,6 +572,14 @@ class BPFN_Module_Admin {
 		// Numbers
 		if ( isset( $input['realtime_interval'] ) ) {
 			$sanitized['realtime_interval'] = max( 15, min( 300, intval( $input['realtime_interval'] ) ) );
+		}
+		
+		// Social links
+		if ( isset( $input['social_links'] ) ) {
+			$sanitized['social_links'] = array();
+			foreach ( $input['social_links'] as $network => $url ) {
+				$sanitized['social_links'][ $network ] = esc_url_raw( $url );
+			}
 		}
 		
 		return $sanitized;
@@ -481,16 +616,20 @@ class BPFN_Module_Admin {
 	 * Enqueue admin scripts
 	 */
 	public function enqueue_admin_scripts() {
-		// Enqueue admin specific scripts if needed
-		wp_enqueue_script( 'bpfn-admin-tools', BPFN_ASSETS_URL . 'js/admin-tools.js', array( 'jquery' ), BPFN_VERSION );
+		// Enqueue admin scripts with all tools functionality included
+		wp_enqueue_script( 'bpfn-admin', BPFN_ASSETS_URL . 'js/admin.js', array( 'jquery' ), BPFN_VERSION, true );
 		
-		wp_localize_script( 'bpfn-admin-tools', 'bpfnAdmin', array(
+		wp_localize_script( 'bpfn-admin', 'bpfnAdmin', array(
 			'ajax_url' => admin_url( 'admin-ajax.php' ),
 			'nonce' => wp_create_nonce( 'bpfn-admin-nonce' ),
 			'strings' => array(
 				'testing' => __( 'Sending test notification...', 'bp-fav-notification' ),
 				'test_success' => __( 'Test notification sent successfully!', 'bp-fav-notification' ),
 				'test_error' => __( 'Failed to send test notification.', 'bp-fav-notification' ),
+				'confirm_clear' => __( 'Are you sure you want to clear old notifications?', 'bp-fav-notification' ),
+				'clearing' => __( 'Clearing...', 'bp-fav-notification' ),
+				'clear_success' => __( 'Notifications cleared successfully.', 'bp-fav-notification' ),
+				'clear_error' => __( 'Failed to clear notifications.', 'bp-fav-notification' ),
 			),
 		) );
 	}
@@ -498,7 +637,7 @@ class BPFN_Module_Admin {
 	/**
 	 * Maybe show review notice
 	 */
-	private function maybe_show_review_notice() {
+	public function maybe_show_review_notice() {
 		// Check if we should show review notice
 		$install_date = get_option( 'bpfn_install_date', false );
 		
@@ -517,8 +656,8 @@ class BPFN_Module_Admin {
 			return;
 		}
 		
-		// Add notice
-		$this->add_notice( 'review', $this->get_review_notice_content(), 'info', true );
+		// Add notice - content will be generated when displayed
+		$this->add_notice( 'review', '', 'info', true );
 	}
 
 	/**
@@ -551,6 +690,11 @@ class BPFN_Module_Admin {
 	 */
 	public function display_admin_notices() {
 		foreach ( $this->notices as $id => $notice ) {
+			// Get content for review notice if empty
+			if ( $id === 'review' && empty( $notice['message'] ) ) {
+				$notice['message'] = $this->get_review_notice_content();
+			}
+			
 			$classes = 'notice notice-' . $notice['type'];
 			if ( $notice['dismissible'] ) {
 				$classes .= ' is-dismissible';
@@ -578,5 +722,269 @@ class BPFN_Module_Admin {
 		}
 		
 		wp_send_json_success();
+	}
+
+	/**
+	 * AJAX send test notification
+	 */
+	public function ajax_send_test_notification() {
+		check_ajax_referer( 'bpfn-admin-nonce', 'nonce' );
+		
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'bp-fav-notification' ) ) );
+		}
+		
+		if ( ! function_exists( 'bpfn_send_test_notification' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Test function not available', 'bp-fav-notification' ) ) );
+		}
+		
+		$user_id = get_current_user_id();
+		$result = bpfn_send_test_notification( $user_id );
+		
+		if ( $result ) {
+			$details = array(
+				'web' => true,
+				'email' => bpfn_is_notification_enabled( $user_id, 'activity_post', 'email' ),
+				'realtime' => bpfn_is_notification_enabled( $user_id, 'activity_post', 'realtime' ),
+			);
+			
+			wp_send_json_success( array( 
+				'message' => __( 'Test notification sent!', 'bp-fav-notification' ),
+				'details' => $details,
+			) );
+		} else {
+			wp_send_json_error( array( 'message' => __( 'Failed to send test notification', 'bp-fav-notification' ) ) );
+		}
+	}
+
+	/**
+	 * AJAX send test email
+	 */
+	public function ajax_send_test_email() {
+		check_ajax_referer( 'bpfn-admin-nonce', 'nonce' );
+		
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'bp-fav-notification' ) ) );
+		}
+		
+		if ( ! function_exists( 'bpfn_send_test_email' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Test function not available', 'bp-fav-notification' ) ) );
+		}
+		
+		$type = sanitize_text_field( $_POST['type'] ?? 'activity_favorited' );
+		$user_id = get_current_user_id();
+		
+		$result = bpfn_send_test_email( $user_id, $type );
+		
+		if ( $result ) {
+			wp_send_json_success( array( 
+				'message' => sprintf( __( 'Test email sent to %s', 'bp-fav-notification' ), wp_get_current_user()->user_email ),
+			) );
+		} else {
+			wp_send_json_error( array( 'message' => __( 'Failed to send test email', 'bp-fav-notification' ) ) );
+		}
+	}
+
+	/**
+	 * AJAX clear old notifications
+	 */
+	public function ajax_clear_old_notifications() {
+		check_ajax_referer( 'bpfn-admin-nonce', 'nonce' );
+		
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'bp-fav-notification' ) ) );
+		}
+		
+		global $wpdb, $bp;
+		
+		if ( ! bp_is_active( 'notifications' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Notifications component is not active', 'bp-fav-notification' ) ) );
+		}
+		
+		$table = $bp->notifications->table_name;
+		$component = $bp->favorite_notifier->id;
+		
+		// Delete notifications older than 30 days that are read
+		$deleted = $wpdb->query( $wpdb->prepare(
+			"DELETE FROM {$table} 
+			WHERE component_name = %s 
+			AND is_new = 0 
+			AND date_notified < DATE_SUB(NOW(), INTERVAL 30 DAY)",
+			$component
+		) );
+		
+		// Get remaining count
+		$remaining = $wpdb->get_var( $wpdb->prepare(
+			"SELECT COUNT(*) FROM {$table} WHERE component_name = %s",
+			$component
+		) );
+		
+		wp_send_json_success( array(
+			'count' => $deleted,
+			'remaining' => $remaining,
+			'message' => sprintf( __( 'Cleared %d old notifications', 'bp-fav-notification' ), $deleted ),
+		) );
+	}
+
+	/**
+	 * AJAX repair tables
+	 */
+	public function ajax_repair_tables() {
+		check_ajax_referer( 'bpfn-admin-nonce', 'nonce' );
+		
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'bp-fav-notification' ) ) );
+		}
+		
+		if ( ! function_exists( 'bpfn_repair_tables' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Repair function not available', 'bp-fav-notification' ) ) );
+		}
+		
+		$result = bpfn_repair_tables();
+		
+		if ( $result ) {
+			wp_send_json_success( array( 'message' => __( 'Tables repaired successfully', 'bp-fav-notification' ) ) );
+		} else {
+			wp_send_json_error( array( 'message' => __( 'Failed to repair tables', 'bp-fav-notification' ) ) );
+		}
+	}
+
+	/**
+	 * AJAX bulk update settings
+	 */
+	public function ajax_bulk_update_settings() {
+		check_ajax_referer( 'bpfn-admin-nonce', 'nonce' );
+		
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'bp-fav-notification' ) ) );
+		}
+		
+		if ( ! function_exists( 'bpfn_bulk_update_settings' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Bulk update function not available', 'bp-fav-notification' ) ) );
+		}
+		
+		$settings = array(
+			'activity_post' => array(
+				'is_enabled' => ! empty( $_POST['web'] ),
+				'email_enabled' => ! empty( $_POST['email'] ),
+				'realtime_enabled' => ! empty( $_POST['realtime'] ),
+			),
+			'activity_comment' => array(
+				'is_enabled' => ! empty( $_POST['web'] ),
+				'email_enabled' => ! empty( $_POST['email'] ),
+				'realtime_enabled' => ! empty( $_POST['realtime'] ),
+			),
+		);
+		
+		$updated = bpfn_bulk_update_settings( $settings );
+		
+		wp_send_json_success( array(
+			'count' => $updated,
+			'message' => sprintf( __( 'Updated settings for %d users', 'bp-fav-notification' ), $updated ),
+		) );
+	}
+
+	/**
+	 * AJAX export settings
+	 */
+	public function ajax_export_settings() {
+		check_ajax_referer( 'bpfn-admin-nonce', 'nonce' );
+		
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'bp-fav-notification' ) ) );
+		}
+		
+		$export_data = array(
+			'version' => BPFN_VERSION,
+			'timestamp' => current_time( 'mysql' ),
+			'site_url' => home_url(),
+			'options' => get_option( 'bpfn_options', array() ),
+		);
+		
+		if ( function_exists( 'bpfn_get_notification_stats' ) ) {
+			$export_data['stats'] = bpfn_get_notification_stats( 'all' );
+		}
+		
+		wp_send_json_success( $export_data );
+	}
+
+	/**
+	 * AJAX import settings
+	 */
+	public function ajax_import_settings() {
+		check_ajax_referer( 'bpfn-admin-nonce', 'nonce' );
+		
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'bp-fav-notification' ) ) );
+		}
+		
+		$settings = json_decode( stripslashes( $_POST['settings'] ), true );
+		
+		if ( ! is_array( $settings ) || ! isset( $settings['options'] ) ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid settings format', 'bp-fav-notification' ) ) );
+		}
+		
+		// Update options
+		update_option( 'bpfn_options', $settings['options'] );
+		
+		wp_send_json_success( array( 'message' => __( 'Settings imported successfully', 'bp-fav-notification' ) ) );
+	}
+
+	/**
+	 * AJAX get stats
+	 */
+	public function ajax_get_stats() {
+		check_ajax_referer( 'bpfn-admin-nonce', 'nonce' );
+		
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'bp-fav-notification' ) ) );
+		}
+		
+		$response = array();
+		
+		if ( function_exists( 'bpfn_get_notification_stats' ) ) {
+			$period = sanitize_text_field( $_POST['period'] ?? 'week' );
+			$stats = bpfn_get_notification_stats( $period );
+			$response['stats'] = $stats;
+			$response['total_notifications'] = $stats['total_notifications'];
+			$response['active_users'] = $stats['active_users'];
+		}
+		
+		if ( function_exists( 'bpfn_get_chart_data' ) ) {
+			$chart = bpfn_get_chart_data( 7 );
+			$response['chart'] = $chart;
+		}
+		
+		wp_send_json_success( $response );
+	}
+
+	/**
+	 * AJAX run diagnostics
+	 */
+	public function ajax_run_diagnostics() {
+		check_ajax_referer( 'bpfn-admin-nonce', 'nonce' );
+		
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'bp-fav-notification' ) ) );
+		}
+		
+		if ( ! function_exists( 'bpfn_get_diagnostics' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Diagnostics function not available', 'bp-fav-notification' ) ) );
+		}
+		
+		$diagnostics = bpfn_get_diagnostics();
+		
+		// Format for display
+		$formatted = array(
+			'php_version' => $diagnostics['environment']['php_version'] ?? 'Unknown',
+			'wp_version' => $diagnostics['environment']['wp_version'] ?? 'Unknown',
+			'bp_version' => $diagnostics['environment']['bp_version'] ?? 'Unknown',
+			'plugin_version' => $diagnostics['environment']['plugin_version'] ?? 'Unknown',
+			'tables' => $diagnostics['tables'] ?? array(),
+			'stats' => $diagnostics['stats'] ?? array(),
+			'components' => $diagnostics['components'] ?? array(),
+		);
+		
+		wp_send_json_success( $formatted );
 	}
 }

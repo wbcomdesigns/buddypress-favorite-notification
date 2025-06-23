@@ -70,12 +70,34 @@ class BP_Favorite_Notification {
 		// Load required files
 		$this->load_dependencies();
 		
-		// Hook into WordPress
-		add_action( 'plugins_loaded', array( $this, 'init' ) );
+		// Early initialization for admin
+		add_action( 'plugins_loaded', array( $this, 'early_init' ), 20 );
+		
+		// Main initialization
+		add_action( 'init', array( $this, 'init' ) );
 		
 		// Activation/Deactivation hooks
 		register_activation_hook( BPFN_PLUGIN_FILE, array( $this, 'activate' ) );
 		register_deactivation_hook( BPFN_PLUGIN_FILE, array( $this, 'deactivate' ) );
+	}
+
+	/**
+	 * Early initialization - for things that need to run before init
+	 */
+	public function early_init() {
+		// Check dependencies
+		if ( ! class_exists( 'BuddyPress' ) ) {
+			add_action( 'admin_notices', array( $this, 'admin_notice_buddypress_required' ) );
+			return false;
+		}
+		
+		// Load admin module early if in admin
+		if ( is_admin() ) {
+			require_once BPFN_INCLUDES_PATH . 'modules/class-admin.php';
+			$this->modules['admin'] = new BPFN_Module_Admin();
+		}
+		
+		return true;
 	}
 
 	/**
@@ -87,6 +109,7 @@ class BP_Favorite_Notification {
 			'functions/core-functions.php',
 			'functions/template-functions.php',
 			'functions/api-functions.php',
+			'functions/integration-functions.php',
 		);
 
 		foreach ( $core_files as $file ) {
@@ -100,15 +123,15 @@ class BP_Favorite_Notification {
 	 * Initialize plugin
 	 */
 	public function init() {
-		// Load textdomain
-		$this->load_textdomain();
-		
-		// Check dependencies
+		// Check dependencies first
 		if ( ! $this->check_dependencies() ) {
 			return;
 		}
 		
-		// Initialize modules
+		// Load textdomain - now at the proper time
+		$this->load_textdomain();
+		
+		// Initialize modules after BuddyPress loads
 		add_action( 'bp_include', array( $this, 'load_modules' ) );
 		
 		// Setup BuddyPress integration
@@ -122,15 +145,19 @@ class BP_Favorite_Notification {
 	 * Load modules
 	 */
 	public function load_modules() {
-		// Core module files
+		// Core module files (skip admin if already loaded)
 		$module_files = array(
 			'modules/class-notifications.php',
 			'modules/class-email.php',
 			'modules/class-realtime.php',
 			'modules/class-settings.php',
-			'modules/class-admin.php',
 			'modules/class-assets.php',
 		);
+		
+		// Add admin module if not already loaded
+		if ( ! isset( $this->modules['admin'] ) ) {
+			$module_files[] = 'modules/class-admin.php';
+		}
 
 		// Load each module
 		foreach ( $module_files as $file ) {
@@ -142,7 +169,10 @@ class BP_Favorite_Notification {
 				$class_name = $this->get_class_name_from_file( $file );
 				if ( class_exists( $class_name ) ) {
 					$module_key = strtolower( str_replace( 'BPFN_Module_', '', $class_name ) );
-					$this->modules[ $module_key ] = new $class_name();
+					// Skip if already loaded (like admin)
+					if ( ! isset( $this->modules[ $module_key ] ) ) {
+						$this->modules[ $module_key ] = new $class_name();
+					}
 				}
 			}
 		}
@@ -206,7 +236,6 @@ class BP_Favorite_Notification {
 	 */
 	public function check_dependencies() {
 		if ( ! class_exists( 'BuddyPress' ) ) {
-			add_action( 'admin_notices', array( $this, 'admin_notice_buddypress_required' ) );
 			return false;
 		}
 		
@@ -217,6 +246,10 @@ class BP_Favorite_Notification {
 	 * Admin notice for BuddyPress requirement
 	 */
 	public function admin_notice_buddypress_required() {
+		// Only show notice after init when translations are loaded
+		if ( ! did_action( 'init' ) ) {
+			return;
+		}
 		?>
 		<div class="error">
 			<p><?php printf( 
