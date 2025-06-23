@@ -148,38 +148,69 @@ function bpfn_send_test_email( $user_id, $type = 'activity_favorited' ) {
 	$email_module = bpfn()->get_module( 'email' );
 	
 	if ( ! $email_module ) {
+		error_log( 'BPFN: Email module not found' );
 		return false;
 	}
 	
 	$user = get_userdata( $user_id );
 	if ( ! $user ) {
+		error_log( 'BPFN: User not found' );
 		return false;
 	}
+	
+	// Get current user as the favoriter
+	$current_user = wp_get_current_user();
 	
 	// Prepare test email data
 	$email_data = array(
 		'to' => $user->user_email,
 		'subject' => '[Test] ' . get_bloginfo( 'name' ) . ' - Favorite Notification Test',
-		'template' => 'emails/' . $type . '.php',
+		'template' => 'emails/' . str_replace( '_', '-', $type ) . '.php',
 		'tokens' => array(
 			'site_name' => get_bloginfo( 'name' ),
 			'site_url' => home_url(),
 			'user_name' => $user->display_name,
 			'recipient_name' => $user->display_name,
-			'activity_content' => __( 'This is a test activity content to show how your notifications will look.', 'bp-fav-notification' ),
+			'activity_content' => __( 'This is a test activity content to show how your notifications will look when someone favorites your activity posts.', 'bp-fav-notification' ),
 			'activity_link' => home_url(),
-			'settings_link' => bp_core_get_user_domain( $user_id ) . bp_get_settings_slug() . '/notifications/',
-			'favorited_by' => __( 'Test User', 'bp-fav-notification' ),
-			'favorited_by_link' => home_url(),
+			'settings_link' => bp_is_active( 'settings' ) ? bp_core_get_user_domain( $user_id ) . bp_get_settings_slug() . '/notifications/' : home_url(),
+			'favorited_by' => $current_user->display_name,
+			'favorited_by_link' => bp_core_get_user_domain( get_current_user_id() ),
+			'secondary_item_id' => get_current_user_id(), // For avatar in template
 		),
 	);
 	
-	// Use reflection to access private method
-	$reflection = new ReflectionMethod( $email_module, 'send_email' );
-	$reflection->setAccessible( true );
+	// Try to call send_test_email if it exists
+	if ( method_exists( $email_module, 'send_test_email' ) ) {
+		return $email_module->send_test_email( $email_data );
+	}
 	
-	return $reflection->invoke( $email_module, $email_data );
+	// Try reflection to access private method
+	try {
+		$reflection = new ReflectionMethod( $email_module, 'send_email' );
+		$reflection->setAccessible( true );
+		return $reflection->invoke( $email_module, $email_data );
+	} catch ( Exception $e ) {
+		error_log( 'BPFN: Failed to use reflection - ' . $e->getMessage() );
+		
+		// If reflection fails, try direct email approach
+		$subject = '[Test] ' . get_bloginfo( 'name' ) . ' - Favorite Notification Test';
+		
+		// Build simple HTML email
+		$message = sprintf(
+			'<h2>%s</h2><p>%s</p><p>%s</p>',
+			sprintf( __( 'Hi %s!', 'bp-fav-notification' ), $user->display_name ),
+			__( 'This is a test email from BuddyPress Favorite Notification plugin.', 'bp-fav-notification' ),
+			sprintf( __( 'If you received this email, your email notifications are working correctly.', 'bp-fav-notification' ) )
+		);
+		
+		$headers = array( 'Content-Type: text/html; charset=UTF-8' );
+		
+		return wp_mail( $user->user_email, $subject, $message, $headers );
+	}
 }
+
+
 
 /**
  * Bulk update user settings
@@ -232,3 +263,8 @@ function bpfn_get_diagnostics() {
 	
 	return apply_filters( 'bpfn_diagnostics', $diagnostics );
 }
+
+// Add cleanup action
+add_action( 'bpfn_cleanup_test_activity', function( $activity_id ) {
+	bp_activity_delete( array( 'id' => $activity_id ) );
+} );

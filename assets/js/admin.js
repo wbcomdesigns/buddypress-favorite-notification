@@ -38,10 +38,28 @@
                 self.sendTestNotification($(this));
             });
             
+            // Test email button
+            $('#bpfn-send-test-email').on('click', function(e) {
+                e.preventDefault();
+                self.sendTestEmail($(this));
+            });
+            
             // Clear old notifications
             $('#bpfn-clear-old-notifications').on('click', function(e) {
                 e.preventDefault();
                 self.clearOldNotifications($(this));
+            });
+            
+            // Repair tables
+            $('#bpfn-repair-tables').on('click', function(e) {
+                e.preventDefault();
+                self.repairTables($(this));
+            });
+            
+            // Bulk update
+            $('#bpfn-bulk-update').on('click', function(e) {
+                e.preventDefault();
+                self.bulkUpdateSettings($(this));
             });
             
             // Export settings
@@ -53,6 +71,12 @@
             // Import settings
             $('#bpfn-import-settings-file').on('change', function(e) {
                 self.importSettings($(this));
+            });
+            
+            // Run diagnostics
+            $('#bpfn-run-diagnostics').on('click', function(e) {
+                e.preventDefault();
+                self.runDiagnostics($(this));
             });
             
             // Dismiss notices
@@ -135,6 +159,54 @@
         },
 
         /**
+         * Send test email
+         */
+        sendTestEmail: function($button) {
+            var self = this;
+            var $container = $button.parent();
+            var originalText = $button.text();
+            var emailType = $('#bpfn-test-email-type').val();
+            
+            // Disable button and show loading
+            $button.prop('disabled', true);
+            $button.text('Sending...');
+            
+            // Remove any previous messages
+            $container.find('.bpfn-message').remove();
+            
+            $.ajax({
+                url: bpfnAdmin.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'bpfn_send_test_email',
+                    nonce: bpfnAdmin.nonce,
+                    type: emailType
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $container.append('<div class="bpfn-message success" style="margin-top: 10px; color: green;">' + response.data.message + '</div>');
+                    } else {
+                        $container.append('<div class="bpfn-message error" style="margin-top: 10px; color: red;">' + (response.data.message || 'Failed to send test email') + '</div>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $container.append('<div class="bpfn-message error" style="margin-top: 10px; color: red;">Error: ' + error + '</div>');
+                    console.error('Test email error:', xhr.responseText);
+                },
+                complete: function() {
+                    // Re-enable button
+                    $button.prop('disabled', false);
+                    $button.text(originalText);
+                    
+                    // Auto-remove message after 5 seconds
+                    setTimeout(function() {
+                        $container.find('.bpfn-message').fadeOut();
+                    }, 5000);
+                }
+            });
+        },
+
+        /**
          * Clear old notifications
          */
         clearOldNotifications: function($button) {
@@ -177,6 +249,82 @@
                 complete: function() {
                     $button.prop('disabled', false);
                     $button.text(originalText);
+                }
+            });
+        },
+
+        /**
+         * Repair tables
+         */
+        repairTables: function($button) {
+            var self = this;
+            var originalText = $button.text();
+            
+            $button.prop('disabled', true).text('Repairing...');
+            
+            $.ajax({
+                url: bpfnAdmin.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'bpfn_repair_tables',
+                    nonce: bpfnAdmin.nonce
+                },
+                success: function(response) {
+                    if (response.success) {
+                        self.showNotice(response.data.message || 'Tables repaired successfully!', 'success');
+                        // Reload page after 2 seconds
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 2000);
+                    } else {
+                        self.showNotice(response.data.message || 'Failed to repair tables.', 'error');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    self.showNotice('Error: ' + error, 'error');
+                },
+                complete: function() {
+                    $button.prop('disabled', false).text(originalText);
+                }
+            });
+        },
+
+        /**
+         * Bulk update settings
+         */
+        bulkUpdateSettings: function($button) {
+            var self = this;
+            var originalText = $button.text();
+            
+            if (!confirm('This will update notification settings for all users. Continue?')) {
+                return;
+            }
+            
+            $button.prop('disabled', true).text('Updating...');
+            
+            $.ajax({
+                url: bpfnAdmin.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'bpfn_bulk_update_settings',
+                    nonce: bpfnAdmin.nonce,
+                    web: $('#bpfn-bulk-web').is(':checked') ? 1 : 0,
+                    email: $('#bpfn-bulk-email').is(':checked') ? 1 : 0,
+                    realtime: $('#bpfn-bulk-realtime').is(':checked') ? 1 : 0
+                },
+                success: function(response) {
+                    if (response.success) {
+                        self.showNotice(response.data.message, 'success');
+                    } else {
+                        self.showNotice(response.data.message || 'Failed to update settings', 'error');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    self.showNotice('Error: ' + error, 'error');
+                    console.error('Bulk update error:', xhr.responseText);
+                },
+                complete: function() {
+                    $button.prop('disabled', false).text(originalText);
                 }
             });
         },
@@ -248,7 +396,7 @@
                         data: {
                             action: 'bpfn_import_settings',
                             nonce: bpfnAdmin.nonce,
-                            settings: settings
+                            settings: JSON.stringify(settings)
                         },
                         success: function(response) {
                             if (response.success) {
@@ -272,6 +420,78 @@
             
             // Reset input
             $input.val('');
+        },
+
+        /**
+         * Run diagnostics
+         */
+        runDiagnostics: function($button) {
+            var self = this;
+            var $results = $('#bpfn-diagnostics-results');
+            var originalText = $button.text();
+            
+            $button.prop('disabled', true).text('Running diagnostics...');
+            $results.html('<div class="bpfn-loading">Running system checks...</div>');
+            
+            $.ajax({
+                url: bpfnAdmin.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'bpfn_run_diagnostics',
+                    nonce: bpfnAdmin.nonce
+                },
+                success: function(response) {
+                    if (response.success && response.data) {
+                        self.displayDiagnostics(response.data, $results);
+                    } else {
+                        $results.html('<div class="notice notice-error"><p>Failed to run diagnostics.</p></div>');
+                    }
+                },
+                error: function() {
+                    $results.html('<div class="notice notice-error"><p>An error occurred while running diagnostics.</p></div>');
+                },
+                complete: function() {
+                    $button.prop('disabled', false).text(originalText);
+                }
+            });
+        },
+
+        /**
+         * Display diagnostic results
+         */
+        displayDiagnostics: function(data, $container) {
+            var html = '<div class="bpfn-diagnostics-report">';
+            
+            // System info
+            html += '<h3>System Information</h3>';
+            html += '<table class="widefat striped">';
+            html += '<tr><td><strong>PHP Version:</strong></td><td>' + data.php_version + '</td></tr>';
+            html += '<tr><td><strong>WordPress Version:</strong></td><td>' + data.wp_version + '</td></tr>';
+            html += '<tr><td><strong>BuddyPress Version:</strong></td><td>' + data.bp_version + '</td></tr>';
+            html += '<tr><td><strong>Plugin Version:</strong></td><td>' + data.plugin_version + '</td></tr>';
+            html += '</table>';
+            
+            // Database info
+            html += '<h3>Database Status</h3>';
+            html += '<table class="widefat striped">';
+            html += '<tr><td><strong>Notifications Table:</strong></td><td>' + (data.tables.notifications ? '<span style="color:green;">✓ Exists</span>' : '<span style="color:red;">✗ Missing</span>') + '</td></tr>';
+            html += '<tr><td><strong>Preferences Table:</strong></td><td>' + (data.tables.preferences ? '<span style="color:green;">✓ Exists</span>' : '<span style="color:red;">✗ Missing</span>') + '</td></tr>';
+            html += '<tr><td><strong>Total Notifications:</strong></td><td>' + data.stats.total_notifications + '</td></tr>';
+            html += '<tr><td><strong>Unread Notifications:</strong></td><td>' + data.stats.unread_notifications + '</td></tr>';
+            html += '</table>';
+            
+            // Component status
+            html += '<h3>Component Status</h3>';
+            html += '<table class="widefat striped">';
+            $.each(data.components, function(component, status) {
+                var statusText = status ? '<span style="color: green;">✓ Active</span>' : '<span style="color: red;">✗ Inactive</span>';
+                html += '<tr><td><strong>' + component.charAt(0).toUpperCase() + component.slice(1) + ':</strong></td><td>' + statusText + '</td></tr>';
+            });
+            html += '</table>';
+            
+            html += '</div>';
+            
+            $container.html(html);
         },
 
         /**
@@ -588,94 +808,10 @@
         }
     };
 
-    /**
-     * Diagnostic Tools Module
-     */
-    var BPFNDiagnostics = {
-        
-        init: function() {
-            var self = this;
-            var $button = $('#bpfn-run-diagnostics');
-            
-            if (!$button.length) return;
-            
-            $button.on('click', function(e) {
-                e.preventDefault();
-                self.run($(this));
-            });
-        },
-        
-        run: function($button) {
-            var self = this;
-            var $results = $('#bpfn-diagnostics-results');
-            
-            $button.prop('disabled', true).text('Running diagnostics...');
-            $results.html('<div class="bpfn-loading">Running system checks...</div>');
-            
-            $.ajax({
-                url: bpfnAdmin.ajax_url,
-                type: 'POST',
-                data: {
-                    action: 'bpfn_run_diagnostics',
-                    nonce: bpfnAdmin.nonce
-                },
-                success: function(response) {
-                    if (response.success && response.data) {
-                        self.displayResults(response.data, $results);
-                    } else {
-                        $results.html('<div class="notice notice-error"><p>Failed to run diagnostics.</p></div>');
-                    }
-                },
-                error: function() {
-                    $results.html('<div class="notice notice-error"><p>An error occurred while running diagnostics.</p></div>');
-                },
-                complete: function() {
-                    $button.prop('disabled', false).text('Run Diagnostics');
-                }
-            });
-        },
-
-        displayResults: function(data, $container) {
-            var html = '<div class="bpfn-diagnostics-report">';
-            
-            // System info
-            html += '<h3>System Information</h3>';
-            html += '<table class="widefat striped">';
-            html += '<tr><td><strong>PHP Version:</strong></td><td>' + data.php_version + '</td></tr>';
-            html += '<tr><td><strong>WordPress Version:</strong></td><td>' + data.wp_version + '</td></tr>';
-            html += '<tr><td><strong>BuddyPress Version:</strong></td><td>' + data.bp_version + '</td></tr>';
-            html += '<tr><td><strong>Plugin Version:</strong></td><td>' + data.plugin_version + '</td></tr>';
-            html += '</table>';
-            
-            // Database info
-            html += '<h3>Database Status</h3>';
-            html += '<table class="widefat striped">';
-            html += '<tr><td><strong>Notifications Table:</strong></td><td>' + (data.tables.notifications ? '<span style="color:green;">✓ Exists</span>' : '<span style="color:red;">✗ Missing</span>') + '</td></tr>';
-            html += '<tr><td><strong>Preferences Table:</strong></td><td>' + (data.tables.preferences ? '<span style="color:green;">✓ Exists</span>' : '<span style="color:red;">✗ Missing</span>') + '</td></tr>';
-            html += '<tr><td><strong>Total Notifications:</strong></td><td>' + data.stats.total_notifications + '</td></tr>';
-            html += '<tr><td><strong>Unread Notifications:</strong></td><td>' + data.stats.unread_notifications + '</td></tr>';
-            html += '</table>';
-            
-            // Component status
-            html += '<h3>Component Status</h3>';
-            html += '<table class="widefat striped">';
-            $.each(data.components, function(component, status) {
-                var statusText = status ? '<span style="color: green;">✓ Active</span>' : '<span style="color: red;">✗ Inactive</span>';
-                html += '<tr><td><strong>' + component.charAt(0).toUpperCase() + component.slice(1) + ':</strong></td><td>' + statusText + '</td></tr>';
-            });
-            html += '</table>';
-            
-            html += '</div>';
-            
-            $container.html(html);
-        }
-    };
-
     // Initialize when ready
     $(document).ready(function() {
         BPFNAdmin.init();
         BPFNStats.init();
-        BPFNDiagnostics.init();
     });
 
     // Expose to global scope for external access

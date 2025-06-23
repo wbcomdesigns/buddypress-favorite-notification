@@ -220,30 +220,55 @@ function bpfn_send_test_notification( $user_id, $type = 'favorite' ) {
 		return false;
 	}
 	
-	// Create test activity
-	$activity_id = bp_activity_add( array(
+	// Create a test activity for the user
+	$activity_args = array(
 		'user_id' => $user_id,
-		'content' => __( 'Test activity for notification testing', 'bp-fav-notification' ),
+		'content' => sprintf( __( 'Test activity for notification testing created at %s', 'bp-fav-notification' ), current_time( 'mysql' ) ),
 		'type' => 'activity_update',
-		'hide_sitewide' => true,
-	) );
+		'recorded_time' => bp_core_current_time(),
+		'hide_sitewide' => false, // Make sure it's not hidden
+	);
+	
+	$activity_id = bp_activity_add( $activity_args );
 	
 	if ( ! $activity_id ) {
+		error_log( 'BPFN: Failed to create test activity' );
 		return false;
 	}
 	
-	// Add notification
-	$notification_id = bpfn_add_notification( array(
-		'user_id' => $user_id,
-		'item_id' => $activity_id,
+	// Add the notification directly
+	global $bp;
+	
+	$notification_args = array(
+		'user_id'           => $user_id,
+		'item_id'           => $activity_id,
 		'secondary_item_id' => get_current_user_id(),
-		'component_action' => 'fav_notify_' . $activity_id,
-	) );
+		'component_name'    => isset( $bp->favorite_notifier ) ? $bp->favorite_notifier->id : 'favorite_notifier',
+		'component_action'  => 'fav_notify_' . $activity_id,
+		'date_notified'     => bp_core_current_time(),
+		'is_new'            => 1,
+	);
 	
-	// Clean up test activity
-	bp_activity_delete( array( 'id' => $activity_id ) );
+	$notification_id = bp_notifications_add_notification( $notification_args );
 	
-	return (bool) $notification_id;
+	if ( ! $notification_id ) {
+		error_log( 'BPFN: Failed to create notification' );
+		// Clean up the activity
+		bp_activity_delete( array( 'id' => $activity_id ) );
+		return false;
+	}
+	
+	// Trigger email if enabled
+	$email_enabled = bpfn_is_notification_enabled( $user_id, 'activity_post', 'email' );
+	if ( $email_enabled ) {
+		$activity = new BP_Activity_Activity( $activity_id );
+		do_action( 'bpfn_after_add_notification', $notification_id, $notification_args, $activity, get_current_user_id() );
+	}
+	
+	// Clean up - delete the test activity after a short delay
+	wp_schedule_single_event( time() + 60, 'bpfn_cleanup_test_activity', array( $activity_id ) );
+	
+	return true;
 }
 
 /**

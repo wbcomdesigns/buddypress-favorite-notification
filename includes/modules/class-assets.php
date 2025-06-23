@@ -142,9 +142,6 @@ class BPFN_Module_Assets {
 	 * Enqueue admin assets
 	 */
 	public function enqueue_admin_assets( $hook ) {
-		// Debug: Log the current hook
-		error_log( 'BPFN Admin Hook: ' . $hook );
-		
 		// Check if we're on any of our admin pages
 		$is_our_page = false;
 		
@@ -187,9 +184,6 @@ class BPFN_Module_Assets {
 		if ( ! $is_our_page ) {
 			return;
 		}
-		
-		// Debug: Log if we're loading assets
-		error_log( 'BPFN Loading admin assets for hook: ' . $hook );
 		
 		// Admin styles
 		wp_enqueue_style(
