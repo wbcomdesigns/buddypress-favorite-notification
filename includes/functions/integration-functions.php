@@ -145,6 +145,8 @@ function bpfn_repair_tables() {
  * @return bool Success status
  */
 function bpfn_send_test_notification( $user_id, $type = 'favorite' ) {
+	global $bp;
+	
 	if ( ! $user_id ) {
 		error_log( 'BPFN: No user ID provided for test notification' );
 		return false;
@@ -158,6 +160,25 @@ function bpfn_send_test_notification( $user_id, $type = 'favorite' ) {
 	if ( ! bp_is_active( 'activity' ) ) {
 		error_log( 'BPFN: Activity component is not active' );
 		return false;
+	}
+	
+	// Ensure BuddyPress is loaded
+	if ( ! function_exists( 'buddypress' ) ) {
+		buddypress();
+	}
+	
+	// Ensure our component is initialized
+	if ( ! isset( $bp->favorite_notifier ) ) {
+		// Initialize it manually if needed
+		$bp->favorite_notifier = new stdClass();
+		$bp->favorite_notifier->id = 'favorite_notifier';
+		$bp->favorite_notifier->slug = 'favorite_notification';
+		$bp->favorite_notifier->notification_callback = array( bpfn(), 'notification_callback' );
+		
+		// Register as active component
+		if ( ! isset( $bp->active_components['favorite_notifier'] ) ) {
+			$bp->active_components['favorite_notifier'] = 'favorite_notifier';
+		}
 	}
 	
 	// Create a test activity for the user
@@ -195,16 +216,6 @@ function bpfn_send_test_notification( $user_id, $type = 'favorite' ) {
 	error_log( 'BPFN: Created test activity with ID: ' . $activity_id );
 	
 	// Add the notification directly
-	global $bp;
-	
-	// Make sure the component is set up
-	if ( ! isset( $bp->favorite_notifier ) ) {
-		// Try to set it up manually
-		$bp->favorite_notifier = new stdClass();
-		$bp->favorite_notifier->id = 'favorite_notifier';
-		error_log( 'BPFN: Had to manually set up favorite_notifier component' );
-	}
-	
 	$notification_args = array(
 		'user_id'           => $user_id,
 		'item_id'           => $activity_id,
@@ -231,8 +242,25 @@ function bpfn_send_test_notification( $user_id, $type = 'favorite' ) {
 	if ( $email_enabled ) {
 		$activity = new BP_Activity_Activity( $activity_id );
 		if ( $activity->id ) {
+			// Get the email module and send email directly
+			$email_module = bpfn()->get_module( 'email' );
+			if ( $email_module ) {
+				// For test notification, we need to swap the user IDs
+				// The activity owner should receive the email
+				$activity->user_id = $user_id; // Set the recipient as the activity owner
+				$sender_id = get_current_user_id(); // The admin is the one who "favorited"
+				
+				// Call the email method directly
+				if ( method_exists( $email_module, 'send_email_notification' ) ) {
+					$email_module->send_email_notification( $notification_id, $notification_args, $activity, $sender_id );
+					error_log( 'BPFN: Called send_email_notification directly' );
+				}
+			} else {
+				error_log( 'BPFN: Email module not found' );
+			}
+			
+			// Also trigger the action for other hooks
 			do_action( 'bpfn_after_add_notification', $notification_id, $notification_args, $activity, get_current_user_id() );
-			error_log( 'BPFN: Triggered email action for notification' );
 		}
 	}
 	

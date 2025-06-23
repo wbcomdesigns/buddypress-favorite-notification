@@ -77,6 +77,12 @@ class BPFN_Module_Notifications {
 
 		global $bp;
 		
+		// Ensure component is initialized
+		if ( ! isset( $bp->favorite_notifier ) ) {
+			error_log( 'BPFN: Component not initialized in add_favorite_notification' );
+			return;
+		}
+		
 		// Get activity
 		$activity = new BP_Activity_Activity( $activity_id );
 		if ( empty( $activity->id ) || $activity->user_id == $user_id ) {
@@ -123,6 +129,11 @@ class BPFN_Module_Notifications {
 		}
 
 		global $bp;
+		
+		// Ensure component is initialized
+		if ( ! isset( $bp->favorite_notifier ) ) {
+			return;
+		}
 		
 		// Delete notification
 		BP_Notifications_Notification::delete( array(
@@ -244,6 +255,11 @@ class BPFN_Module_Notifications {
 
 		global $activities_template, $bp;
 		
+		// Ensure component is initialized
+		if ( ! isset( $bp->favorite_notifier ) ) {
+			return;
+		}
+		
 		if ( empty( $activities_template->activity ) ) {
 			return;
 		}
@@ -278,6 +294,11 @@ class BPFN_Module_Notifications {
 	 */
 	public function filter_notification_content( $component_action_name, $component_name, $item_id, $secondary_item_id, $total_items, $format, $action, $notification ) {
 		global $bp;
+		
+		// Ensure component is initialized
+		if ( ! isset( $bp->favorite_notifier ) ) {
+			return $component_action_name;
+		}
 		
 		// Only filter our notifications
 		if ( $component_name !== $bp->favorite_notifier->id ) {

@@ -67,18 +67,34 @@ class BP_Favorite_Notification {
 	 * Constructor
 	 */
 	private function __construct() {
-		// Load required files
+		// Load required files FIRST
 		$this->load_dependencies();
 		
-		// Early initialization for admin
-		add_action( 'plugins_loaded', array( $this, 'early_init' ), 20 );
+		// Load admin module early for menu registration
+		if ( is_admin() ) {
+			$this->load_admin_module();
+		}
 		
-		// Main initialization
-		add_action( 'init', array( $this, 'init' ) );
+		// THEN setup hooks
+		add_action( 'plugins_loaded', array( $this, 'early_init' ), 20 );
+		add_action( 'bp_loaded', array( $this, 'init' ), 10 );
 		
 		// Activation/Deactivation hooks
 		register_activation_hook( BPFN_PLUGIN_FILE, array( $this, 'activate' ) );
 		register_deactivation_hook( BPFN_PLUGIN_FILE, array( $this, 'deactivate' ) );
+	}
+
+	/**
+	 * Load admin module early
+	 */
+	private function load_admin_module() {
+		$admin_path = BPFN_INCLUDES_PATH . 'modules/class-admin.php';
+		if ( file_exists( $admin_path ) ) {
+			require_once $admin_path;
+			if ( class_exists( 'BPFN_Module_Admin' ) ) {
+				$this->modules['admin'] = new BPFN_Module_Admin();
+			}
+		}
 	}
 
 	/**
@@ -89,12 +105,6 @@ class BP_Favorite_Notification {
 		if ( ! class_exists( 'BuddyPress' ) ) {
 			add_action( 'admin_notices', array( $this, 'admin_notice_buddypress_required' ) );
 			return false;
-		}
-		
-		// Load admin module early if in admin
-		if ( is_admin() ) {
-			require_once BPFN_INCLUDES_PATH . 'modules/class-admin.php';
-			$this->modules['admin'] = new BPFN_Module_Admin();
 		}
 		
 		return true;
@@ -154,9 +164,9 @@ class BP_Favorite_Notification {
 			'modules/class-assets.php',
 		);
 		
-		// Add admin module if not already loaded
+		// Add admin if not already loaded
 		if ( ! isset( $this->modules['admin'] ) ) {
-			$module_files[] = 'modules/class-admin.php';
+			array_unshift( $module_files, 'modules/class-admin.php' );
 		}
 
 		// Load each module
@@ -169,7 +179,6 @@ class BP_Favorite_Notification {
 				$class_name = $this->get_class_name_from_file( $file );
 				if ( class_exists( $class_name ) ) {
 					$module_key = strtolower( str_replace( 'BPFN_Module_', '', $class_name ) );
-					// Skip if already loaded (like admin)
 					if ( ! isset( $this->modules[ $module_key ] ) ) {
 						$this->modules[ $module_key ] = new $class_name();
 					}
@@ -296,10 +305,12 @@ class BP_Favorite_Notification {
 	private function create_tables() {
 		global $wpdb;
 		
+		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+		
 		$charset_collate = $wpdb->get_charset_collate();
 		$table_name = $wpdb->prefix . 'bp_favorite_notification_prefs';
 		
-		$sql = "CREATE TABLE IF NOT EXISTS $table_name (
+		$sql = "CREATE TABLE $table_name (
 			id bigint(20) NOT NULL AUTO_INCREMENT,
 			user_id bigint(20) NOT NULL,
 			notification_type varchar(50) NOT NULL,
@@ -313,8 +324,13 @@ class BP_Favorite_Notification {
 			KEY user_id (user_id)
 		) $charset_collate;";
 		
-		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 		dbDelta( $sql );
+		
+		// Verify table was created
+		$table_exists = $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) === $table_name;
+		if ( ! $table_exists ) {
+			error_log( 'BPFN: Failed to create preferences table' );
+		}
 		
 		// Allow additional tables to be created
 		do_action( 'bpfn_create_tables', $wpdb, $charset_collate );

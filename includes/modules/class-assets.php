@@ -29,11 +29,8 @@ class BPFN_Module_Assets {
 		// Frontend assets
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_assets' ) );
 		
-		// Admin assets - this needs to be on admin_enqueue_scripts
+		// Admin assets
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
-		
-		// Also add a specific hook for our menu pages as a fallback
-		add_action( 'admin_head', array( $this, 'enqueue_admin_assets_fallback' ) );
 		
 		// Login page assets
 		add_action( 'login_enqueue_scripts', array( $this, 'enqueue_login_assets' ) );
@@ -51,6 +48,9 @@ class BPFN_Module_Assets {
 			return;
 		}
 		
+		// Ensure jQuery is loaded
+		wp_enqueue_script( 'jquery' );
+		
 		// Core styles
 		wp_enqueue_style(
 			'bpfn-notifications',
@@ -59,17 +59,26 @@ class BPFN_Module_Assets {
 			BPFN_VERSION
 		);
 		
-		// Core scripts
+		// Core scripts with proper dependencies
 		wp_enqueue_script(
 			'bpfn-notifications',
 			BPFN_ASSETS_URL . 'js/notifications.js',
 			array( 'jquery' ),
 			BPFN_VERSION,
-			true
+			true  // Load in footer
 		);
 		
 		// Localize main script
 		wp_localize_script( 'bpfn-notifications', 'BPFN', $this->get_localized_data() );
+		
+		// Initialize script inline after localization
+		wp_add_inline_script( 'bpfn-notifications', '
+			jQuery(document).ready(function($) {
+				if (typeof BPFN !== "undefined" && BPFN.init) {
+					BPFN.init(BPFN.config || {});
+				}
+			});
+		', 'after' );
 		
 		// Real-time notifications
 		if ( $this->should_load_realtime() ) {
@@ -143,45 +152,7 @@ class BPFN_Module_Assets {
 	 */
 	public function enqueue_admin_assets( $hook ) {
 		// Check if we're on any of our admin pages
-		$is_our_page = false;
-		
-		// Check main menu pages - more flexible checking
-		if ( strpos( $hook, 'bpfn' ) !== false ) {
-			$is_our_page = true;
-		}
-		
-		// Check if it's the main menu page or subpages
-		// The actual hooks might be different depending on menu position
-		$our_pages = array(
-			'toplevel_page_bpfn-settings',
-			'bp-favorites_page_bpfn-tools', 
-			'bp-favorites_page_bpfn-help',
-			// Alternative possible hooks
-			'admin_page_bpfn-tools',
-			'admin_page_bpfn-help',
-			'bpfn-settings_page_bpfn-tools',
-			'bpfn-settings_page_bpfn-help',
-			// Check for variations
-			'toplevel_page_bp-favorite-notification',
-			'bp-favorite-notification_page_bpfn-tools',
-			'bp-favorite-notification_page_bpfn-help',
-		);
-		
-		if ( in_array( $hook, $our_pages ) ) {
-			$is_our_page = true;
-		}
-		
-		// Also check for options page if added there
-		if ( $hook === 'settings_page_bpfn-settings' ) {
-			$is_our_page = true;
-		}
-		
-		// More flexible check - if the page parameter contains our slug
-		if ( isset( $_GET['page'] ) && strpos( $_GET['page'], 'bpfn' ) !== false ) {
-			$is_our_page = true;
-		}
-		
-		if ( ! $is_our_page ) {
+		if ( ! ( isset( $_GET['page'] ) && strpos( $_GET['page'], 'bpfn' ) !== false ) ) {
 			return;
 		}
 		
@@ -218,13 +189,11 @@ class BPFN_Module_Assets {
 		) );
 		
 		// Add color picker if needed
-		if ( $hook === 'toplevel_page_bpfn-settings' || $hook === 'settings_page_bpfn-settings' ) {
+		if ( isset( $_GET['page'] ) && $_GET['page'] === 'bpfn-settings' ) {
 			wp_enqueue_style( 'wp-color-picker' );
 			wp_enqueue_script( 'wp-color-picker' );
-		}
-		
-		// Add Chart.js for stats
-		if ( $hook === 'toplevel_page_bpfn-settings' ) {
+			
+			// Add Chart.js for stats
 			wp_enqueue_script(
 				'chart-js',
 				'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js',
@@ -349,24 +318,5 @@ class BPFN_Module_Assets {
 		if ( ! empty( $script ) ) {
 			wp_add_inline_script( 'bpfn-notifications', $script, $position );
 		}
-	}
-	
-	/**
-	 * Fallback method to ensure admin assets are loaded
-	 */
-	public function enqueue_admin_assets_fallback() {
-		// Only run if we're on our admin pages and assets haven't been loaded
-		if ( ! isset( $_GET['page'] ) || strpos( $_GET['page'], 'bpfn' ) === false ) {
-			return;
-		}
-		
-		// Check if assets are already enqueued
-		if ( wp_style_is( 'bpfn-admin', 'enqueued' ) ) {
-			return;
-		}
-		
-		// If we're here, assets haven't been loaded, so load them
-		global $hook_suffix;
-		$this->enqueue_admin_assets( $hook_suffix );
 	}
 }

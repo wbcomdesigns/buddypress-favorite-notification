@@ -173,7 +173,7 @@ function bpfn_get_notification_count( $user_id, $args = array() ) {
 	global $bp;
 	
 	$defaults = array(
-		'component_name' => $bp->favorite_notifier->id,
+		'component_name' => isset( $bp->favorite_notifier ) ? $bp->favorite_notifier->id : 'favorite_notifier',
 		'is_new' => 1,
 	);
 	
@@ -193,6 +193,11 @@ function bpfn_get_notification_count( $user_id, $args = array() ) {
  */
 function bpfn_format_notification_data( $notification ) {
 	global $bp;
+	
+	// Check if component exists
+	if ( ! isset( $bp->favorite_notifier ) || ! isset( $bp->favorite_notifier->notification_callback ) ) {
+		return false;
+	}
 	
 	// Get base data from notification callback
 	$data = call_user_func(

@@ -513,8 +513,25 @@
      */
     $(document).ready(function() {
         // Initialize if config is available
-        if (typeof BPFN !== 'undefined' && BPFN.config) {
-            BPFN.Core.init(BPFN.config);
+        if (typeof BPFN !== 'undefined') {
+            // Check if we have config
+            if (BPFN.config) {
+                BPFN.Core.init(BPFN.config);
+            } else {
+                // Try to initialize with available data
+                BPFN.Core.init({
+                    ajaxUrl: BPFN.ajax_url || '',
+                    nonce: BPFN.nonce || '',
+                    userId: BPFN.user_id || 0,
+                    componentId: BPFN.component_id || 'favorite_notifier',
+                    debug: BPFN.debug || false
+                });
+            }
+            
+            // Add strings if available
+            if (BPFN.strings) {
+                BPFN.strings = $.extend({}, BPFN.strings);
+            }
         }
     });
 

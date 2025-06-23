@@ -21,6 +21,11 @@ class BPFN_Module_Admin {
 	private $notices = array();
 
 	/**
+	 * Admin page hooks
+	 */
+	private $admin_hooks = array();
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
@@ -46,8 +51,8 @@ class BPFN_Module_Admin {
 		// Admin init - for settings registration
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 		
-		// Ensure admin assets are loaded
-		add_action( 'admin_enqueue_scripts', array( $this, 'ensure_admin_assets' ), 20 );
+		// Admin assets
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
 		
 		// AJAX handlers
 		$this->register_ajax_handlers();
@@ -67,6 +72,7 @@ class BPFN_Module_Admin {
 			'dismiss_notice',
 			'send_test_notification',
 			'send_test_email',
+			'test_wp_email',
 			'clear_old_notifications',
 			'repair_tables',
 			'bulk_update_settings',
@@ -86,7 +92,7 @@ class BPFN_Module_Admin {
 	 */
 	public function add_admin_menu() {
 		// Main menu
-		add_menu_page(
+		$hook = add_menu_page(
 			__( 'BP Favorite Notification', 'bp-fav-notification' ),
 			__( 'BP Favorites', 'bp-fav-notification' ),
 			'manage_options',
@@ -96,8 +102,11 @@ class BPFN_Module_Admin {
 			30
 		);
 		
+		// Store the hook for asset loading
+		$this->admin_hooks[] = $hook;
+		
 		// Submenu pages
-		add_submenu_page(
+		$this->admin_hooks[] = add_submenu_page(
 			'bpfn-settings',
 			__( 'Settings', 'bp-fav-notification' ),
 			__( 'Settings', 'bp-fav-notification' ),
@@ -106,7 +115,7 @@ class BPFN_Module_Admin {
 			array( $this, 'settings_page' )
 		);
 		
-		add_submenu_page(
+		$this->admin_hooks[] = add_submenu_page(
 			'bpfn-settings',
 			__( 'Tools', 'bp-fav-notification' ),
 			__( 'Tools', 'bp-fav-notification' ),
@@ -115,7 +124,7 @@ class BPFN_Module_Admin {
 			array( $this, 'tools_page' )
 		);
 		
-		add_submenu_page(
+		$this->admin_hooks[] = add_submenu_page(
 			'bpfn-settings',
 			__( 'Help', 'bp-fav-notification' ),
 			__( 'Help', 'bp-fav-notification' ),
@@ -126,17 +135,16 @@ class BPFN_Module_Admin {
 	}
 
 	/**
-	 * Ensure admin assets are loaded on our pages
+	 * Enqueue admin assets
 	 */
-	public function ensure_admin_assets() {
-		$screen = get_current_screen();
-		
+	public function enqueue_admin_assets( $hook ) {
 		// Check if we're on one of our admin pages
-		if ( ! $screen || strpos( $screen->id, 'bpfn' ) === false ) {
+		if ( ! in_array( $hook, $this->admin_hooks ) && 
+			 ! ( isset( $_GET['page'] ) && strpos( $_GET['page'], 'bpfn' ) !== false ) ) {
 			return;
 		}
 		
-		// Load admin CSS
+		// Admin styles
 		wp_enqueue_style(
 			'bpfn-admin',
 			BPFN_ASSETS_URL . 'css/admin.css',
@@ -144,7 +152,7 @@ class BPFN_Module_Admin {
 			BPFN_VERSION
 		);
 		
-		// Load admin JS
+		// Admin scripts
 		wp_enqueue_script(
 			'bpfn-admin',
 			BPFN_ASSETS_URL . 'js/admin.js',
@@ -169,7 +177,7 @@ class BPFN_Module_Admin {
 		) );
 		
 		// Add Chart.js for stats if on settings page
-		if ( strpos( $screen->id, 'bpfn-settings' ) !== false ) {
+		if ( isset( $_GET['page'] ) && $_GET['page'] === 'bpfn-settings' ) {
 			wp_enqueue_script(
 				'chart-js',
 				'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js',
@@ -180,10 +188,13 @@ class BPFN_Module_Admin {
 		}
 		
 		// Add color picker if needed
-		if ( strpos( $screen->id, 'bpfn-settings' ) !== false ) {
+		if ( isset( $_GET['page'] ) && $_GET['page'] === 'bpfn-settings' ) {
 			wp_enqueue_style( 'wp-color-picker' );
 			wp_enqueue_script( 'wp-color-picker' );
 		}
+		
+		// Allow additional admin assets
+		do_action( 'bpfn_enqueue_admin_assets', $hook );
 	}
 
 	/**
@@ -342,6 +353,50 @@ class BPFN_Module_Admin {
 				<?php
 			}
 			?>
+		</div>
+		
+		<div class="bpfn-tool-box">
+			<h3><?php _e( 'Test WordPress Email', 'bp-fav-notification' ); ?></h3>
+			<p><?php _e( 'Send a simple test email to check if WordPress email is working.', 'bp-fav-notification' ); ?></p>
+			<button class="button" id="bpfn-test-wp-email">
+				<?php _e( 'Send Simple Test Email', 'bp-fav-notification' ); ?>
+			</button>
+			<div id="bpfn-wp-email-result"></div>
+			<script>
+			jQuery(document).ready(function($) {
+				$('#bpfn-test-wp-email').on('click', function(e) {
+					e.preventDefault();
+					var $button = $(this);
+					var originalText = $button.text();
+					var $result = $('#bpfn-wp-email-result');
+					
+					$button.prop('disabled', true).text('Sending...');
+					$result.html('');
+					
+					$.ajax({
+						url: ajaxurl,
+						type: 'POST',
+						data: {
+							action: 'bpfn_test_wp_email',
+							nonce: bpfnAdmin.nonce
+						},
+						success: function(response) {
+							if (response.success) {
+								$result.html('<div style="color: green; margin-top: 10px;">' + response.data.message + '</div>');
+							} else {
+								$result.html('<div style="color: red; margin-top: 10px;">' + response.data.message + '</div>');
+							}
+						},
+						error: function() {
+							$result.html('<div style="color: red; margin-top: 10px;">AJAX Error</div>');
+						},
+						complete: function() {
+							$button.prop('disabled', false).text(originalText);
+						}
+					});
+				});
+			});
+			</script>
 		</div>
 		
 		<div class="bpfn-tool-box">
@@ -844,7 +899,7 @@ class BPFN_Module_Admin {
 		}
 		
 		$table = $bp->notifications->table_name;
-		$component = $bp->favorite_notifier->id;
+		$component = isset( $bp->favorite_notifier ) ? $bp->favorite_notifier->id : 'favorite_notifier';
 		
 		// Delete notifications older than 30 days that are read
 		$deleted = $wpdb->query( $wpdb->prepare(
@@ -1028,5 +1083,36 @@ class BPFN_Module_Admin {
 		);
 		
 		wp_send_json_success( $formatted );
+	}
+
+	/**
+	 * AJAX test WordPress email
+	 */
+	public function ajax_test_wp_email() {
+		check_ajax_referer( 'bpfn-admin-nonce', 'nonce' );
+		
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'bp-fav-notification' ) ) );
+		}
+		
+		$user = wp_get_current_user();
+		$to = $user->user_email;
+		$subject = 'WordPress Email Test - ' . get_bloginfo( 'name' );
+		$message = 'This is a test email sent at ' . current_time( 'mysql' ) . ' to verify WordPress email functionality.';
+		$headers = array( 'Content-Type: text/plain; charset=UTF-8' );
+		
+		error_log( 'BPFN: Testing wp_mail to ' . $to );
+		$sent = wp_mail( $to, $subject, $message, $headers );
+		error_log( 'BPFN: wp_mail result: ' . ( $sent ? 'true' : 'false' ) );
+		
+		if ( $sent ) {
+			wp_send_json_success( array( 
+				'message' => sprintf( __( 'Test email sent to %s. Check your inbox (and spam folder).', 'bp-fav-notification' ), $to ),
+			) );
+		} else {
+			wp_send_json_error( array( 
+				'message' => __( 'Failed to send email. WordPress wp_mail() returned false. This means email is not configured on your site.', 'bp-fav-notification' ) 
+			) );
+		}
 	}
 }
