@@ -110,6 +110,18 @@ class BPFN_Module_Email {
 			return;
 		}
 		
+		// Get proper display name for sender
+		$sender_name = $this->get_proper_display_name( $sender );
+		
+		// Use bp_members_get_user_url() instead of deprecated function
+		$favorited_by_link = function_exists( 'bp_members_get_user_url' ) ? 
+			bp_members_get_user_url( $user_id ) : 
+			bp_core_get_user_domain( $user_id );
+		
+		$settings_link = function_exists( 'bp_members_get_user_url' ) ? 
+			bp_members_get_user_url( $activity->user_id ) . bp_get_settings_slug() . '/notifications/' : 
+			$this->get_settings_link( $activity->user_id );
+		
 		// Prepare email data
 		$email_data = array(
 			'to' => $recipient->user_email,
@@ -118,14 +130,14 @@ class BPFN_Module_Email {
 			'tokens' => array(
 				'site_name' => get_bloginfo( 'name' ),
 				'site_url' => home_url(),
-				'user_name' => $sender->display_name,
+				'user_name' => $sender_name,
 				'recipient_name' => $recipient->display_name,
 				'activity_content' => wp_trim_words( wp_strip_all_tags( $activity->content ), 20, '...' ),
 				'activity_link' => bp_activity_get_permalink( $activity->id ),
-				'settings_link' => $this->get_settings_link( $activity->user_id ),
-				'favorited_by' => $sender->display_name,
-				'favorited_by_link' => bp_core_get_user_domain( $user_id ),
-				'secondary_item_id' => $user_id, // Add this for avatar in template
+				'settings_link' => $settings_link,
+				'favorited_by' => $sender_name,
+				'favorited_by_link' => $favorited_by_link,
+				'secondary_item_id' => $user_id,
 			),
 		);
 		
@@ -137,10 +149,27 @@ class BPFN_Module_Email {
 	}
 
 	/**
+	 * Get proper display name for user
+	 */
+	private function get_proper_display_name( $user ) {
+		// Check if display name is the generic "User X" format
+		if ( preg_match( '/^User\s+\d+$/', $user->display_name ) ) {
+			// Try first + last name
+			if ( ! empty( $user->first_name ) || ! empty( $user->last_name ) ) {
+				$name = trim( $user->first_name . ' ' . $user->last_name );
+				if ( ! empty( $name ) ) {
+					return $name;
+				}
+			}
+			// Use login name as fallback
+			return $user->user_login;
+		}
+		
+		return $user->display_name;
+	}
+
+	/**
 	 * Send test email (public method for testing)
-	 * 
-	 * @param array $email_data Email data
-	 * @return bool Success status
 	 */
 	public function send_test_email( $email_data ) {
 		// Add test flag
@@ -171,11 +200,11 @@ class BPFN_Module_Email {
 		
 		// Parse subject
 		$subject = $this->parse_email_tokens( $email_data['subject'], $email_data['tokens'] );
-		$subject = apply_filters( 'bpfn_email_subject', $subject, $email_data );
+		$subject = apply_filters( 'bpfn_email_subject', $subject, $email_data['tokens'] );
 		
 		// Get message
 		$message = $this->get_email_message( $email_data['template'], $email_data['tokens'] );
-		$message = apply_filters( 'bpfn_email_message', $message, $email_data );
+		$message = apply_filters( 'bpfn_email_message', $message, $email_data['tokens'] );
 		
 		// Set headers
 		$headers = apply_filters( 'bpfn_email_headers', array(
@@ -252,9 +281,6 @@ class BPFN_Module_Email {
 
 	/**
 	 * Get fallback email message when template is not found
-	 * 
-	 * @param array $tokens Email tokens
-	 * @return string HTML email content
 	 */
 	private function get_fallback_email_message( $tokens ) {
 		$html = '<!DOCTYPE html>
@@ -303,11 +329,20 @@ class BPFN_Module_Email {
 	}
 
 	/**
-	 * Parse email tokens
+	 * Parse email tokens - Fixed to handle array properly
 	 */
 	public function parse_email_tokens( $content, $tokens ) {
+		// If tokens is not an array, return content as is
+		if ( ! is_array( $tokens ) ) {
+			return $content;
+		}
+		
+		// Replace each token
 		foreach ( $tokens as $token => $value ) {
-			$content = str_replace( '{' . $token . '}', $value, $content );
+			// Only replace string values
+			if ( is_string( $value ) || is_numeric( $value ) ) {
+				$content = str_replace( '{' . $token . '}', $value, $content );
+			}
 		}
 		
 		return $content;
@@ -334,6 +369,12 @@ class BPFN_Module_Email {
 			return home_url();
 		}
 		
+		// Use bp_members_get_user_url() if available
+		if ( function_exists( 'bp_members_get_user_url' ) ) {
+			return bp_members_get_user_url( $user_id ) . bp_get_settings_slug() . '/notifications/';
+		}
+		
+		// Fallback to deprecated function
 		return trailingslashit( bp_core_get_user_domain( $user_id ) . bp_get_settings_slug() ) . 'notifications/';
 	}
 

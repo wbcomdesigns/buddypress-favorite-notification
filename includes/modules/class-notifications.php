@@ -1,6 +1,6 @@
 <?php
 /**
- * Debug Module for BuddyPress Favorite Notification
+ * Notifications Module for BuddyPress Favorite Notification
  *
  * @package BuddyPress_Favorite_Notification
  */
@@ -11,118 +11,221 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Debug Module Class
+ * Notifications Module Class
  */
-class BPFN_Module_Debug {
+class BPFN_Module_Notifications {
+
+	/**
+	 * Notification types
+	 */
+	private $notification_types = array();
+
+	/**
+	 * Flag to prevent infinite loops
+	 */
+	private $fixing_display_name = false;
 
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
-		// Always apply critical fixes
-		$this->apply_fixes();
+		$this->register_default_types();
+		$this->setup_hooks();
 	}
 
 	/**
-	 * Apply fixes for notification issues
+	 * Register default notification types
 	 */
-	private function apply_fixes() {
-		// Fix 1: Ensure proper user display names
-		add_filter( 'bp_core_get_user_displayname', array( $this, 'fix_user_displayname' ), 10, 2 );
-		
-		// Fix 2: Ensure component is properly initialized
-		add_action( 'bp_init', array( $this, 'ensure_component_initialized' ), 5 );
-		
-		// Fix 3: Add filter to fix notification text
-		add_filter( 'bpfn_notification_text', array( $this, 'fix_notification_text' ), 10, 5 );
-		
-		// Fix 4: Add filter to fix notification array data
-		add_filter( 'bpfn_notification_array', array( $this, 'fix_notification_array' ), 10, 3 );
-		
-		// Fix 5: Add JavaScript fix for any missed cases
-		add_action( 'wp_footer', array( $this, 'add_frontend_fixes' ) );
-		
-		// Fix 6: AJAX handler for getting proper user names
-		add_action( 'wp_ajax_bpfn_get_user_display_name', array( $this, 'ajax_get_user_display_name' ) );
-		add_action( 'wp_ajax_nopriv_bpfn_get_user_display_name', array( $this, 'ajax_get_user_display_name' ) );
+	private function register_default_types() {
+		$this->notification_types = array(
+			'favorite' => array(
+				'labels' => array(
+					'single' => __( '%s favorited your activity', 'bp-fav-notification' ),
+					'multiple' => __( '%d people favorited your activity', 'bp-fav-notification' ),
+				),
+				'action_prefix' => 'fav_notify',
+			),
+			'favorite_comment' => array(
+				'labels' => array(
+					'single' => __( '%s favorited your comment', 'bp-fav-notification' ),
+					'multiple' => __( '%d people favorited your comment', 'bp-fav-notification' ),
+				),
+				'action_prefix' => 'fav_comment_notify',
+			),
+		);
 	}
 
 	/**
-	 * Fix user display name
+	 * Setup hooks
 	 */
-	public function fix_user_displayname( $display_name, $user_id ) {
-		// Check if display name looks like "User X"
-		if ( preg_match( '/^User\s+\d+$/', $display_name ) ) {
-			// Get the real display name
-			$user = get_userdata( $user_id );
-			if ( $user ) {
-				// Try display name first
-				if ( ! empty( $user->display_name ) && ! preg_match( '/^User\s+\d+$/', $user->display_name ) ) {
-					return $user->display_name;
+	private function setup_hooks() {
+		// Activity favorite hook
+		add_action( 'bp_activity_add_user_favorite', array( $this, 'add_favorite_notification' ), 10, 2 );
+		add_action( 'bp_activity_remove_user_favorite', array( $this, 'remove_favorite_notification' ), 10, 2 );
+		
+		// Format notifications
+		add_filter( 'bp_notifications_get_notifications_for_user', array( $this, 'format_notifications' ), 10, 8 );
+		
+		// Fix display names - with lower priority to avoid conflicts
+		add_filter( 'bp_core_get_user_displayname', array( $this, 'fix_user_displayname' ), 20, 2 );
+	}
+
+	/**
+	 * Add notification when activity is favorited
+	 */
+	public function add_favorite_notification( $activity_id, $user_id ) {
+		global $bp;
+		
+		// Ensure component is initialized
+		if ( ! isset( $bp->favorite_notifier ) || ! isset( $bp->favorite_notifier->id ) ) {
+			// Try to initialize it
+			if ( function_exists( 'bpfn' ) ) {
+				$plugin = bpfn();
+				if ( method_exists( $plugin, 'setup_globals' ) ) {
+					$plugin->setup_globals();
 				}
-				
-				// Then try first + last name
-				if ( ! empty( $user->first_name ) || ! empty( $user->last_name ) ) {
-					$name = trim( $user->first_name . ' ' . $user->last_name );
-					if ( ! empty( $name ) ) {
-						return $name;
-					}
-				}
-				
-				// Finally use login
-				if ( ! empty( $user->user_login ) ) {
-					return $user->user_login;
-				}
+			}
+			
+			// Check again
+			if ( ! isset( $bp->favorite_notifier ) || ! isset( $bp->favorite_notifier->id ) ) {
+				error_log( 'BPFN: Component not initialized, cannot add notification' );
+				return;
 			}
 		}
 		
-		return $display_name;
+		// Get activity
+		$activity = new BP_Activity_Activity( $activity_id );
+		if ( empty( $activity->id ) || $activity->user_id == $user_id ) {
+			return;
+		}
+
+		// Check if notifications are enabled
+		$activity_type = $this->get_activity_notification_type( $activity );
+		if ( ! bpfn_is_notification_enabled( $activity->user_id, $activity_type, 'web' ) ) {
+			return;
+		}
+
+		// Add notification
+		$notification_id = bp_notifications_add_notification( array(
+			'user_id'           => $activity->user_id,
+			'item_id'           => $activity_id,
+			'secondary_item_id' => $user_id,
+			'component_name'    => $bp->favorite_notifier->id,
+			'component_action'  => $this->get_component_action( $activity ),
+			'date_notified'     => bp_core_current_time(),
+			'is_new'            => 1,
+		) );
+
+		// Trigger action for other modules
+		if ( $notification_id ) {
+			do_action( 'bpfn_after_add_notification', $notification_id, array(
+				'activity_id' => $activity_id,
+				'user_id' => $activity->user_id,
+				'secondary_item_id' => $user_id,
+			), $activity, $user_id );
+		}
 	}
 
 	/**
-	 * Fix notification text
+	 * Remove notification when activity is unfavorited
 	 */
-	public function fix_notification_text( $text, $item_id, $secondary_item_id, $total_items, $type ) {
-		// Check if text contains "User X" pattern
-		if ( preg_match( '/User\s+\d+/', $text ) ) {
-			// Get the actual user name
-			$user = get_userdata( $secondary_item_id );
-			if ( $user ) {
-				$proper_name = $this->get_proper_display_name( $user );
-				
-				// Replace the generic name with the proper name
-				$text = preg_replace( '/User\s+\d+/', $proper_name, $text );
-			}
+	public function remove_favorite_notification( $activity_id, $user_id ) {
+		global $bp;
+		
+		// Ensure component is initialized
+		if ( ! isset( $bp->favorite_notifier ) || ! isset( $bp->favorite_notifier->id ) ) {
+			return;
 		}
 		
-		return $text;
+		BP_Notifications_Notification::delete( array(
+			'item_id'           => $activity_id,
+			'secondary_item_id' => $user_id,
+			'component_name'    => $bp->favorite_notifier->id,
+		) );
 	}
 
 	/**
-	 * Fix notification array data
+	 * Format notifications - Fixed parameter order
 	 */
-	public function fix_notification_array( $data, $activity, $secondary_item_id ) {
-		// Fix user_name if it looks like "User X"
-		if ( ! empty( $data['user_name'] ) && preg_match( '/^User\s+\d+$/', $data['user_name'] ) ) {
-			$user = get_userdata( $secondary_item_id );
-			if ( $user ) {
-				$data['user_name'] = $this->get_proper_display_name( $user );
-			}
+	public function format_notifications( $action, $item_id, $secondary_item_id, $total_items, $format, $component_action, $component_name, $id ) {
+		global $bp;
+		
+		if ( ! isset( $bp->favorite_notifier ) || $component_name !== $bp->favorite_notifier->id ) {
+			return $action;
+		}
+
+		return $this->format_notification( $component_action, $item_id, $secondary_item_id, $total_items, $format );
+	}
+
+	/**
+	 * Format a single notification
+	 */
+	public function format_notification( $action, $item_id, $secondary_item_id, $total_items, $format = 'string' ) {
+		// Get activity
+		$activity = new BP_Activity_Activity( $item_id );
+		if ( empty( $activity->id ) ) {
+			return false;
+		}
+
+		// Determine notification type
+		$type = strpos( $action, 'fav_comment_notify' ) !== false ? 'favorite_comment' : 'favorite';
+		$config = $this->notification_types[ $type ];
+
+		// Format text
+		if ( $total_items > 1 ) {
+			$text = sprintf( $config['labels']['multiple'], $total_items );
+		} else {
+			$user_name = $this->get_user_displayname_safe( $secondary_item_id );
+			$text = sprintf( $config['labels']['single'], $user_name );
+		}
+
+		// Build link
+		$link = bp_activity_get_permalink( $activity );
+
+		// Return formatted notification
+		if ( 'string' === $format ) {
+			return apply_filters( 'bpfn_notification_string', '<a href="' . esc_url( $link ) . '">' . esc_html( $text ) . '</a>', $item_id, $secondary_item_id, $total_items );
+		}
+
+		// Use bp_members_get_user_url() instead of deprecated bp_core_get_user_domain()
+		$user_link = function_exists( 'bp_members_get_user_url' ) ? 
+			bp_members_get_user_url( $secondary_item_id ) : 
+			bp_core_get_user_domain( $secondary_item_id );
+
+		return apply_filters( 'bpfn_notification_array', array(
+			'text' => $text,
+			'link' => $link,
+			'notification_type' => $type,
+			'activity_id' => $item_id,
+			'activity_excerpt' => wp_trim_words( wp_strip_all_tags( $activity->content ), 20, '...' ),
+			'user_id' => $secondary_item_id,
+			'user_name' => $this->get_user_displayname_safe( $secondary_item_id ),
+			'user_link' => $user_link,
+			'user_avatar' => bp_core_fetch_avatar( array(
+				'item_id' => $secondary_item_id,
+				'type' => 'thumb',
+				'width' => 50,
+				'height' => 50,
+			) ),
+		), $activity, $secondary_item_id );
+	}
+
+	/**
+	 * Get user display name safely (without triggering filters)
+	 */
+	private function get_user_displayname_safe( $user_id ) {
+		// Get user data directly to avoid filter loops
+		$user = get_userdata( $user_id );
+		if ( ! $user ) {
+			return __( 'Someone', 'bp-fav-notification' );
 		}
 		
-		return $data;
-	}
-
-	/**
-	 * Get proper display name for a user
-	 */
-	private function get_proper_display_name( $user ) {
-		// Try display name first
+		// Check display name directly
 		if ( ! empty( $user->display_name ) && ! preg_match( '/^User\s+\d+$/', $user->display_name ) ) {
 			return $user->display_name;
 		}
 		
-		// Then try first + last name
+		// Try first + last name
 		if ( ! empty( $user->first_name ) || ! empty( $user->last_name ) ) {
 			$name = trim( $user->first_name . ' ' . $user->last_name );
 			if ( ! empty( $name ) ) {
@@ -130,108 +233,61 @@ class BPFN_Module_Debug {
 			}
 		}
 		
-		// Finally use login
-		if ( ! empty( $user->user_login ) ) {
-			return $user->user_login;
-		}
-		
-		// Fallback
-		return __( 'Someone', 'bp-fav-notification' );
+		// Use login name
+		return $user->user_login ?: __( 'Someone', 'bp-fav-notification' );
 	}
 
 	/**
-	 * Ensure component is initialized
+	 * Fix user display name filter
 	 */
-	public function ensure_component_initialized() {
-		global $bp;
-		
-		// Check if our component is set up
-		if ( ! isset( $bp->favorite_notifier ) ) {
-			// Force initialization
-			if ( function_exists( 'bpfn' ) ) {
-				$plugin = bpfn();
-				if ( method_exists( $plugin, 'setup_globals' ) ) {
-					$plugin->setup_globals();
-				}
-			}
+	public function fix_user_displayname( $display_name, $user_id ) {
+		// Prevent infinite loops
+		if ( $this->fixing_display_name ) {
+			return $display_name;
 		}
+		
+		// Only fix if it's a generic "User X" name
+		if ( ! preg_match( '/^User\s+\d+$/', $display_name ) ) {
+			return $display_name;
+		}
+		
+		// Set flag to prevent recursion
+		$this->fixing_display_name = true;
+		
+		// Get proper display name
+		$proper_name = $this->get_user_displayname_safe( $user_id );
+		
+		// Reset flag
+		$this->fixing_display_name = false;
+		
+		return $proper_name;
 	}
 
 	/**
-	 * Add frontend fixes
+	 * Get activity notification type
 	 */
-	public function add_frontend_fixes() {
-		// Only on BuddyPress pages
-		if ( ! is_buddypress() ) {
-			return;
-		}
-		?>
-		<script>
-		jQuery(document).ready(function($) {
-			// Fix any remaining "User X" display names
-			function fixUserNames() {
-				$('a:contains("User "), .notification-content:contains("User "), .bpfn-notification-text:contains("User ")').each(function() {
-					var $elem = $(this);
-					var text = $elem.text();
-					var matches = text.match(/User (\d+)/g);
-					
-					if (matches) {
-						matches.forEach(function(match) {
-							var userId = match.replace('User ', '');
-							
-							// Check if we already have this user's name cached
-							if (window.bpfnUserNames && window.bpfnUserNames[userId]) {
-								var newText = text.replace(match, window.bpfnUserNames[userId]);
-								$elem.text(newText);
-							} else {
-								// Fetch the user's real name
-								$.post(ajaxurl, {
-									action: 'bpfn_get_user_display_name',
-									user_id: userId,
-									nonce: '<?php echo wp_create_nonce( 'bpfn_get_user_name' ); ?>'
-								}, function(response) {
-									if (response.success && response.data.name) {
-										// Cache the name
-										window.bpfnUserNames = window.bpfnUserNames || {};
-										window.bpfnUserNames[userId] = response.data.name;
-										
-										// Update all occurrences
-										var newText = $elem.text().replace('User ' + userId, response.data.name);
-										$elem.text(newText);
-									}
-								});
-							}
-						});
-					}
-				});
-			}
-			
-			// Run on page load
-			fixUserNames();
-			
-			// Run after AJAX updates
-			$(document).ajaxComplete(function() {
-				setTimeout(fixUserNames, 100);
-			});
-		});
-		</script>
-		<?php
+	private function get_activity_notification_type( $activity ) {
+		return $activity->type === 'activity_comment' ? 'activity_comment' : 'activity_post';
 	}
 
 	/**
-	 * AJAX handler to get user display names
+	 * Get component action
 	 */
-	public function ajax_get_user_display_name() {
-		check_ajax_referer( 'bpfn_get_user_name', 'nonce' );
-		
-		$user_id = intval( $_POST['user_id'] );
-		$user = get_userdata( $user_id );
-		
-		if ( $user ) {
-			$display_name = $this->get_proper_display_name( $user );
-			wp_send_json_success( array( 'name' => $display_name ) );
-		}
-		
-		wp_send_json_error();
+	private function get_component_action( $activity ) {
+		$type = $activity->type === 'activity_comment' ? 'favorite_comment' : 'favorite';
+		return $this->notification_types[ $type ]['action_prefix'] . '_' . $activity->id;
+	}
+
+	/**
+	 * Register custom notification type
+	 */
+	public function register_notification_type( $type, $args ) {
+		$this->notification_types[ $type ] = wp_parse_args( $args, array(
+			'labels' => array(
+				'single' => '',
+				'multiple' => '',
+			),
+			'action_prefix' => $type . '_notify',
+		) );
 	}
 }

@@ -10,6 +10,8 @@
  * - $settings_link: Link to notification settings
  * - $site_name: Site name
  * - $site_url: Site URL
+ * - $secondary_item_id: ID of user who favorited
+ * - $recipient_name: Name of recipient
  *
  * @package BuddyPress_Favorite_Notification
  */
@@ -19,15 +21,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Get user who favorited
-$favoriter = get_userdata( $secondary_item_id ?? 0 );
-$favoriter_avatar = bp_core_fetch_avatar( array(
-	'item_id' => $favoriter->ID ?? 0,
-	'type' => 'full',
-	'width' => 60,
-	'height' => 60,
-	'html' => false,
-) );
+// Get user who favorited from secondary_item_id (this is the user_id who performed the favorite action)
+$favoriter_id = $secondary_item_id ?? 0;
+$favoriter = get_userdata( $favoriter_id );
+$favoriter_avatar = '';
+
+if ( $favoriter ) {
+	$favoriter_avatar = bp_core_fetch_avatar( array(
+		'item_id' => $favoriter->ID,
+		'type' => 'full',
+		'width' => 60,
+		'height' => 60,
+		'html' => false,
+	) );
+}
 
 // Get parent activity if this is a comment
 $parent_activity = null;
@@ -40,7 +47,7 @@ ob_start();
 ?>
 
 <h2 style="margin: 0 0 20px; color: #333;">
-	<?php echo esc_html( sprintf( __( 'Hi %s!', 'bp-fav-notification' ), $user_name ) ); ?>
+	<?php echo esc_html( sprintf( __( 'Hi %s!', 'bp-fav-notification' ), $recipient_name ?? $user_name ) ); ?>
 </h2>
 
 <p style="font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
@@ -115,7 +122,9 @@ ob_start();
 				<div style="font-size: 24px; font-weight: bold; color: #1d84b5;">
 					<?php 
 					// Get total favorites for this user's comments
-					$total_favorites = apply_filters( 'bpfn_user_comment_favorites_count', 0, $user_id );
+					// Using the recipient's user ID from the activity
+					$recipient_user_id = isset( $activity ) ? $activity->user_id : 0;
+					$total_favorites = apply_filters( 'bpfn_user_comment_favorites_count', 0, $recipient_user_id );
 					echo number_format_i18n( $total_favorites );
 					?>
 				</div>
@@ -127,7 +136,7 @@ ob_start();
 				<div style="font-size: 24px; font-weight: bold; color: #1d84b5;">
 					<?php 
 					// Get total comments by user
-					$total_comments = apply_filters( 'bpfn_user_comments_count', 0, $user_id );
+					$total_comments = apply_filters( 'bpfn_user_comments_count', 0, $recipient_user_id );
 					echo number_format_i18n( $total_comments );
 					?>
 				</div>

@@ -159,9 +159,6 @@
             var intervalSeconds = Math.max(15, Math.floor(self.config.checkInterval / 1000));
             wp.heartbeat.interval(intervalSeconds);
             
-            // Heartbeat should already be running, but make sure interval is set
-            // wp.heartbeat.start() is not needed - heartbeat auto-starts
-            
             self.log('Heartbeat configured with interval: ' + intervalSeconds + ' seconds');
         },
 
@@ -273,12 +270,6 @@
             // Custom events for manual notifications
             $(document).on('bpfn:notification:new', function(e, data) {
                 self.showNotification(data);
-            });
-            
-            // Test button for debugging
-            $(document).on('click', '#bpfn-test-realtime', function(e) {
-                e.preventDefault();
-                self.showTestNotification();
             });
         },
 
@@ -406,7 +397,7 @@
         },
 
         /**
-         * Show test notification
+         * Show test notification (ONLY for admin/debugging)
          */
         showTestNotification: function() {
             var self = this;
@@ -617,11 +608,6 @@
             setTimeout(function() {
                 BPFN.Realtime.init();
             }, 100);
-            
-            // Add test button if in debug mode
-            if (window.BPFNRealtime.debug || (window.location.search.indexOf('bpfn_debug=1') !== -1)) {
-                $('body').append('<button id="bpfn-test-realtime" style="position:fixed;bottom:20px;right:20px;z-index:99999;background:#ff7b00;color:white;padding:10px 20px;border:none;border-radius:5px;cursor:pointer;">Test Realtime</button>');
-            }
         }
     });
 

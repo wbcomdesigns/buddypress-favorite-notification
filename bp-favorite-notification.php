@@ -67,18 +67,14 @@ class BP_Favorite_Notification {
 	 * Constructor
 	 */
 	private function __construct() {
-		// Load required files FIRST (but NOT translations)
-		$this->load_dependencies();
+		// Check dependencies
+		add_action( 'plugins_loaded', array( $this, 'check_dependencies' ), 5 );
 		
-		// Load admin module early for menu registration
-		if ( is_admin() ) {
-			$this->load_admin_module();
-		}
-		
-		// Setup hooks - use proper action for textdomain
-		add_action( 'init', array( $this, 'load_textdomain' ), 5 );
-		add_action( 'plugins_loaded', array( $this, 'early_init' ), 20 );
+		// Initialize plugin
 		add_action( 'bp_loaded', array( $this, 'init' ), 10 );
+		
+		// Load textdomain
+		add_action( 'init', array( $this, 'load_textdomain' ), 5 );
 		
 		// Activation/Deactivation hooks
 		register_activation_hook( BPFN_PLUGIN_FILE, array( $this, 'activate' ) );
@@ -86,27 +82,16 @@ class BP_Favorite_Notification {
 	}
 
 	/**
-	 * Load admin module early
+	 * Check dependencies
 	 */
-	private function load_admin_module() {
-		$admin_path = BPFN_INCLUDES_PATH . 'modules/class-admin.php';
-		if ( file_exists( $admin_path ) ) {
-			require_once $admin_path;
-			if ( class_exists( 'BPFN_Module_Admin' ) ) {
-				$this->modules['admin'] = new BPFN_Module_Admin();
-			}
-		}
-	}
-
-	/**
-	 * Early initialization - for things that need to run before init
-	 */
-	public function early_init() {
-		// Check dependencies
+	public function check_dependencies() {
 		if ( ! class_exists( 'BuddyPress' ) ) {
 			add_action( 'admin_notices', array( $this, 'admin_notice_buddypress_required' ) );
 			return false;
 		}
+		
+		// Load core files
+		$this->load_dependencies();
 		
 		return true;
 	}
@@ -115,17 +100,18 @@ class BP_Favorite_Notification {
 	 * Load dependencies
 	 */
 	private function load_dependencies() {
-		// Core files that are always needed
-		$core_files = array(
+		// Core function files
+		$files = array(
 			'functions/core-functions.php',
 			'functions/template-functions.php',
 			'functions/api-functions.php',
 			'functions/integration-functions.php',
 		);
 
-		foreach ( $core_files as $file ) {
-			if ( file_exists( BPFN_INCLUDES_PATH . $file ) ) {
-				require_once BPFN_INCLUDES_PATH . $file;
+		foreach ( $files as $file ) {
+			$path = BPFN_INCLUDES_PATH . $file;
+			if ( file_exists( $path ) ) {
+				require_once $path;
 			}
 		}
 	}
@@ -134,21 +120,11 @@ class BP_Favorite_Notification {
 	 * Initialize plugin
 	 */
 	public function init() {
-		// Check dependencies first
-		if ( ! $this->check_dependencies() ) {
-			return;
-		}
-		
 		// Setup BuddyPress integration
 		add_action( 'bp_setup_components', array( $this, 'setup_globals' ), 1 );
 		
-		// Initialize modules - ensure they load!
+		// Load modules
 		add_action( 'bp_init', array( $this, 'load_modules' ), 5 );
-		
-		// Also try to load modules immediately if BuddyPress is already loaded
-		if ( did_action( 'bp_init' ) ) {
-			$this->load_modules();
-		}
 		
 		// Allow developers to hook into initialization
 		do_action( 'bpfn_init', $this );
@@ -158,56 +134,30 @@ class BP_Favorite_Notification {
 	 * Load modules
 	 */
 	public function load_modules() {
-		// Core module files (skip admin if already loaded)
-		$module_files = array(
-			'modules/class-notifications.php',
-			'modules/class-email.php',
-			'modules/class-realtime.php',
-			'modules/class-settings.php',
-			'modules/class-assets.php',
+		$modules = array(
+			'notifications' => 'class-notifications.php',
+			'email' => 'class-email.php',
+			'realtime' => 'class-realtime.php',
+			'settings' => 'class-settings.php',
+			'assets' => 'class-assets.php',
+			'admin' => 'class-admin.php',
+			'debug' => 'class-debug.php', // Add debug module
 		);
-		
-		// Add admin if not already loaded
-		if ( ! isset( $this->modules['admin'] ) ) {
-			array_unshift( $module_files, 'modules/class-admin.php' );
-		}
 
-		// Load each module
-		foreach ( $module_files as $file ) {
-			$path = BPFN_INCLUDES_PATH . $file;
+		foreach ( $modules as $key => $file ) {
+			$path = BPFN_INCLUDES_PATH . 'modules/' . $file;
 			if ( file_exists( $path ) ) {
 				require_once $path;
 				
-				// Get class name from file
-				$class_name = $this->get_class_name_from_file( $file );
+				$class_name = 'BPFN_Module_' . ucfirst( $key );
 				if ( class_exists( $class_name ) ) {
-					$module_key = strtolower( str_replace( 'BPFN_Module_', '', $class_name ) );
-					if ( ! isset( $this->modules[ $module_key ] ) ) {
-						$this->modules[ $module_key ] = new $class_name();
-					}
+					$this->modules[ $key ] = new $class_name();
 				}
 			}
 		}
 
-		// Allow additional modules to be loaded
+		// Allow additional modules
 		do_action( 'bpfn_load_modules', $this );
-	}
-
-	/**
-	 * Get class name from file path
-	 */
-	private function get_class_name_from_file( $file ) {
-		$filename = basename( $file, '.php' );
-		$class_parts = explode( '-', $filename );
-		$class_name = 'BPFN_Module';
-		
-		foreach ( $class_parts as $part ) {
-			if ( $part !== 'class' ) {
-				$class_name .= '_' . ucfirst( $part );
-			}
-		}
-		
-		return $class_name;
 	}
 
 	/**
@@ -244,17 +194,6 @@ class BP_Favorite_Notification {
 	}
 
 	/**
-	 * Check dependencies
-	 */
-	public function check_dependencies() {
-		if ( ! class_exists( 'BuddyPress' ) ) {
-			return false;
-		}
-		
-		return apply_filters( 'bpfn_dependencies_met', true );
-	}
-
-	/**
 	 * Admin notice for BuddyPress requirement
 	 */
 	public function admin_notice_buddypress_required() {
@@ -280,13 +219,8 @@ class BP_Favorite_Notification {
 	 * Plugin activation
 	 */
 	public function activate() {
-		// Create database tables
 		$this->create_tables();
-		
-		// Set default options
 		update_option( 'bpfn_version', BPFN_VERSION );
-		
-		// Allow modules to run activation routines
 		do_action( 'bpfn_activate' );
 	}
 
@@ -294,7 +228,6 @@ class BP_Favorite_Notification {
 	 * Plugin deactivation
 	 */
 	public function deactivate() {
-		// Allow modules to run deactivation routines
 		do_action( 'bpfn_deactivate' );
 	}
 
@@ -325,13 +258,6 @@ class BP_Favorite_Notification {
 		
 		dbDelta( $sql );
 		
-		// Verify table was created
-		$table_exists = $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) === $table_name;
-		if ( ! $table_exists ) {
-			error_log( 'BPFN: Failed to create preferences table' );
-		}
-		
-		// Allow additional tables to be created
 		do_action( 'bpfn_create_tables', $wpdb, $charset_collate );
 	}
 
