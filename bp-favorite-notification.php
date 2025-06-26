@@ -100,6 +100,9 @@ class BP_Favorite_Notification {
 	 * Load dependencies
 	 */
 	private function load_dependencies() {
+		// Load compatibility layer first
+		require_once BPFN_INCLUDES_PATH . 'compat/buddypress-compat.php';
+		
 		// Core function files
 		$files = array(
 			'functions/core-functions.php',
@@ -120,10 +123,7 @@ class BP_Favorite_Notification {
 	 * Initialize plugin
 	 */
 	public function init() {
-		// Setup BuddyPress integration
-		add_action( 'bp_setup_components', array( $this, 'setup_globals' ), 1 );
-		
-		// Load modules
+		// Load modules - let compat layer handle component setup
 		add_action( 'bp_init', array( $this, 'load_modules' ), 5 );
 		
 		// Allow developers to hook into initialization
@@ -158,29 +158,6 @@ class BP_Favorite_Notification {
 
 		// Allow additional modules
 		do_action( 'bpfn_load_modules', $this );
-	}
-
-	/**
-	 * Setup BuddyPress globals
-	 */
-	public function setup_globals() {
-		if ( ! bp_is_active( 'notifications' ) ) {
-			return;
-		}
-
-		global $bp;
-		
-		// Create component object
-		$bp->{$this->component_id} = new stdClass();
-		$bp->{$this->component_id}->id = $this->component_id;
-		$bp->{$this->component_id}->slug = $this->component_slug;
-		$bp->{$this->component_id}->notification_callback = array( $this, 'notification_callback' );
-		
-		// Register component
-		$bp->active_components[ $this->component_id ] = $this->component_id;
-		
-		// Allow customization
-		do_action( 'bpfn_setup_globals', $this );
 	}
 
 	/**

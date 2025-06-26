@@ -150,11 +150,21 @@ class BPFN_Module_Notifications {
 	public function format_notifications( $action, $item_id, $secondary_item_id, $total_items, $format, $component_action, $component_name, $id ) {
 		global $bp;
 		
+		// Check if this is our component
 		if ( ! isset( $bp->favorite_notifier ) || $component_name !== $bp->favorite_notifier->id ) {
 			return $action;
 		}
 
-		return $this->format_notification( $component_action, $item_id, $secondary_item_id, $total_items, $format );
+		// Format and return our notification
+		$formatted = $this->format_notification( $component_action, $item_id, $secondary_item_id, $total_items, $format );
+		
+		// If we have a valid formatted notification, return it
+		if ( $formatted !== false ) {
+			return $formatted;
+		}
+		
+		// Otherwise return the original action
+		return $action;
 	}
 
 	/**
@@ -179,8 +189,8 @@ class BPFN_Module_Notifications {
 			$text = sprintf( $config['labels']['single'], $user_name );
 		}
 
-		// Build link
-		$link = bp_activity_get_permalink( $activity );
+		// Build link - pass activity ID, not the object
+		$link = bp_activity_get_permalink( $item_id );
 
 		// Return formatted notification
 		if ( 'string' === $format ) {
@@ -198,6 +208,7 @@ class BPFN_Module_Notifications {
 			'notification_type' => $type,
 			'activity_id' => $item_id,
 			'activity_excerpt' => wp_trim_words( wp_strip_all_tags( $activity->content ), 20, '...' ),
+			'activity_type' => $activity->type,
 			'user_id' => $secondary_item_id,
 			'user_name' => $this->get_user_displayname_safe( $secondary_item_id ),
 			'user_link' => $user_link,
