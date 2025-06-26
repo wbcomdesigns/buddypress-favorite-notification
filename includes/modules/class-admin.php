@@ -1140,4 +1140,655 @@ class BPFN_Module_Admin {
 			) );
 		}
 	}
+
+
+
+	/**
+	 * Enhanced Admin Tools for BuddyPress Favorite Notification
+	 * Complete replacement for enhanced admin functionality
+	 * Add these methods to your BPFN_Module_Admin class
+	 */
+
+	public function render_enhanced_tools() {
+		$realtime_module = bpfn()->get_module('realtime');
+		$system_status = $realtime_module ? $realtime_module->get_system_status() : null;
+		?>
+		
+		<!-- Real-time System Diagnostics -->
+		<div class="bpfn-tool-box">
+			<h3>🔍 Real-time System Diagnostics</h3>
+			<p>Comprehensive analysis of your real-time notification system.</p>
+			
+			<?php if ($system_status): ?>
+				<div class="bpfn-diagnostics-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
+					
+					<!-- System Status -->
+					<div>
+						<h4>System Status</h4>
+						<table class="widefat striped">
+							<tr>
+								<td><strong>Heartbeat Available:</strong></td>
+								<td><?php echo $system_status['heartbeat_available'] ? 
+									'<span style="color: green;">✅ Available</span>' : 
+									'<span style="color: red;">❌ Unavailable</span>'; ?></td>
+							</tr>
+							<tr>
+								<td><strong>SSE Supported:</strong></td>
+								<td><?php echo $system_status['sse_supported'] ? 
+									'<span style="color: green;">✅ Supported</span>' : 
+									'<span style="color: orange;">⚠️ Limited</span>'; ?></td>
+							</tr>
+							<tr>
+								<td><strong>Preferred Method:</strong></td>
+								<td><strong><?php echo ucfirst($system_status['preferred_method']); ?></strong></td>
+							</tr>
+							<tr>
+								<td><strong>Server Software:</strong></td>
+								<td><?php echo esc_html($system_status['server_info']['server_software']); ?></td>
+							</tr>
+						</table>
+					</div>
+					
+					<!-- Performance Impact -->
+					<div>
+						<h4>Performance Analysis</h4>
+						<table class="widefat striped">
+							<tr>
+								<td><strong>PHP Version:</strong></td>
+								<td><?php echo $system_status['server_info']['php_version']; ?>
+									<?php if (version_compare($system_status['server_info']['php_version'], '8.0', '>=')): ?>
+										<span style="color: green;">✅</span>
+									<?php else: ?>
+										<span style="color: orange;">⚠️</span>
+									<?php endif; ?>
+								</td>
+							</tr>
+							<tr>
+								<td><strong>Max Execution Time:</strong></td>
+								<td><?php 
+									$max_exec = $system_status['server_info']['max_execution_time'];
+									echo $max_exec . 's';
+									if ($max_exec >= 300) {
+										echo ' <span style="color: green;">✅</span>';
+									} elseif ($max_exec >= 60) {
+										echo ' <span style="color: orange;">⚠️</span>';
+									} else {
+										echo ' <span style="color: red;">❌</span>';
+									}
+								?></td>
+							</tr>
+							<tr>
+								<td><strong>Output Buffering:</strong></td>
+								<td><?php 
+									$ob = $system_status['server_info']['output_buffering'];
+									echo $ob ? $ob : 'Off';
+									echo $ob ? ' <span style="color: orange;">⚠️</span>' : ' <span style="color: green;">✅</span>';
+								?></td>
+							</tr>
+							<tr>
+								<td><strong>Performance Plugins:</strong></td>
+								<td><?php 
+									if (empty($system_status['active_performance_plugins'])) {
+										echo '<span style="color: green;">None detected ✅</span>';
+									} else {
+										echo '<span style="color: orange;">' . 
+											implode(', ', $system_status['active_performance_plugins']) . 
+											' ⚠️</span>';
+									}
+								?></td>
+							</tr>
+						</table>
+					</div>
+				</div>
+				
+				<!-- Method-specific Status -->
+				<div style="margin: 20px 0;">
+					<h4>Notification Methods</h4>
+					<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+						
+						<?php foreach ($system_status['supported_methods'] as $method => $supported): ?>
+							<div class="method-status" style="padding: 15px; border: 1px solid #ddd; border-radius: 5px; text-align: center;">
+								<h5 style="margin: 0 0 10px;"><?php echo ucfirst($method); ?></h5>
+								<?php if ($supported): ?>
+									<span style="font-size: 24px; color: green;">✅</span>
+									<p style="margin: 5px 0; color: green;">Available</p>
+								<?php else: ?>
+									<span style="font-size: 24px; color: #ccc;">⭕</span>
+									<p style="margin: 5px 0; color: #666;">Not Available</p>
+								<?php endif; ?>
+							</div>
+						<?php endforeach; ?>
+					</div>
+				</div>
+				
+				<!-- Testing Tools -->
+				<div style="margin: 20px 0;">
+					<h4>Testing Tools</h4>
+					<div class="button-group">
+						<button class="button button-primary" id="test-all-methods">🧪 Test All Methods</button>
+						<button class="button" id="test-heartbeat-only">💓 Test Heartbeat</button>
+						<button class="button" id="test-sse-only">📡 Test SSE</button>
+						<button class="button" id="test-polling-only">🔄 Test Polling</button>
+						<button class="button" id="force-polling-mode">⚙️ Force Polling Mode</button>
+					</div>
+				</div>
+				
+				<!-- Live Test Results -->
+				<div id="realtime-test-results" style="margin-top: 20px; display: none;">
+					<h4>Test Results</h4>
+					<div id="test-output" style="background: #f5f5f5; padding: 15px; border-radius: 5px; font-family: monospace; max-height: 300px; overflow-y: auto;"></div>
+				</div>
+				
+			<?php else: ?>
+				<div style="color: red; padding: 20px; text-align: center;">
+					<h4>❌ Real-time Module Not Available</h4>
+					<p>The real-time notifications module could not be loaded. Please check your plugin installation.</p>
+				</div>
+			<?php endif; ?>
+		</div>
+		
+		<!-- Connection Monitor -->
+		<div class="bpfn-tool-box">
+			<h3>📊 Live Connection Monitor</h3>
+			<p>Monitor real-time notification performance in real-time.</p>
+			
+			<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin: 20px 0;">
+				<div class="stat-box" style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 5px;">
+					<div style="font-size: 24px; font-weight: bold; color: #007cba;" id="connection-status">Disconnected</div>
+					<div style="font-size: 12px; color: #666;">Connection Status</div>
+				</div>
+				<div class="stat-box" style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 5px;">
+					<div style="font-size: 24px; font-weight: bold; color: #00a32a;" id="success-count">0</div>
+					<div style="font-size: 12px; color: #666;">Successful Requests</div>
+				</div>
+				<div class="stat-box" style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 5px;">
+					<div style="font-size: 24px; font-weight: bold; color: #d63638;" id="error-count">0</div>
+					<div style="font-size: 12px; color: #666;">Failed Requests</div>
+				</div>
+				<div class="stat-box" style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 5px;">
+					<div style="font-size: 24px; font-weight: bold; color: #ff7b00;" id="avg-response">0ms</div>
+					<div style="font-size: 12px; color: #666;">Avg Response Time</div>
+				</div>
+			</div>
+			
+			<div style="margin: 20px 0;">
+				<button class="button button-primary" id="start-monitoring">📈 Start Monitoring</button>
+				<button class="button" id="stop-monitoring">⏹️ Stop Monitoring</button>
+				<button class="button" id="clear-monitor">🗑️ Clear Data</button>
+			</div>
+			
+			<div id="monitoring-log" style="background: #fff; border: 1px solid #ddd; padding: 15px; max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px; display: none;"></div>
+		</div>
+		
+		<!-- Configuration Optimizer -->
+		<div class="bpfn-tool-box">
+			<h3>⚙️ Configuration Optimizer</h3>
+			<p>Automatically optimize settings based on your server environment.</p>
+			
+			<div id="optimization-results" style="margin: 20px 0;">
+				<h4>Current Configuration</h4>
+				<table class="widefat striped">
+					<tr>
+						<td><strong>Check Interval:</strong></td>
+						<td><?php echo get_option('bpfn_options')['realtime_interval'] ?? 15; ?> seconds</td>
+					</tr>
+					<tr>
+						<td><strong>Max Notifications:</strong></td>
+						<td>5</td>
+					</tr>
+					<tr>
+						<td><strong>Auto Dismiss:</strong></td>
+						<td>5 seconds</td>
+					</tr>
+				</table>
+			</div>
+			
+			<button class="button button-primary" id="optimize-config">🎯 Auto-Optimize Configuration</button>
+			<button class="button" id="reset-config">🔄 Reset to Defaults</button>
+			
+			<div id="optimization-suggestions" style="margin-top: 20px; display: none;"></div>
+		</div>
+		
+		<!-- Troubleshooting Guide -->
+		<div class="bpfn-tool-box">
+			<h3>🛠️ Troubleshooting Assistant</h3>
+			<p>Get personalized help based on your specific configuration.</p>
+			
+			<div class="troubleshooting-steps" style="margin: 20px 0;">
+				<?php if (!empty($system_status['active_performance_plugins'])): ?>
+					<div class="notice notice-warning" style="margin: 10px 0;">
+						<p><strong>Performance Plugin Detected:</strong> 
+						<?php echo implode(', ', $system_status['active_performance_plugins']); ?> may interfere with real-time notifications.</p>
+						<button class="button" onclick="showPerformancePluginHelp()">Show Solutions</button>
+					</div>
+				<?php endif; ?>
+				
+				<?php if (!$system_status['heartbeat_available']): ?>
+					<div class="notice notice-error" style="margin: 10px 0;">
+						<p><strong>Heartbeat Unavailable:</strong> WordPress Heartbeat API is not working.</p>
+						<button class="button" onclick="showHeartbeatHelp()">Show Solutions</button>
+					</div>
+				<?php endif; ?>
+				
+				<?php if (!$system_status['sse_supported']): ?>
+					<div class="notice notice-info" style="margin: 10px 0;">
+						<p><strong>SSE Limited:</strong> Server-Sent Events have limited support on your server.</p>
+						<button class="button" onclick="showSSEHelp()">Show Solutions</button>
+					</div>
+				<?php endif; ?>
+			</div>
+			
+			<button class="button button-primary" id="run-full-diagnostic">🔍 Run Full Diagnostic</button>
+			<button class="button" id="generate-support-info">📋 Generate Support Info</button>
+			
+			<div id="diagnostic-output" style="margin-top: 20px; display: none;"></div>
+		</div>
+		
+		<script>
+		jQuery(document).ready(function($) {
+			// Enhanced testing functionality
+			var testMonitor = {
+				stats: {
+					connected: false,
+					successCount: 0,
+					errorCount: 0,
+					responseTimes: [],
+					isMonitoring: false
+				},
+				
+				updateStats: function() {
+					$('#connection-status').text(this.stats.connected ? 'Connected' : 'Disconnected');
+					$('#success-count').text(this.stats.successCount);
+					$('#error-count').text(this.stats.errorCount);
+					
+					if (this.stats.responseTimes.length > 0) {
+						var avg = this.stats.responseTimes.reduce((a, b) => a + b, 0) / this.stats.responseTimes.length;
+						$('#avg-response').text(Math.round(avg) + 'ms');
+					}
+				},
+				
+				log: function(message, type = 'info') {
+					var timestamp = new Date().toLocaleTimeString();
+					var color = type === 'error' ? 'red' : type === 'success' ? 'green' : 'black';
+					$('#monitoring-log').append(
+						'<div style="color: ' + color + '">[' + timestamp + '] ' + message + '</div>'
+					).scrollTop($('#monitoring-log')[0].scrollHeight);
+				}
+			};
+			
+			// Test all methods
+			$('#test-all-methods').on('click', function() {
+				var $button = $(this);
+				var $output = $('#test-output');
+				var $results = $('#realtime-test-results');
+				
+				$button.prop('disabled', true).text('🧪 Testing...');
+				$results.show();
+				$output.html('<div>Starting comprehensive test suite...</div>');
+				
+				// Test sequence
+				Promise.resolve()
+					.then(() => testHeartbeat($output))
+					.then(() => testSSE($output))
+					.then(() => testPolling($output))
+					.then(() => {
+						$output.append('<div style="color: green; font-weight: bold; margin-top: 20px;">✅ All tests completed!</div>');
+					})
+					.catch(error => {
+						$output.append('<div style="color: red; font-weight: bold; margin-top: 20px;">❌ Test suite failed: ' + error + '</div>');
+					})
+					.finally(() => {
+						$button.prop('disabled', false).text('🧪 Test All Methods');
+					});
+			});
+			
+			// Individual test functions
+			function testHeartbeat($output) {
+				return new Promise((resolve, reject) => {
+					$output.append('<div><strong>Testing WordPress Heartbeat...</strong></div>');
+					
+					if (typeof wp === 'undefined' || !wp.heartbeat) {
+						$output.append('<div style="color: red;">❌ WordPress Heartbeat not available</div>');
+						resolve();
+						return;
+					}
+					
+					var timeout = setTimeout(() => {
+						$output.append('<div style="color: red;">❌ Heartbeat test timeout</div>');
+						$(document).off('.bpfn-test');
+						resolve();
+					}, 10000);
+					
+					$(document).on('heartbeat-send.bpfn-test', function(e, data) {
+						data.bpfn_test = { timestamp: Date.now() };
+						$output.append('<div style="color: blue;">🔵 Heartbeat test sent</div>');
+					});
+					
+					$(document).on('heartbeat-tick.bpfn-test', function(e, data) {
+						if (data.bpfn_test_response) {
+							clearTimeout(timeout);
+							$output.append('<div style="color: green;">✅ Heartbeat working! Response time: ' + 
+										(Date.now() - data.bpfn_test_response.timestamp) + 'ms</div>');
+							$(document).off('.bpfn-test');
+							resolve();
+						}
+					});
+					
+					$(document).on('heartbeat-error.bpfn-test', function() {
+						clearTimeout(timeout);
+						$output.append('<div style="color: red;">❌ Heartbeat error occurred</div>');
+						$(document).off('.bpfn-test');
+						resolve();
+					});
+					
+					wp.heartbeat.connectNow();
+				});
+			}
+			
+			function testSSE($output) {
+				return new Promise((resolve) => {
+					$output.append('<div><strong>Testing Server-Sent Events...</strong></div>');
+					
+					if (!window.EventSource) {
+						$output.append('<div style="color: red;">❌ SSE not supported by browser</div>');
+						resolve();
+						return;
+					}
+					
+					var testUrl = ajaxurl + '?action=bpfn_sse_test&nonce=' + encodeURIComponent(bpfnAdmin.nonce);
+					var eventSource = new EventSource(testUrl);
+					var startTime = Date.now();
+					
+					var timeout = setTimeout(() => {
+						eventSource.close();
+						$output.append('<div style="color: red;">❌ SSE test timeout</div>');
+						resolve();
+					}, 15000);
+					
+					eventSource.onopen = function() {
+						$output.append('<div style="color: green;">✅ SSE connection opened</div>');
+					};
+					
+					eventSource.onmessage = function(event) {
+						var data = JSON.parse(event.data);
+						if (data.message) {
+							$output.append('<div style="color: blue;">📨 ' + data.message + '</div>');
+						}
+					};
+					
+					eventSource.addEventListener('close', function(event) {
+						clearTimeout(timeout);
+						var data = JSON.parse(event.data);
+						var duration = Date.now() - startTime;
+						$output.append('<div style="color: green;">✅ SSE test completed (' + duration + 'ms)</div>');
+						eventSource.close();
+						resolve();
+					});
+					
+					eventSource.onerror = function(error) {
+						clearTimeout(timeout);
+						$output.append('<div style="color: red;">❌ SSE connection error</div>');
+						eventSource.close();
+						resolve();
+					};
+				});
+			}
+			
+			function testPolling($output) {
+				return new Promise((resolve) => {
+					$output.append('<div><strong>Testing AJAX Polling...</strong></div>');
+					
+					var startTime = Date.now();
+					
+					$.ajax({
+						url: ajaxurl,
+						type: 'POST',
+						timeout: 10000,
+						data: {
+							action: 'bpfn_check_notifications',
+							last_checked: Math.floor(Date.now() / 1000),
+							nonce: bpfnAdmin.nonce
+						},
+						success: function(response) {
+							var responseTime = Date.now() - startTime;
+							if (response.success) {
+								$output.append('<div style="color: green;">✅ Polling successful (' + responseTime + 'ms)</div>');
+								$output.append('<div style="color: blue;">📊 Found ' + response.data.notifications.length + ' notifications</div>');
+							} else {
+								$output.append('<div style="color: orange;">⚠️ Polling returned error: ' + (response.data?.message || 'Unknown error') + '</div>');
+							}
+							resolve();
+						},
+						error: function(xhr, status, error) {
+							$output.append('<div style="color: red;">❌ Polling failed: ' + error + '</div>');
+							resolve();
+						}
+					});
+				});
+			}
+			
+			// Start monitoring
+			$('#start-monitoring').on('click', function() {
+				testMonitor.stats.isMonitoring = true;
+				$('#monitoring-log').show();
+				testMonitor.log('Monitoring started', 'success');
+				
+				function monitor() {
+					if (!testMonitor.stats.isMonitoring) return;
+					
+					var startTime = Date.now();
+					testMonitor.stats.connected = false;
+					testMonitor.updateStats();
+					
+					$.ajax({
+						url: ajaxurl,
+						type: 'POST',
+						data: {
+							action: 'bpfn_check_notifications',
+							last_checked: Math.floor(Date.now() / 1000),
+							nonce: bpfnAdmin.nonce
+						},
+						success: function(response) {
+							var responseTime = Date.now() - startTime;
+							testMonitor.stats.connected = true;
+							testMonitor.stats.successCount++;
+							testMonitor.stats.responseTimes.push(responseTime);
+							
+							// Keep only last 10 response times
+							if (testMonitor.stats.responseTimes.length > 10) {
+								testMonitor.stats.responseTimes.shift();
+							}
+							
+							testMonitor.updateStats();
+							testMonitor.log('Success (' + responseTime + 'ms)', 'success');
+							
+							setTimeout(monitor, 5000);
+						},
+						error: function(xhr, status, error) {
+							testMonitor.stats.connected = false;
+							testMonitor.stats.errorCount++;
+							testMonitor.updateStats();
+							testMonitor.log('Error: ' + error, 'error');
+							
+							setTimeout(monitor, 5000);
+						}
+					});
+				}
+				
+				monitor();
+			});
+			
+			$('#stop-monitoring').on('click', function() {
+				testMonitor.stats.isMonitoring = false;
+				testMonitor.log('Monitoring stopped', 'info');
+			});
+			
+			$('#clear-monitor').on('click', function() {
+				testMonitor.stats = {
+					connected: false,
+					successCount: 0,
+					errorCount: 0,
+					responseTimes: [],
+					isMonitoring: false
+				};
+				testMonitor.updateStats();
+				$('#monitoring-log').empty();
+			});
+			
+			// Configuration optimizer
+			$('#optimize-config').on('click', function() {
+				var $button = $(this);
+				$button.prop('disabled', true).text('⚙️ Optimizing...');
+				
+				$.ajax({
+					url: ajaxurl,
+					type: 'POST',
+					data: {
+						action: 'bpfn_optimize_config',
+						nonce: bpfnAdmin.nonce
+					},
+					success: function(response) {
+						if (response.success) {
+							$('#optimization-suggestions').html(response.data.suggestions).show();
+						}
+					},
+					complete: function() {
+						$button.prop('disabled', false).text('🎯 Auto-Optimize Configuration');
+					}
+				});
+			});
+			
+			// Troubleshooting helpers
+			window.showPerformancePluginHelp = function() {
+				alert('Performance Plugin Solutions:\n\n1. WP Rocket: Enable "Load JavaScript deferred" exception for heartbeat\n2. W3 Total Cache: Exclude heartbeat from page cache\n3. Heartbeat Control: Allow heartbeat on user pages\n\nFor detailed instructions, visit the Help page.');
+			};
+			
+			window.showHeartbeatHelp = function() {
+				alert('Heartbeat Solutions:\n\n1. Check if Heartbeat Control plugin is disabling it\n2. Verify performance plugins are not blocking heartbeat\n3. Contact your hosting provider about server limitations\n4. Enable fallback polling mode\n\nReal-time notifications will work with polling as backup.');
+			};
+			
+			window.showSSEHelp = function() {
+				alert('SSE Solutions:\n\n1. Disable output buffering in PHP settings\n2. Configure web server for SSE support\n3. Check if hosting provider supports long-running connections\n4. Verify firewall is not blocking connections\n\nPolling will be used as fallback.');
+			};
+		});
+		</script>
+		
+		<?php
+	}
+
+	/**
+	 * Add AJAX handlers for the new functionality
+	 */
+	public function ajax_optimize_config() {
+		check_ajax_referer('bpfn-admin-nonce', 'nonce');
+		
+		if (!current_user_can('manage_options')) {
+			wp_send_json_error(array('message' => 'Insufficient permissions'));
+		}
+		
+		$realtime_module = bpfn()->get_module('realtime');
+		if (!$realtime_module) {
+			wp_send_json_error(array('message' => 'Realtime module not available'));
+		}
+		
+		$system_status = $realtime_module->get_system_status();
+		$suggestions = array();
+		
+		// Generate optimization suggestions
+		if (!$system_status['heartbeat_available']) {
+			$suggestions[] = '<div class="notice notice-warning"><p><strong>Recommendation:</strong> Increase polling interval to 30 seconds to reduce server load since Heartbeat is unavailable.</p></div>';
+		}
+		
+		if (!empty($system_status['active_performance_plugins'])) {
+			$suggestions[] = '<div class="notice notice-info"><p><strong>Recommendation:</strong> Consider configuring ' . implode(', ', $system_status['active_performance_plugins']) . ' to allow Heartbeat for better performance.</p></div>';
+		}
+		
+		if ($system_status['server_info']['max_execution_time'] < 60) {
+			$suggestions[] = '<div class="notice notice-warning"><p><strong>Recommendation:</strong> Reduce max notifications to 3 due to limited execution time.</p></div>';
+		}
+		
+		if (empty($suggestions)) {
+			$suggestions[] = '<div class="notice notice-success"><p><strong>Great!</strong> Your configuration appears to be optimized for your server environment.</p></div>';
+		}
+		
+		wp_send_json_success(array(
+			'suggestions' => implode('', $suggestions)
+		));
+	}
+
+	/**
+	 * Modified tools page to include enhanced tools
+	 */
+	public function tools_page() {
+		?>
+		<div class="wrap">
+			<h1><?php _e( 'BuddyPress Favorite Notification Tools', 'bp-fav-notification' ); ?></h1>
+			
+			<div class="bpfn-tools-container">
+				<?php $this->render_enhanced_tools(); ?>
+				<?php $this->render_original_tools(); ?>
+			</div>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Render original tools (existing functionality)
+	 */
+	private function render_original_tools() {
+		?>
+		<!-- Test WordPress Email -->
+		<div class="bpfn-tool-box">
+			<h3><?php _e( 'Test WordPress Email', 'bp-fav-notification' ); ?></h3>
+			<p><?php _e( 'Send a simple test email to check if WordPress email is working.', 'bp-fav-notification' ); ?></p>
+			<button class="button" id="bpfn-test-wp-email">
+				<?php _e( 'Send Simple Test Email', 'bp-fav-notification' ); ?>
+			</button>
+			<div id="bpfn-wp-email-result"></div>
+		</div>
+		
+		<!-- Clear Old Notifications -->
+		<div class="bpfn-tool-box">
+			<h3><?php _e( 'Clear Old Notifications', 'bp-fav-notification' ); ?></h3>
+			<p><?php _e( 'Remove read notifications older than 30 days.', 'bp-fav-notification' ); ?></p>
+			<button class="button" id="bpfn-clear-old-notifications">
+				<?php _e( 'Clear Old Notifications', 'bp-fav-notification' ); ?>
+			</button>
+		</div>
+		
+		<!-- Database Maintenance -->
+		<div class="bpfn-tool-box">
+			<h3><?php _e( 'Database Maintenance', 'bp-fav-notification' ); ?></h3>
+			<p><?php _e( 'Check and repair database tables.', 'bp-fav-notification' ); ?></p>
+			<?php
+			if ( function_exists( 'bpfn_check_tables' ) ) {
+				$tables = bpfn_check_tables();
+				foreach ( $tables as $table => $exists ) {
+					echo '<p>';
+					echo ucfirst( $table ) . ' table: ';
+					echo $exists ? '<span style="color:green;">✓ OK</span>' : '<span style="color:red;">✗ Missing</span>';
+					echo '</p>';
+				}
+				?>
+				<button class="button" id="bpfn-repair-tables" <?php echo ! in_array( false, $tables ) ? 'disabled' : ''; ?>>
+					<?php _e( 'Repair Tables', 'bp-fav-notification' ); ?>
+				</button>
+				<?php
+			}
+			?>
+		</div>
+		
+		<!-- Export/Import Settings -->
+		<div class="bpfn-tool-box">
+			<h3><?php _e( 'Export/Import Settings', 'bp-fav-notification' ); ?></h3>
+			<p><?php _e( 'Export your plugin settings for backup or migration.', 'bp-fav-notification' ); ?></p>
+			<button class="button" id="bpfn-export-settings">
+				<?php _e( 'Export Settings', 'bp-fav-notification' ); ?>
+			</button>
+			<br><br>
+			<label for="bpfn-import-file"><?php _e( 'Import Settings:', 'bp-fav-notification' ); ?></label><br>
+			<input type="file" id="bpfn-import-settings-file" accept=".json">
+		</div>
+		<?php
+	}
 }
