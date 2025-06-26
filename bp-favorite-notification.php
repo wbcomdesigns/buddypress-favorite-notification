@@ -67,7 +67,7 @@ class BP_Favorite_Notification {
 	 * Constructor
 	 */
 	private function __construct() {
-		// Load required files FIRST
+		// Load required files FIRST (but NOT translations)
 		$this->load_dependencies();
 		
 		// Load admin module early for menu registration
@@ -75,7 +75,8 @@ class BP_Favorite_Notification {
 			$this->load_admin_module();
 		}
 		
-		// THEN setup hooks
+		// Setup hooks - use proper action for textdomain
+		add_action( 'init', array( $this, 'load_textdomain' ), 5 );
 		add_action( 'plugins_loaded', array( $this, 'early_init' ), 20 );
 		add_action( 'bp_loaded', array( $this, 'init' ), 10 );
 		
@@ -138,14 +139,16 @@ class BP_Favorite_Notification {
 			return;
 		}
 		
-		// Load textdomain - now at the proper time
-		$this->load_textdomain();
+		// Setup BuddyPress integration
+		add_action( 'bp_setup_components', array( $this, 'setup_globals' ), 1 );
 		
-		// Setup BuddyPress integration immediately
-		add_action( 'bp_loaded', array( $this, 'setup_globals' ), 5 );
+		// Initialize modules - ensure they load!
+		add_action( 'bp_init', array( $this, 'load_modules' ), 5 );
 		
-		// Initialize modules after BuddyPress loads
-		add_action( 'bp_include', array( $this, 'load_modules' ) );
+		// Also try to load modules immediately if BuddyPress is already loaded
+		if ( did_action( 'bp_init' ) ) {
+			$this->load_modules();
+		}
 		
 		// Allow developers to hook into initialization
 		do_action( 'bpfn_init', $this );
@@ -255,10 +258,6 @@ class BP_Favorite_Notification {
 	 * Admin notice for BuddyPress requirement
 	 */
 	public function admin_notice_buddypress_required() {
-		// Only show notice after init when translations are loaded
-		if ( ! did_action( 'init' ) ) {
-			return;
-		}
 		?>
 		<div class="error">
 			<p><?php printf( 

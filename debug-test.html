@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BPFN Realtime Debug</title>
+    <style>
+        .debug-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: #2a2a2a;
+            color: #0f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            max-width: 600px;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 99999;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        .debug-title {
+            color: #ff7b00;
+            font-size: 16px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+        }
+        .debug-section {
+            margin: 10px 0;
+            padding: 10px;
+            background: #1a1a1a;
+            border-radius: 4px;
+        }
+        .debug-label {
+            color: #ff7b00;
+            font-weight: bold;
+        }
+        .debug-value {
+            color: #0f0;
+        }
+        .debug-error {
+            color: #f00;
+        }
+        .debug-success {
+            color: #0f0;
+        }
+        .debug-button {
+            background: #ff7b00;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .debug-button:hover {
+            background: #ff9a33;
+        }
+    </style>
+</head>
+<body>
+
+<div class="debug-panel" id="bpfn-debug-panel">
+    <div class="debug-title">🔍 BPFN Realtime Debug Panel</div>
+    
+    <div class="debug-section">
+        <div class="debug-label">Status:</div>
+        <div id="debug-status"></div>
+    </div>
+    
+    <div class="debug-section">
+        <div class="debug-label">Configuration:</div>
+        <div id="debug-config"></div>
+    </div>
+    
+    <div class="debug-section">
+        <div class="debug-label">Actions:</div>
+        <button class="debug-button" onclick="debugInit()">Force Init</button>
+        <button class="debug-button" onclick="debugTest()">Test Notification</button>
+        <button class="debug-button" onclick="debugHeartbeat()">Check Heartbeat</button>
+        <button class="debug-button" onclick="debugAjax()">Test AJAX</button>
+    </div>
+    
+    <div class="debug-section">
+        <div class="debug-label">Console:</div>
+        <div id="debug-console" style="max-height: 150px; overflow-y: auto;"></div>
+    </div>
+</div>
+
+<script>
+// Debug functions
+function log(msg, type = 'info') {
+    const time = new Date().toLocaleTimeString();
+    const color = type === 'error' ? 'debug-error' : type === 'success' ? 'debug-success' : 'debug-value';
+    const html = `<div>[${time}] <span class="${color}">${msg}</span></div>`;
+    document.getElementById('debug-console').innerHTML = html + document.getElementById('debug-console').innerHTML;
+    console.log('[BPFN Debug]', msg);
+}
+
+function checkStatus() {
+    let status = '';
+    
+    // Check jQuery
+    if (typeof jQuery !== 'undefined') {
+        status += '<div class="debug-success">✓ jQuery loaded (v' + jQuery.fn.jquery + ')</div>';
+    } else {
+        status += '<div class="debug-error">✗ jQuery NOT loaded</div>';
+    }
+    
+    // Check BPFN
+    if (typeof BPFN !== 'undefined') {
+        status += '<div class="debug-success">✓ BPFN core loaded</div>';
+        
+        if (BPFN.Realtime) {
+            status += '<div class="debug-success">✓ BPFN.Realtime module loaded</div>';
+            
+            if (BPFN.Realtime.state && BPFN.Realtime.state.initialized) {
+                status += '<div class="debug-success">✓ Realtime initialized</div>';
+            } else {
+                status += '<div class="debug-error">✗ Realtime NOT initialized</div>';
+            }
+        } else {
+            status += '<div class="debug-error">✗ BPFN.Realtime module NOT loaded</div>';
+        }
+    } else {
+        status += '<div class="debug-error">✗ BPFN core NOT loaded</div>';
+    }
+    
+    // Check BPFNRealtime config
+    if (typeof BPFNRealtime !== 'undefined') {
+        status += '<div class="debug-success">✓ BPFNRealtime config loaded</div>';
+    } else {
+        status += '<div class="debug-error">✗ BPFNRealtime config NOT loaded</div>';
+    }
+    
+    // Check WordPress
+    if (typeof wp !== 'undefined' && wp.heartbeat) {
+        status += '<div class="debug-success">✓ WordPress Heartbeat available</div>';
+    } else {
+        status += '<div class="debug-error">✗ WordPress Heartbeat NOT available</div>';
+    }
+    
+    document.getElementById('debug-status').innerHTML = status;
+}
+
+function checkConfig() {
+    let config = '';
+    
+    if (typeof BPFNRealtime !== 'undefined') {
+        config += '<div>AJAX URL: <span class="debug-value">' + (BPFNRealtime.ajax_url || 'Not set') + '</span></div>';
+        config += '<div>Nonce: <span class="debug-value">' + (BPFNRealtime.nonce ? 'Set' : 'Not set') + '</span></div>';
+        config += '<div>Check Interval: <span class="debug-value">' + (BPFNRealtime.checkInterval || 'Not set') + 'ms</span></div>';
+        config += '<div>Position: <span class="debug-value">' + (BPFNRealtime.position || 'Not set') + '</span></div>';
+        config += '<div>Debug: <span class="debug-value">' + (BPFNRealtime.debug || false) + '</span></div>';
+    } else {
+        config = '<div class="debug-error">BPFNRealtime config not found</div>';
+    }
+    
+    document.getElementById('debug-config').innerHTML = config;
+}
+
+function debugInit() {
+    log('Attempting to initialize BPFN.Realtime...');
+    
+    if (typeof BPFN !== 'undefined' && BPFN.Realtime) {
+        try {
+            // Destroy if already initialized
+            if (BPFN.Realtime.state.initialized) {
+                BPFN.Realtime.destroy();
+                log('Destroyed existing instance', 'success');
+            }
+            
+            // Enable debug mode
+            BPFN.Realtime.config.debug = true;
+            
+            // Initialize
+            BPFN.Realtime.init();
+            log('Initialization called', 'success');
+            
+            // Check status after a delay
+            setTimeout(() => {
+                checkStatus();
+                if (BPFN.Realtime.state.initialized) {
+                    log('Realtime successfully initialized!', 'success');
+                } else {
+                    log('Initialization may have failed', 'error');
+                }
+            }, 1000);
+        } catch (e) {
+            log('Error during initialization: ' + e.message, 'error');
+        }
+    } else {
+        log('BPFN.Realtime not available', 'error');
+    }
+}
+
+function debugTest() {
+    log('Triggering test notification...');
+    
+    if (typeof BPFN !== 'undefined' && BPFN.Realtime && BPFN.Realtime.showTestNotification) {
+        try {
+            BPFN.Realtime.showTestNotification();
+            log('Test notification triggered', 'success');
+        } catch (e) {
+            log('Error showing test notification: ' + e.message, 'error');
+        }
+    } else {
+        log('BPFN.Realtime.showTestNotification not available', 'error');
+    }
+}
+
+function debugHeartbeat() {
+    log('Checking WordPress Heartbeat...');
+    
+    if (typeof wp !== 'undefined' && wp.heartbeat) {
+        // Listen for heartbeat
+        jQuery(document).on('heartbeat-tick.debug', function(e, data) {
+            log('Heartbeat tick received!', 'success');
+            console.log('Heartbeat data:', data);
+            
+            if (data.bpfn_realtime_notifications) {
+                log('BPFN data found in heartbeat: ' + JSON.stringify(data.bpfn_realtime_notifications), 'success');
+            } else {
+                log('No BPFN data in heartbeat response', 'error');
+            }
+            
+            jQuery(document).off('heartbeat-tick.debug');
+        });
+        
+        // Send heartbeat
+        jQuery(document).on('heartbeat-send.debug', function(e, data) {
+            log('Sending heartbeat...');
+            data.bpfn_realtime_check = {
+                last_checked: Math.floor(Date.now() / 1000) - 300, // 5 minutes ago
+                nonce: BPFNRealtime ? BPFNRealtime.nonce : ''
+            };
+        });
+        
+        wp.heartbeat.interval(5);
+        log('Heartbeat interval set to 5 seconds', 'success');
+    } else {
+        log('WordPress Heartbeat not available', 'error');
+    }
+}
+
+function debugAjax() {
+    log('Testing AJAX endpoint...');
+    
+    if (typeof jQuery === 'undefined') {
+        log('jQuery not available', 'error');
+        return;
+    }
+    
+    const ajaxUrl = (typeof ajaxurl !== 'undefined') ? ajaxurl : (BPFNRealtime ? BPFNRealtime.ajax_url : '/wp-admin/admin-ajax.php');
+    const nonce = (typeof BPFN !== 'undefined' && BPFN.nonce) ? BPFN.nonce : (BPFNRealtime ? BPFNRealtime.nonce : '');
+    
+    log('Using AJAX URL: ' + ajaxUrl);
+    
+    jQuery.ajax({
+        url: ajaxUrl,
+        type: 'POST',
+        data: {
+            action: 'bpfn_check_notifications',
+            last_checked: Math.floor(Date.now() / 1000) - 300,
+            nonce: nonce
+        },
+        success: function(response) {
+            log('AJAX Success!', 'success');
+            console.log('Response:', response);
+            
+            if (response.success && response.data) {
+                log('Notifications: ' + response.data.notifications.length, 'success');
+                log('Count: ' + response.data.count, 'success');
+            }
+        },
+        error: function(xhr, status, error) {
+            log('AJAX Error: ' + error, 'error');
+            console.log('XHR:', xhr);
+        }
+    });
+}
+
+// Auto-check on load
+setTimeout(() => {
+    checkStatus();
+    checkConfig();
+    
+    // Try to inject test button
+    if (document.getElementById('bpfn-test-realtime')) {
+        log('Test button already exists', 'success');
+    } else {
+        const btn = document.createElement('button');
+        btn.id = 'bpfn-test-realtime';
+        btn.textContent = 'Test Realtime';
+        btn.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:99999;background:#ff7b00;color:white;padding:10px 20px;border:none;border-radius:5px;cursor:pointer;';
+        document.body.appendChild(btn);
+        log('Test button injected', 'success');
+    }
+}, 1000);
+
+// Listen for BPFN events
+if (typeof jQuery !== 'undefined') {
+    jQuery(document).on('bpfn:realtime:notification:shown', function(e, data) {
+        log('Notification shown event fired!', 'success');
+        console.log('Notification data:', data);
+    });
+}
+
+log('Debug panel loaded');
+</script>
+
+</body>
+</html>

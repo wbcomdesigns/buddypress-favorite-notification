@@ -58,7 +58,7 @@ class BPFN_Module_Admin {
 		$this->register_ajax_handlers();
 		
 		// Review notice - delay until translations are ready
-		add_action( 'init', array( $this, 'maybe_show_review_notice' ) );
+		add_action( 'admin_init', array( $this, 'maybe_show_review_notice' ) );
 		
 		// Custom hooks
 		do_action( 'bpfn_admin_setup_hooks', $this );

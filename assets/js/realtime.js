@@ -31,7 +31,8 @@
             initialized: false,
             notifications: [],
             soundEnabled: true,
-            isChecking: false
+            isChecking: false,
+            heartbeatActive: false
         },
 
         /**
@@ -39,6 +40,12 @@
          */
         init: function(options) {
             var self = this;
+            
+            // Prevent double initialization
+            if (self.state.initialized) {
+                self.log('Already initialized, skipping');
+                return;
+            }
             
             // Merge options
             self.config = $.extend(true, {}, self.config, window.BPFNRealtime || {}, options || {});
@@ -49,8 +56,8 @@
             // Create container
             self.createContainer();
             
-            // Setup heartbeat
-            self.setupHeartbeat();
+            // Setup heartbeat with retry logic
+            self.setupHeartbeatWithRetry();
             
             // Bind events
             self.bindEvents();
@@ -61,22 +68,44 @@
             // Mark as initialized
             self.state.initialized = true;
             
-            self.log('Realtime module initialized');
+            self.log('Realtime module initialized with config:', self.config);
+            
+            // Check if heartbeat is available after a short delay
+            setTimeout(function() {
+                if (!self.state.heartbeatActive) {
+                    self.log('Heartbeat not active after init, using fallback polling');
+                    self.startFallbackPolling();
+                }
+            }, 5000);
         },
 
         /**
-         * Create notification container
+         * Setup WordPress Heartbeat API with retry logic
          */
-        createContainer: function() {
+        setupHeartbeatWithRetry: function() {
             var self = this;
+            var retryCount = 0;
+            var maxRetries = 3;
             
-            if ($('#bpfn-realtime-container').length === 0) {
-                self.config.container = $('<div id="bpfn-realtime-container"></div>');
-                self.config.container.addClass('bpfn-position-' + self.config.position);
-                $('body').append(self.config.container);
-            } else {
-                self.config.container = $('#bpfn-realtime-container');
+            function trySetupHeartbeat() {
+                // Check if heartbeat is available
+                if (!window.wp || !window.wp.heartbeat) {
+                    self.log('WordPress Heartbeat API not available, retry ' + (retryCount + 1) + '/' + maxRetries);
+                    
+                    if (retryCount < maxRetries) {
+                        retryCount++;
+                        setTimeout(trySetupHeartbeat, 2000);
+                    } else {
+                        self.log('Heartbeat not available after retries, using fallback');
+                        self.startFallbackPolling();
+                    }
+                    return;
+                }
+                
+                self.setupHeartbeat();
             }
+            
+            trySetupHeartbeat();
         },
 
         /**
@@ -85,14 +114,11 @@
         setupHeartbeat: function() {
             var self = this;
             
-            // Check if heartbeat is available
-            if (!window.wp || !window.wp.heartbeat) {
-                self.log('WordPress Heartbeat API not available');
-                return;
-            }
+            // Remove any existing handlers first
+            $(document).off('heartbeat-send.bpfn heartbeat-tick.bpfn heartbeat-error.bpfn');
             
             // Hook into heartbeat-send
-            $(document).on('heartbeat-send', function(e, data) {
+            $(document).on('heartbeat-send.bpfn', function(e, data) {
                 if (!self.state.initialized || self.state.isChecking) {
                     return;
                 }
@@ -108,8 +134,9 @@
             });
             
             // Hook into heartbeat-tick
-            $(document).on('heartbeat-tick', function(e, data) {
+            $(document).on('heartbeat-tick.bpfn', function(e, data) {
                 self.state.isChecking = false;
+                self.state.heartbeatActive = true;
                 
                 if (data.bpfn_realtime_notifications) {
                     self.log('Received heartbeat response', data.bpfn_realtime_notifications);
@@ -118,15 +145,95 @@
             });
             
             // Hook into heartbeat-error
-            $(document).on('heartbeat-error', function(e, jqXHR, textStatus, error) {
+            $(document).on('heartbeat-error.bpfn', function(e, jqXHR, textStatus, error) {
                 self.state.isChecking = false;
                 self.log('Heartbeat error: ' + textStatus + ' - ' + error);
+                
+                // If heartbeat fails, try fallback
+                if (!self.fallbackTimer) {
+                    self.startFallbackPolling();
+                }
             });
             
-            // Configure heartbeat interval
-            wp.heartbeat.interval(self.config.checkInterval / 1000);
+            // Configure heartbeat interval (convert from milliseconds to seconds)
+            var intervalSeconds = Math.max(15, Math.floor(self.config.checkInterval / 1000));
+            wp.heartbeat.interval(intervalSeconds);
             
-            self.log('Heartbeat configured with interval: ' + (self.config.checkInterval / 1000) + ' seconds');
+            // Heartbeat should already be running, but make sure interval is set
+            // wp.heartbeat.start() is not needed - heartbeat auto-starts
+            
+            self.log('Heartbeat configured with interval: ' + intervalSeconds + ' seconds');
+        },
+
+        /**
+         * Start fallback polling
+         */
+        startFallbackPolling: function() {
+            var self = this;
+            
+            if (self.fallbackTimer) {
+                return;
+            }
+            
+            self.log('Starting fallback polling with interval: ' + self.config.checkInterval);
+            
+            // Initial check
+            self.checkNotifications();
+            
+            // Set up interval
+            self.fallbackTimer = setInterval(function() {
+                self.checkNotifications();
+            }, self.config.checkInterval);
+        },
+
+        /**
+         * Check for new notifications via AJAX
+         */
+        checkNotifications: function() {
+            var self = this;
+            
+            if (self.state.isChecking || !self.state.initialized) {
+                return;
+            }
+            
+            self.state.isChecking = true;
+            
+            $.ajax({
+                url: self.config.ajax_url || ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'bpfn_check_notifications',
+                    last_checked: self.config.lastChecked,
+                    nonce: self.config.nonce || (window.BPFN && window.BPFN.nonce)
+                },
+                success: function(response) {
+                    if (response.success && response.data) {
+                        self.log('AJAX check response:', response.data);
+                        self.handleHeartbeatResponse(response.data);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    self.log('AJAX check error: ' + error);
+                },
+                complete: function() {
+                    self.state.isChecking = false;
+                }
+            });
+        },
+
+        /**
+         * Create notification container
+         */
+        createContainer: function() {
+            var self = this;
+            
+            if ($('#bpfn-realtime-container').length === 0) {
+                self.config.container = $('<div id="bpfn-realtime-container"></div>');
+                self.config.container.addClass('bpfn-position-' + self.config.position);
+                $('body').append(self.config.container);
+            } else {
+                self.config.container = $('#bpfn-realtime-container');
+            }
         },
 
         /**
@@ -163,7 +270,7 @@
                 self.toggleSound();
             });
             
-            // Custom events
+            // Custom events for manual notifications
             $(document).on('bpfn:notification:new', function(e, data) {
                 self.showNotification(data);
             });
@@ -186,7 +293,7 @@
             
             // Process new notifications
             if (data.notifications && data.notifications.length > 0) {
-                self.log('Received ' + data.notifications.length + ' new notifications');
+                self.log('Processing ' + data.notifications.length + ' new notifications');
                 
                 $.each(data.notifications, function(i, notification) {
                     // Delay each notification slightly for stagger effect
@@ -233,7 +340,7 @@
                 $notification.addClass('show');
                 
                 // Play sound
-                if (self.state.soundEnabled) {
+                if (self.state.soundEnabled && self.config.soundEnabled) {
                     self.playSound();
                 }
                 
@@ -469,6 +576,34 @@
             if (this.config.debug && window.console) {
                 console.log('[BPFN Realtime] ' + message, data || '');
             }
+        },
+
+        /**
+         * Destroy and cleanup
+         */
+        destroy: function() {
+            var self = this;
+            
+            // Remove event handlers
+            $(document).off('.bpfn');
+            
+            // Clear timers
+            if (self.fallbackTimer) {
+                clearInterval(self.fallbackTimer);
+                self.fallbackTimer = null;
+            }
+            
+            // Remove container
+            if (self.config.container) {
+                self.config.container.remove();
+            }
+            
+            // Reset state
+            self.state.initialized = false;
+            self.state.notifications = [];
+            self.state.heartbeatActive = false;
+            
+            self.log('Realtime module destroyed');
         }
     };
 
@@ -478,11 +613,14 @@
     $(document).ready(function() {
         // Check if realtime config exists
         if (window.BPFNRealtime && window.BPFNRealtime.nonce) {
-            BPFN.Realtime.init();
+            // Add a small delay to ensure all scripts are loaded
+            setTimeout(function() {
+                BPFN.Realtime.init();
+            }, 100);
             
             // Add test button if in debug mode
             if (window.BPFNRealtime.debug || (window.location.search.indexOf('bpfn_debug=1') !== -1)) {
-                $('body').append('<button id="bpfn-test-realtime" style="position:fixed;bottom:20px;right:20px;z-index:99999;">Test Realtime</button>');
+                $('body').append('<button id="bpfn-test-realtime" style="position:fixed;bottom:20px;right:20px;z-index:99999;background:#ff7b00;color:white;padding:10px 20px;border:none;border-radius:5px;cursor:pointer;">Test Realtime</button>');
             }
         }
     });
