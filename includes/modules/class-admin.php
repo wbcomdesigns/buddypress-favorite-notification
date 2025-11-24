@@ -137,12 +137,9 @@ class BPFN_Module_Admin {
 	}
 
 	/**
-	 * Main admin page with tabs
+	 * Main admin page (single page with sections)
 	 */
 	public function admin_page() {
-		// Get current tab
-		$current_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'dashboard';
-
 		?>
 		<div class="wrap">
 			<h1><?php _e( 'BuddyPress Favorite Notification', 'bp-fav-notification' ); ?></h1>
@@ -158,45 +155,21 @@ class BPFN_Module_Admin {
 			endif;
 			?>
 
-			<!-- Tabs -->
-			<h2 class="nav-tab-wrapper">
-				<a href="?page=bpfn-dashboard&tab=dashboard" class="nav-tab <?php echo $current_tab === 'dashboard' ? 'nav-tab-active' : ''; ?>">
-					<?php _e( 'Dashboard', 'bp-fav-notification' ); ?>
-				</a>
-				<a href="?page=bpfn-dashboard&tab=settings" class="nav-tab <?php echo $current_tab === 'settings' ? 'nav-tab-active' : ''; ?>">
-					<?php _e( 'Settings', 'bp-fav-notification' ); ?>
-				</a>
-				<a href="?page=bpfn-dashboard&tab=tools" class="nav-tab <?php echo $current_tab === 'tools' ? 'nav-tab-active' : ''; ?>">
-					<?php _e( 'Tools', 'bp-fav-notification' ); ?>
-				</a>
-			</h2>
+			<!-- All sections on one page -->
+			<?php $this->render_dashboard_section(); ?>
+			<?php $this->render_settings_section(); ?>
+			<?php $this->render_tools_section(); ?>
 
-			<div class="bpfn-tab-content">
-				<?php
-				switch ( $current_tab ) {
-					case 'settings':
-						$this->render_settings_tab();
-						break;
-					case 'tools':
-						$this->render_tools_tab();
-						break;
-					case 'dashboard':
-					default:
-						$this->render_dashboard_tab();
-						break;
-				}
-				?>
-			</div>
 		</div>
 		<?php
 	}
 
 	/**
-	 * Render dashboard tab
+	 * Render dashboard section
 	 */
-	private function render_dashboard_tab() {
+	private function render_dashboard_section() {
 		?>
-		<div class="bpfn-dashboard">
+		<div class="bpfn-dashboard" style="margin-bottom: 40px;">
 			<style>
 				.bpfn-dashboard { margin-top: 20px; }
 				.bpfn-stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
@@ -208,6 +181,8 @@ class BPFN_Module_Admin {
 				.stat-trend.positive { color: #00a32a; }
 				.stat-trend.negative { color: #d63638; }
 			</style>
+
+			<h2><?php _e( 'Overview', 'bp-fav-notification' ); ?></h2>
 
 			<?php
 			// Get stats for last 7 days
@@ -390,26 +365,12 @@ class BPFN_Module_Admin {
 	}
 
 	/**
-	 * Render settings tab
+	 * Render settings section
 	 */
-	private function render_settings_tab() {
-		$this->settings_page();
-	}
-
-	/**
-	 * Render tools tab
-	 */
-	private function render_tools_tab() {
-		$this->tools_page_content();
-	}
-
-	/**
-	 * Settings page (kept for backward compatibility)
-	 */
-	public function settings_page() {
+	private function render_settings_section() {
 		?>
-		<div class="wrap">
-			<h1><?php _e( 'BuddyPress Favorite Notification Settings', 'bp-fav-notification' ); ?></h1>
+		<div class="bpfn-settings-section" style="margin-bottom: 40px;">
+			<h2><?php _e( 'Settings', 'bp-fav-notification' ); ?></h2>
 			
 			<div class="bpfn-admin-container">
 				<div class="bpfn-admin-main">
@@ -431,11 +392,12 @@ class BPFN_Module_Admin {
 	}
 
 	/**
-	 * Tools page content (without wrap, used in tab)
+	 * Render tools section
 	 */
-	public function tools_page_content() {
+	private function render_tools_section() {
 		?>
-		<div class="bpfn-tools-tab" style="margin-top: 20px;">
+		<div class="bpfn-tools-section" style="margin-bottom: 40px;">
+			<h2><?php _e( 'Tools & Maintenance', 'bp-fav-notification' ); ?></h2>
 
 			<!-- Migrate Favorites -->
 				<?php
@@ -743,7 +705,7 @@ class BPFN_Module_Admin {
 		}
 
 		// Redirect with success message
-		wp_redirect( add_query_arg( array( 'page' => 'bpfn-dashboard', 'tab' => 'tools', 'settings_updated' => 'true' ), admin_url( 'admin.php' ) ) );
+		wp_redirect( add_query_arg( array( 'page' => 'bpfn-dashboard', 'settings_updated' => 'true' ), admin_url( 'admin.php' ) ) . '#tools' );
 		exit;
 	}
 
@@ -933,7 +895,7 @@ class BPFN_Module_Admin {
 			return;
 		}
 
-		$tools_url = admin_url( 'admin.php?page=bpfn-dashboard&tab=tools' );
+		$tools_url = admin_url( 'admin.php?page=bpfn-dashboard#tools' );
 		?>
 		<div class="notice notice-info is-dismissible" data-dismissible="bpfn-migration-notice">
 			<p>
