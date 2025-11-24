@@ -34,13 +34,15 @@
 	text-decoration: underline;
 }
 
-.bpfn-others-count {
+/* Make "X others" clickable link */
+a.bpfn-others-count {
 	color: #1d84b5;
+	text-decoration: none;
 	cursor: pointer;
 	font-weight: 500;
 }
 
-.bpfn-others-count:hover {
+a.bpfn-others-count:hover {
 	text-decoration: underline;
 }
 
@@ -63,31 +65,32 @@
 	outline-offset: 2px;
 }
 
-/* Modal Overlay */
+/* Modal Overlay - Light theme compatible */
 .bpfn-modal-overlay {
 	position: fixed;
 	top: 0;
 	left: 0;
 	right: 0;
 	bottom: 0;
-	background: rgba(0, 0, 0, 0.6);
+	background: rgba(0, 0, 0, 0.4);
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	z-index: 99999;
-	backdrop-filter: blur(2px);
+	backdrop-filter: blur(1px);
 }
 
 .bpfn-modal {
-	background: #fff;
-	border-radius: 12px;
+	background: #ffffff;
+	border-radius: 8px;
+	border: 1px solid #e0e0e0;
 	max-width: 450px;
 	width: 90%;
 	max-height: 80vh;
 	overflow-y: auto;
 	padding: 24px;
 	position: relative;
-	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 	animation: bpfn-modal-slide-up 0.3s ease-out;
 }
 
@@ -253,39 +256,7 @@ body.bpfn-modal-open {
 	}
 }
 
-/* Dark Mode Support */
-@media (prefers-color-scheme: dark) {
-	.bpfn-modal {
-		background: #2d3748;
-		color: #e2e8f0;
-	}
-
-	.bpfn-favorites-modal-content h3 {
-		color: #f7fafc;
-	}
-
-	.bpfn-modal-close {
-		color: #cbd5e0;
-	}
-
-	.bpfn-modal-close:hover {
-		background: #4a5568;
-		color: #f7fafc;
-	}
-
-	.bpfn-favorite-user-item a {
-		color: #e2e8f0;
-	}
-
-	.bpfn-favorite-user-item a:hover {
-		background: #4a5568;
-	}
-
-	.bpfn-loading,
-	.bpfn-error {
-		color: #cbd5e0;
-	}
-}
+/* Removed dark mode - using light theme for universal compatibility */
 
 /* BuddyPress Theme Compatibility */
 #buddypress .activity .bpfn-favorite-display {

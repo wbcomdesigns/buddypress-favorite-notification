@@ -107,7 +107,8 @@
 
         showAllFavorites: function(e) {
             e.preventDefault();
-            var activityId = $(e.currentTarget).closest('.bpfn-favorite-display').data('activity-id');
+            var $target = $(e.currentTarget);
+            var activityId = $target.data('activity-id') || $target.closest('.bpfn-favorite-display').data('activity-id');
 
             if (!activityId) {
                 return;
