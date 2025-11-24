@@ -44,6 +44,12 @@
                 self.sendTestEmail($(this));
             });
             
+            // Migrate favorites
+            $('#bpfn-migrate-favorites').on('click', function(e) {
+                e.preventDefault();
+                self.migrateFavorites($(this));
+            });
+
             // Clear old notifications
             $('#bpfn-clear-old-notifications').on('click', function(e) {
                 e.preventDefault();
@@ -202,6 +208,50 @@
                     setTimeout(function() {
                         $container.find('.bpfn-message').fadeOut();
                     }, 5000);
+                }
+            });
+        },
+
+        /**
+         * Migrate favorites
+         */
+        migrateFavorites: function($button) {
+            var self = this;
+            var originalText = $button.text();
+            var $result = $('#bpfn-migrate-result');
+
+            if (!confirm('This will migrate all existing favorites to the new optimized table. Continue?')) {
+                return;
+            }
+
+            $button.prop('disabled', true);
+            $button.html('<span class="dashicons dashicons-update spin"></span> Migrating...');
+            $result.html('');
+
+            $.ajax({
+                url: bpfnAdmin.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'bpfn_migrate_favorites',
+                    nonce: bpfnAdmin.nonce
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $result.html('<div class="notice notice-success inline"><p>' + response.data.message + '</p></div>');
+                        // Reload page after 2 seconds to show new stats
+                        setTimeout(function() {
+                            location.reload();
+                        }, 2000);
+                    } else {
+                        $result.html('<div class="notice notice-error inline"><p>' + (response.data.message || 'Migration failed.') + '</p></div>');
+                        $button.prop('disabled', false);
+                        $button.text(originalText);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $result.html('<div class="notice notice-error inline"><p>An error occurred: ' + error + '</p></div>');
+                    $button.prop('disabled', false);
+                    $button.text(originalText);
                 }
             });
         },

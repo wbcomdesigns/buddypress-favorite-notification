@@ -141,6 +141,7 @@ class BP_Favorite_Notification {
 			'settings' => 'class-settings.php',
 			'assets' => 'class-assets.php',
 			'admin' => 'class-admin.php',
+			'favorite_display' => 'class-favorite-display.php',
 		);
 
 		foreach ( $modules as $key => $file ) {
@@ -212,12 +213,14 @@ class BP_Favorite_Notification {
 	 */
 	private function create_tables() {
 		global $wpdb;
-		
+
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-		
+
 		$charset_collate = $wpdb->get_charset_collate();
+
+		// User notification preferences table
 		$table_name = $wpdb->prefix . 'bp_favorite_notification_prefs';
-		
+
 		$sql = "CREATE TABLE $table_name (
 			id bigint(20) NOT NULL AUTO_INCREMENT,
 			user_id bigint(20) NOT NULL,
@@ -231,9 +234,25 @@ class BP_Favorite_Notification {
 			UNIQUE KEY user_notification_type (user_id, notification_type),
 			KEY user_id (user_id)
 		) $charset_collate;";
-		
+
 		dbDelta( $sql );
-		
+
+		// Activity favorites tracking table
+		$favorites_table = $wpdb->prefix . 'bp_activity_favorites';
+
+		$sql_favorites = "CREATE TABLE $favorites_table (
+			id bigint(20) NOT NULL AUTO_INCREMENT,
+			activity_id bigint(20) NOT NULL,
+			user_id bigint(20) NOT NULL,
+			favorited_at datetime DEFAULT CURRENT_TIMESTAMP,
+			PRIMARY KEY (id),
+			KEY activity_id (activity_id),
+			KEY user_id (user_id),
+			UNIQUE KEY activity_user (activity_id, user_id)
+		) $charset_collate;";
+
+		dbDelta( $sql_favorites );
+
 		do_action( 'bpfn_create_tables', $wpdb, $charset_collate );
 	}
 

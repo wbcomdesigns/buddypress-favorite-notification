@@ -1,0 +1,446 @@
+<?php
+/**
+ * Favorite Display Module for BuddyPress Favorite Notification
+ *
+ * @package BuddyPress_Favorite_Notification
+ */
+
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Favorite Display Module Class
+ */
+class BPFN_Module_Favorite_Display {
+
+	/**
+	 * Database table name
+	 */
+	private $table_name;
+
+	/**
+	 * Cache group
+	 */
+	private $cache_group = 'bpfn_favorites';
+
+	/**
+	 * Cache expiration (5 minutes)
+	 */
+	private $cache_expiration = 300;
+
+	/**
+	 * Constructor
+	 */
+	public function __construct() {
+		global $wpdb;
+		$this->table_name = $wpdb->prefix . 'bp_activity_favorites';
+
+		$this->setup_hooks();
+	}
+
+	/**
+	 * Setup hooks
+	 */
+	private function setup_hooks() {
+		// Display favorite count on activities
+		add_action( 'bp_activity_before_post_footer_content', array( $this, 'display_favorite_count' ), 10 );
+
+		// Sync with BuddyPress favorite actions
+		add_action( 'bp_activity_add_user_favorite', array( $this, 'sync_favorite_add' ), 10, 2 );
+		add_action( 'bp_activity_remove_user_favorite', array( $this, 'sync_favorite_remove' ), 10, 2 );
+
+		// AJAX handlers
+		add_action( 'wp_ajax_bpfn_get_all_favorites', array( $this, 'ajax_get_all_favorites' ) );
+		add_action( 'wp_ajax_nopriv_bpfn_get_all_favorites', array( $this, 'ajax_get_all_favorites' ) );
+		add_action( 'wp_ajax_bpfn_refresh_favorite_display', array( $this, 'ajax_refresh_favorite_display' ) );
+		add_action( 'wp_ajax_nopriv_bpfn_refresh_favorite_display', array( $this, 'ajax_refresh_favorite_display' ) );
+	}
+
+	/**
+	 * Sync favorite add to our table
+	 */
+	public function sync_favorite_add( $activity_id, $user_id ) {
+		global $wpdb;
+
+		// Insert into our table
+		$wpdb->insert(
+			$this->table_name,
+			array(
+				'activity_id' => $activity_id,
+				'user_id'     => $user_id,
+			),
+			array( '%d', '%d' )
+		);
+
+		// Clear cache for this activity
+		$this->clear_cache( $activity_id );
+	}
+
+	/**
+	 * Sync favorite remove from our table
+	 */
+	public function sync_favorite_remove( $activity_id, $user_id ) {
+		global $wpdb;
+
+		// Delete from our table
+		$wpdb->delete(
+			$this->table_name,
+			array(
+				'activity_id' => $activity_id,
+				'user_id'     => $user_id,
+			),
+			array( '%d', '%d' )
+		);
+
+		// Clear cache for this activity
+		$this->clear_cache( $activity_id );
+	}
+
+	/**
+	 * Get favorite count for activity
+	 */
+	public function get_favorite_count( $activity_id ) {
+		global $wpdb;
+
+		$cache_key = 'count_' . $activity_id;
+		$count = wp_cache_get( $cache_key, $this->cache_group );
+
+		if ( false === $count ) {
+			$count = (int) $wpdb->get_var( $wpdb->prepare(
+				"SELECT COUNT(*) FROM {$this->table_name} WHERE activity_id = %d",
+				$activity_id
+			) );
+
+			wp_cache_set( $cache_key, $count, $this->cache_group, $this->cache_expiration );
+		}
+
+		return max( 0, $count );
+	}
+
+	/**
+	 * Get users who favorited activity
+	 */
+	public function get_users_who_favorited( $activity_id, $limit = 3, $offset = 0 ) {
+		global $wpdb;
+
+		$cache_key = 'users_' . $activity_id . '_' . $limit . '_' . $offset;
+		$cached = wp_cache_get( $cache_key, $this->cache_group );
+
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
+		// Get total count
+		$total = $this->get_favorite_count( $activity_id );
+
+		if ( $total === 0 ) {
+			$result = array(
+				'users'     => array(),
+				'total'     => 0,
+				'remaining' => 0,
+			);
+			wp_cache_set( $cache_key, $result, $this->cache_group, $this->cache_expiration );
+			return $result;
+		}
+
+		// Get user IDs
+		$user_ids = $wpdb->get_col( $wpdb->prepare(
+			"SELECT user_id FROM {$this->table_name}
+			WHERE activity_id = %d
+			ORDER BY favorited_at DESC
+			LIMIT %d OFFSET %d",
+			$activity_id,
+			$limit,
+			$offset
+		) );
+
+		// Get user data
+		$users = array();
+		foreach ( $user_ids as $user_id ) {
+			$user = get_userdata( $user_id );
+			if ( $user ) {
+				$users[] = array(
+					'id'     => $user_id,
+					'name'   => $user->display_name,
+					'avatar' => bp_core_fetch_avatar( array(
+						'item_id' => $user_id,
+						'type'    => 'thumb',
+						'width'   => 32,
+						'height'  => 32,
+						'html'    => false,
+					) ),
+					'link'   => function_exists( 'bp_members_get_user_url' ) ?
+								bp_members_get_user_url( $user_id ) :
+								bp_core_get_user_domain( $user_id ),
+				);
+			}
+		}
+
+		$result = array(
+			'users'     => $users,
+			'total'     => $total,
+			'remaining' => max( 0, $total - $limit - $offset ),
+		);
+
+		wp_cache_set( $cache_key, $result, $this->cache_group, $this->cache_expiration );
+
+		return $result;
+	}
+
+	/**
+	 * Format favorite text (Facebook style)
+	 */
+	public function format_favorite_text( $users_data ) {
+		$total = $users_data['total'];
+		$users = $users_data['users'];
+		$remaining = $users_data['remaining'];
+
+		if ( $total === 0 ) {
+			return '';
+		}
+
+		if ( $total === 1 && isset( $users[0] ) ) {
+			return sprintf(
+				'<a href="%s" class="bpfn-user-link">%s</a>',
+				esc_url( $users[0]['link'] ),
+				esc_html( $users[0]['name'] )
+			);
+		}
+
+		if ( $total === 2 && isset( $users[0], $users[1] ) ) {
+			return sprintf(
+				'<a href="%s" class="bpfn-user-link">%s</a> and <a href="%s" class="bpfn-user-link">%s</a>',
+				esc_url( $users[0]['link'] ),
+				esc_html( $users[0]['name'] ),
+				esc_url( $users[1]['link'] ),
+				esc_html( $users[1]['name'] )
+			);
+		}
+
+		// More than 2 users
+		$names = array();
+		$shown = min( 2, count( $users ) );
+
+		for ( $i = 0; $i < $shown; $i++ ) {
+			if ( isset( $users[ $i ] ) ) {
+				$names[] = sprintf(
+					'<a href="%s" class="bpfn-user-link">%s</a>',
+					esc_url( $users[ $i ]['link'] ),
+					esc_html( $users[ $i ]['name'] )
+				);
+			}
+		}
+
+		if ( $remaining > 0 ) {
+			return sprintf(
+				'%s, and <span class="bpfn-others-count">%d %s</span>',
+				implode( ', ', $names ),
+				$remaining,
+				_n( 'other', 'others', $remaining, 'bp-fav-notification' )
+			);
+		} else {
+			$last = array_pop( $names );
+			if ( ! empty( $names ) ) {
+				return implode( ', ', $names ) . ' and ' . $last;
+			}
+			return $last;
+		}
+	}
+
+	/**
+	 * Display favorite count on activity
+	 */
+	public function display_favorite_count() {
+		if ( ! bp_is_active( 'activity' ) ) {
+			return;
+		}
+
+		$activity_id = bp_get_activity_id();
+		if ( ! $activity_id ) {
+			return;
+		}
+
+		$count = $this->get_favorite_count( $activity_id );
+
+		if ( $count === 0 ) {
+			return; // Don't show anything if no favorites
+		}
+
+		$users_data = $this->get_users_who_favorited( $activity_id, 3 );
+		$text = $this->format_favorite_text( $users_data );
+		?>
+		<div class="bpfn-favorite-display" data-activity-id="<?php echo esc_attr( $activity_id ); ?>">
+			<span class="bpfn-favorite-icon">❤</span>
+			<span class="bpfn-favorite-text">
+				<?php
+				echo wp_kses(
+					$text,
+					array(
+						'a' => array(
+							'href'  => array(),
+							'class' => array(),
+						),
+						'span' => array(
+							'class' => array(),
+						),
+					)
+				);
+				?>
+			</span>
+			<?php if ( $users_data['total'] > 3 ) : ?>
+				<button class="bpfn-view-all-favorites"
+						data-activity-id="<?php echo esc_attr( $activity_id ); ?>"
+						aria-label="<?php esc_attr_e( 'View all people who liked this', 'bp-fav-notification' ); ?>">
+					<?php
+					printf(
+						/* translators: %d: number of likes */
+						esc_html__( 'View all %d', 'bp-fav-notification' ),
+						$count
+					);
+					?>
+				</button>
+			<?php endif; ?>
+		</div>
+		<?php
+	}
+
+	/**
+	 * AJAX handler to get all favorites for modal
+	 */
+	public function ajax_get_all_favorites() {
+		check_ajax_referer( 'bpfn-favorite-nonce', 'nonce' );
+
+		$activity_id = isset( $_POST['activity_id'] ) ? absint( $_POST['activity_id'] ) : 0;
+
+		if ( ! $activity_id ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid activity ID', 'bp-fav-notification' ) ) );
+		}
+
+		$users_data = $this->get_users_who_favorited( $activity_id, 999 ); // Get all users
+
+		ob_start();
+		?>
+		<div class="bpfn-favorites-modal-content">
+			<h3>
+				<?php
+				printf(
+					/* translators: %d: number of likes */
+					esc_html( _n( '%d Like', '%d Likes', $users_data['total'], 'bp-fav-notification' ) ),
+					$users_data['total']
+				);
+				?>
+			</h3>
+			<ul class="bpfn-favorites-user-list">
+				<?php foreach ( $users_data['users'] as $user ) : ?>
+					<li class="bpfn-favorite-user-item">
+						<a href="<?php echo esc_url( $user['link'] ); ?>">
+							<img src="<?php echo esc_url( $user['avatar'] ); ?>"
+								 alt="<?php echo esc_attr( $user['name'] ); ?>"
+								 class="bpfn-user-avatar"
+								 width="40"
+								 height="40">
+							<span class="bpfn-user-name"><?php echo esc_html( $user['name'] ); ?></span>
+						</a>
+					</li>
+				<?php endforeach; ?>
+			</ul>
+		</div>
+		<?php
+		$html = ob_get_clean();
+
+		wp_send_json_success( array( 'html' => $html ) );
+	}
+
+	/**
+	 * Clear cache for activity
+	 */
+	private function clear_cache( $activity_id ) {
+		wp_cache_delete( 'count_' . $activity_id, $this->cache_group );
+
+		// Clear user list caches (we cache first 3 users)
+		for ( $i = 0; $i < 10; $i++ ) {
+			wp_cache_delete( 'users_' . $activity_id . '_3_' . $i, $this->cache_group );
+		}
+
+		// Clear full list cache
+		wp_cache_delete( 'users_' . $activity_id . '_999_0', $this->cache_group );
+	}
+
+	/**
+	 * AJAX handler to refresh favorite display
+	 */
+	public function ajax_refresh_favorite_display() {
+		check_ajax_referer( 'bpfn-favorite-nonce', 'nonce' );
+
+		$activity_id = isset( $_POST['activity_id'] ) ? absint( $_POST['activity_id'] ) : 0;
+
+		if ( ! $activity_id ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid activity ID', 'bp-fav-notification' ) ) );
+		}
+
+		$count = $this->get_favorite_count( $activity_id );
+
+		if ( $count === 0 ) {
+			wp_send_json_success( array(
+				'count' => 0,
+				'html'  => '',
+			) );
+			return;
+		}
+
+		// Generate the HTML
+		$users_data = $this->get_users_who_favorited( $activity_id, 3 );
+		$text = $this->format_favorite_text( $users_data );
+
+		ob_start();
+		?>
+		<div class="bpfn-favorite-display" data-activity-id="<?php echo esc_attr( $activity_id ); ?>">
+			<span class="bpfn-favorite-icon">❤</span>
+			<span class="bpfn-favorite-text">
+				<?php
+				echo wp_kses(
+					$text,
+					array(
+						'a' => array(
+							'href'  => array(),
+							'class' => array(),
+						),
+						'span' => array(
+							'class' => array(),
+						),
+					)
+				);
+				?>
+			</span>
+			<?php if ( $users_data['total'] > 3 ) : ?>
+				<button class="bpfn-view-all-favorites"
+						data-activity-id="<?php echo esc_attr( $activity_id ); ?>"
+						aria-label="<?php esc_attr_e( 'View all people who liked this', 'bp-fav-notification' ); ?>">
+					<?php
+					printf(
+						/* translators: %d: number of likes */
+						esc_html__( 'View all %d', 'bp-fav-notification' ),
+						$count
+					);
+					?>
+				</button>
+			<?php endif; ?>
+		</div>
+		<?php
+		$html = ob_get_clean();
+
+		wp_send_json_success( array(
+			'count' => $count,
+			'html'  => $html,
+		) );
+	}
+
+	/**
+	 * Get table name
+	 */
+	public function get_table_name() {
+		return $this->table_name;
+	}
+}

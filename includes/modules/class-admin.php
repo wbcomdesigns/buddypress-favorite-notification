@@ -61,7 +61,8 @@ class BPFN_Module_Admin {
 	private function register_ajax_handlers() {
 		$ajax_actions = array(
 			'clear_old_notifications',
-			'get_stats'
+			'get_stats',
+			'migrate_favorites'
 		);
 
 		foreach ( $ajax_actions as $action ) {
@@ -183,6 +184,69 @@ class BPFN_Module_Admin {
 			<h1><?php _e( 'BuddyPress Favorite Notification Tools', 'bp-fav-notification' ); ?></h1>
 
 			<div class="postbox-container" style="width: 70%;">
+
+				<!-- Migrate Favorites -->
+				<?php
+				require_once BPFN_INCLUDES_PATH . 'migrations/class-favorites-migration.php';
+				$migration = new BPFN_Favorites_Migration();
+				$stats = $migration->get_migration_stats();
+				?>
+				<div class="postbox">
+					<h3 class="hndle"><?php _e( 'Migrate Favorites', 'bp-fav-notification' ); ?></h3>
+					<div class="inside">
+						<?php if ( $stats['migrated'] ) : ?>
+							<div class="notice notice-success inline">
+								<p><strong><?php _e( 'Migration completed!', 'bp-fav-notification' ); ?></strong></p>
+							</div>
+							<?php
+							$log = $migration->get_migration_log();
+							if ( ! empty( $log ) ) :
+								?>
+								<p>
+									<?php
+									printf(
+										/* translators: 1: number of users, 2: number of favorites */
+										esc_html__( 'Processed %1$d users and migrated %2$d favorites.', 'bp-fav-notification' ),
+										isset( $log['users_processed'] ) ? $log['users_processed'] : 0,
+										isset( $log['favorites_added'] ) ? $log['favorites_added'] : 0
+									);
+									?>
+								</p>
+								<?php if ( isset( $log['start_time'] ) ) : ?>
+									<p>
+										<small>
+											<?php
+											printf(
+												/* translators: %s: migration date/time */
+												esc_html__( 'Completed on: %s', 'bp-fav-notification' ),
+												esc_html( $log['start_time'] )
+											);
+											?>
+										</small>
+									</p>
+								<?php endif; ?>
+							<?php endif; ?>
+						<?php elseif ( $stats['migration_pending'] ) : ?>
+							<p>
+								<?php
+								printf(
+									/* translators: 1: number of users, 2: number of favorites */
+									esc_html__( 'Found %1$d users with %2$d favorites to migrate.', 'bp-fav-notification' ),
+									$stats['users_with_favorites'],
+									$stats['meta_favorites_count']
+								);
+								?>
+							</p>
+							<p><?php _e( 'Click the button below to migrate existing favorites to the new optimized table.', 'bp-fav-notification' ); ?></p>
+							<button class="button button-primary" id="bpfn-migrate-favorites">
+								<?php _e( 'Run Migration', 'bp-fav-notification' ); ?>
+							</button>
+							<div id="bpfn-migrate-result" style="margin-top: 10px;"></div>
+						<?php else : ?>
+							<p><?php _e( 'No favorites found to migrate.', 'bp-fav-notification' ); ?></p>
+						<?php endif; ?>
+					</div>
+				</div>
 
 				<!-- Clear Old Notifications -->
 				<div class="postbox">
@@ -381,7 +445,32 @@ class BPFN_Module_Admin {
 		if ( function_exists( 'bpfn_get_notification_stats' ) ) {
 			$stats = bpfn_get_notification_stats();
 		}
-		
+
 		wp_send_json_success( $stats );
+	}
+
+	/**
+	 * AJAX migrate favorites
+	 */
+	public function ajax_migrate_favorites() {
+		check_ajax_referer( 'bpfn-admin-nonce', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'bp-fav-notification' ) ) );
+		}
+
+		require_once BPFN_INCLUDES_PATH . 'migrations/class-favorites-migration.php';
+		$migration = new BPFN_Favorites_Migration();
+
+		$log = $migration->run_migration();
+
+		if ( isset( $log['message'] ) ) {
+			wp_send_json_success( array(
+				'message' => $log['message'],
+				'log'     => $log
+			) );
+		} else {
+			wp_send_json_error( array( 'message' => __( 'Migration failed', 'bp-fav-notification' ) ) );
+		}
 	}
 }

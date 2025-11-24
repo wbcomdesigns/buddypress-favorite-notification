@@ -61,11 +61,42 @@ class BPFN_Module_Assets {
 		
 		// Localize main script
 		wp_localize_script( 'bpfn-notifications', 'BPFN', $this->get_localized_data() );
-		
+
 		// Real-time notifications
 		if ( $this->should_load_realtime() ) {
 			$this->enqueue_realtime_assets();
 		}
+
+		// Favorite display assets
+		$this->enqueue_favorite_display_assets();
+	}
+
+	/**
+	 * Enqueue favorite display assets
+	 */
+	private function enqueue_favorite_display_assets() {
+		// Favorite display styles
+		wp_enqueue_style(
+			'bpfn-favorite-display',
+			BPFN_ASSETS_URL . 'css/favorite-display.css',
+			array( 'bpfn-notifications' ),
+			BPFN_VERSION
+		);
+
+		// Favorite display scripts
+		wp_enqueue_script(
+			'bpfn-favorite-display',
+			BPFN_ASSETS_URL . 'js/favorite-display.js',
+			array( 'jquery', 'bpfn-notifications' ),
+			BPFN_VERSION,
+			true
+		);
+
+		// Localize favorite display script
+		wp_localize_script( 'bpfn-favorite-display', 'bpfnFavorites', array(
+			'ajax_url' => admin_url( 'admin-ajax.php' ),
+			'nonce'    => wp_create_nonce( 'bpfn-favorite-nonce' ),
+		) );
 	}
 
 	/**
