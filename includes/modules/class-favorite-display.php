@@ -386,7 +386,7 @@ class BPFN_Module_Favorite_Display {
 
 		// Generate the HTML
 		$users_data = $this->get_users_who_favorited( $activity_id, 3 );
-		$text = $this->format_favorite_text( $users_data );
+		$text = $this->format_favorite_text( $users_data, $activity_id );
 
 		ob_start();
 		?>
@@ -398,8 +398,9 @@ class BPFN_Module_Favorite_Display {
 					$text,
 					array(
 						'a' => array(
-							'href'  => array(),
-							'class' => array(),
+							'href'       => array(),
+							'class'      => array(),
+							'data-activity-id' => array(),
 						),
 						'span' => array(
 							'class' => array(),
@@ -408,19 +409,6 @@ class BPFN_Module_Favorite_Display {
 				);
 				?>
 			</span>
-			<?php if ( $users_data['total'] > 3 ) : ?>
-				<button class="bpfn-view-all-favorites"
-						data-activity-id="<?php echo esc_attr( $activity_id ); ?>"
-						aria-label="<?php esc_attr_e( 'View all people who liked this', 'bp-fav-notification' ); ?>">
-					<?php
-					printf(
-						/* translators: %d: number of likes */
-						esc_html__( 'View all %d', 'bp-fav-notification' ),
-						$count
-					);
-					?>
-				</button>
-			<?php endif; ?>
 		</div>
 		<?php
 		$html = ob_get_clean();
