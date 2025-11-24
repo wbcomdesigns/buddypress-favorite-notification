@@ -54,6 +54,9 @@ class BPFN_Module_Admin {
 		// Admin notices
 		add_action( 'admin_notices', array( $this, 'migration_notice' ) );
 
+		// Automatic cleanup
+		$this->setup_automatic_cleanup();
+
 		// AJAX handlers
 		$this->register_ajax_handlers();
 	}
@@ -187,6 +190,17 @@ class BPFN_Module_Admin {
 		<div class="wrap">
 			<h1><?php _e( 'BuddyPress Favorite Notification Tools', 'bp-fav-notification' ); ?></h1>
 
+			<?php
+			// Show success message if settings were saved
+			if ( isset( $_GET['settings_updated'] ) && $_GET['settings_updated'] === 'true' ) :
+				?>
+				<div class="notice notice-success is-dismissible">
+					<p><?php _e( 'Settings saved successfully!', 'bp-fav-notification' ); ?></p>
+				</div>
+				<?php
+			endif;
+			?>
+
 			<div class="postbox-container" style="width: 70%;">
 
 				<!-- Migrate Favorites -->
@@ -256,9 +270,111 @@ class BPFN_Module_Admin {
 				<div class="postbox">
 					<h3 class="hndle"><?php _e( 'Database Maintenance', 'bp-fav-notification' ); ?></h3>
 					<div class="inside">
-						<p><?php _e( 'Remove read notifications older than 30 days to keep your database clean.', 'bp-fav-notification' ); ?></p>
+						<p><?php _e( 'Remove read notifications older than a specified period to keep your database clean.', 'bp-fav-notification' ); ?></p>
+
+						<!-- Automatic Cleanup Settings -->
+						<form method="post" action="">
+							<?php wp_nonce_field( 'bpfn_cleanup_settings', 'bpfn_cleanup_nonce' ); ?>
+
+							<table class="form-table">
+								<tr>
+									<th scope="row">
+										<label for="bpfn_auto_cleanup_enabled">
+											<?php _e( 'Automatic Cleanup', 'bp-fav-notification' ); ?>
+										</label>
+									</th>
+									<td>
+										<?php $auto_enabled = get_option( 'bpfn_auto_cleanup_enabled', 'yes' ); ?>
+										<label>
+											<input type="checkbox"
+												   name="bpfn_auto_cleanup_enabled"
+												   id="bpfn_auto_cleanup_enabled"
+												   value="yes"
+												   <?php checked( $auto_enabled, 'yes' ); ?> />
+											<?php _e( 'Enable automatic monthly cleanup', 'bp-fav-notification' ); ?>
+										</label>
+										<p class="description">
+											<?php _e( 'Automatically remove old read notifications once per month via WP Cron.', 'bp-fav-notification' ); ?>
+										</p>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">
+										<label for="bpfn_auto_cleanup_days">
+											<?php _e( 'Retention Period', 'bp-fav-notification' ); ?>
+										</label>
+									</th>
+									<td>
+										<?php $cleanup_days = get_option( 'bpfn_auto_cleanup_days', 30 ); ?>
+										<select name="bpfn_auto_cleanup_days" id="bpfn_auto_cleanup_days">
+											<option value="7" <?php selected( $cleanup_days, 7 ); ?>>7 <?php _e( 'days', 'bp-fav-notification' ); ?></option>
+											<option value="15" <?php selected( $cleanup_days, 15 ); ?>>15 <?php _e( 'days', 'bp-fav-notification' ); ?></option>
+											<option value="30" <?php selected( $cleanup_days, 30 ); ?>>30 <?php _e( 'days', 'bp-fav-notification' ); ?></option>
+											<option value="60" <?php selected( $cleanup_days, 60 ); ?>>60 <?php _e( 'days', 'bp-fav-notification' ); ?></option>
+											<option value="90" <?php selected( $cleanup_days, 90 ); ?>>90 <?php _e( 'days', 'bp-fav-notification' ); ?></option>
+										</select>
+										<p class="description">
+											<?php _e( 'Only read/dismissed notifications older than this will be deleted.', 'bp-fav-notification' ); ?>
+										</p>
+									</td>
+								</tr>
+							</table>
+
+							<p class="submit">
+								<button type="submit" name="bpfn_save_cleanup_settings" class="button button-primary">
+									<?php _e( 'Save Settings', 'bp-fav-notification' ); ?>
+								</button>
+							</p>
+						</form>
+
+						<?php
+						// Show last cleanup info
+						$last_cleanup = get_option( 'bpfn_last_auto_cleanup', array() );
+						if ( ! empty( $last_cleanup ) ) :
+							?>
+							<div class="notice notice-info inline">
+								<p>
+									<strong><?php _e( 'Last automatic cleanup:', 'bp-fav-notification' ); ?></strong><br>
+									<?php
+									printf(
+										/* translators: 1: date, 2: number deleted, 3: number remaining */
+										esc_html__( '%1$s - Deleted %2$d notifications, %3$d remaining', 'bp-fav-notification' ),
+										isset( $last_cleanup['date'] ) ? esc_html( $last_cleanup['date'] ) : 'N/A',
+										isset( $last_cleanup['deleted'] ) ? (int) $last_cleanup['deleted'] : 0,
+										isset( $last_cleanup['remaining'] ) ? (int) $last_cleanup['remaining'] : 0
+									);
+									?>
+								</p>
+							</div>
+							<?php
+						endif;
+
+						// Show next scheduled cleanup
+						$next_cleanup = wp_next_scheduled( 'bpfn_auto_cleanup_notifications' );
+						if ( $next_cleanup && $auto_enabled === 'yes' ) :
+							?>
+							<p>
+								<small>
+									<?php
+									printf(
+										/* translators: %s: next cleanup date/time */
+										esc_html__( 'Next automatic cleanup: %s', 'bp-fav-notification' ),
+										date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $next_cleanup )
+									);
+									?>
+								</small>
+							</p>
+							<?php
+						endif;
+						?>
+
+						<hr style="margin: 20px 0;">
+
+						<!-- Manual Cleanup -->
+						<h4><?php _e( 'Manual Cleanup', 'bp-fav-notification' ); ?></h4>
+						<p><?php _e( 'Run cleanup immediately without waiting for the automatic schedule.', 'bp-fav-notification' ); ?></p>
 						<button class="button" id="bpfn-clear-old-notifications">
-							<?php _e( 'Clear Old Notifications', 'bp-fav-notification' ); ?>
+							<?php _e( 'Clear Old Notifications Now', 'bp-fav-notification' ); ?>
 						</button>
 						<div id="bpfn-clear-result" style="margin-top: 10px;"></div>
 					</div>
@@ -326,7 +442,7 @@ class BPFN_Module_Admin {
 	public function admin_init() {
 		// Register settings
 		register_setting( 'bpfn_settings', 'bpfn_options', array( $this, 'sanitize_options' ) );
-		
+
 		// Add settings sections
 		add_settings_section(
 			'bpfn_general',
@@ -334,7 +450,7 @@ class BPFN_Module_Admin {
 			array( $this, 'section_general' ),
 			'bpfn-settings'
 		);
-		
+
 		// Add settings fields
 		add_settings_field(
 			'enable_enhanced_notifications',
@@ -347,6 +463,55 @@ class BPFN_Module_Admin {
 				'label' => __( 'Enable enhanced notification display', 'bp-fav-notification' ),
 			)
 		);
+
+		// Handle cleanup settings save
+		$this->handle_cleanup_settings_save();
+	}
+
+	/**
+	 * Handle cleanup settings save
+	 */
+	private function handle_cleanup_settings_save() {
+		if ( ! isset( $_POST['bpfn_save_cleanup_settings'] ) ) {
+			return;
+		}
+
+		// Verify nonce
+		if ( ! isset( $_POST['bpfn_cleanup_nonce'] ) || ! wp_verify_nonce( $_POST['bpfn_cleanup_nonce'], 'bpfn_cleanup_settings' ) ) {
+			return;
+		}
+
+		// Check permissions
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		// Save enabled/disabled
+		$enabled = isset( $_POST['bpfn_auto_cleanup_enabled'] ) ? 'yes' : 'no';
+		$old_enabled = get_option( 'bpfn_auto_cleanup_enabled', 'yes' );
+		update_option( 'bpfn_auto_cleanup_enabled', $enabled );
+
+		// Save retention period
+		$days = isset( $_POST['bpfn_auto_cleanup_days'] ) ? absint( $_POST['bpfn_auto_cleanup_days'] ) : 30;
+		if ( $days < 7 ) {
+			$days = 7;
+		}
+		update_option( 'bpfn_auto_cleanup_days', $days );
+
+		// Schedule or unschedule based on enabled status
+		$next_scheduled = wp_next_scheduled( 'bpfn_auto_cleanup_notifications' );
+
+		if ( $enabled === 'yes' && ! $next_scheduled ) {
+			// Schedule if enabled and not already scheduled
+			wp_schedule_event( time(), 'monthly', 'bpfn_auto_cleanup_notifications' );
+		} elseif ( $enabled === 'no' && $next_scheduled ) {
+			// Unschedule if disabled
+			wp_clear_scheduled_hook( 'bpfn_auto_cleanup_notifications' );
+		}
+
+		// Redirect with success message
+		wp_redirect( add_query_arg( 'settings_updated', 'true', wp_get_referer() ) );
+		exit;
 	}
 
 	/**
@@ -560,5 +725,49 @@ class BPFN_Module_Admin {
 		});
 		</script>
 		<?php
+	}
+
+	/**
+	 * Setup automatic cleanup
+	 */
+	private function setup_automatic_cleanup() {
+		// Register WP Cron action
+		add_action( 'bpfn_auto_cleanup_notifications', array( $this, 'run_automatic_cleanup' ) );
+
+		// Schedule if not already scheduled and option is enabled
+		$enabled = get_option( 'bpfn_auto_cleanup_enabled', 'yes' );
+		if ( $enabled === 'yes' && ! wp_next_scheduled( 'bpfn_auto_cleanup_notifications' ) ) {
+			wp_schedule_event( time(), 'monthly', 'bpfn_auto_cleanup_notifications' );
+		}
+	}
+
+	/**
+	 * Run automatic cleanup
+	 */
+	public function run_automatic_cleanup() {
+		// Check if enabled
+		$enabled = get_option( 'bpfn_auto_cleanup_enabled', 'yes' );
+		if ( $enabled !== 'yes' ) {
+			return;
+		}
+
+		// Get retention period (default 30 days)
+		$days = get_option( 'bpfn_auto_cleanup_days', 30 );
+		$days = absint( $days );
+		if ( $days < 7 ) {
+			$days = 7; // Minimum 7 days
+		}
+
+		// Run cleanup
+		if ( function_exists( 'bpfn_clear_old_notifications' ) ) {
+			$result = bpfn_clear_old_notifications( $days );
+
+			// Log result
+			update_option( 'bpfn_last_auto_cleanup', array(
+				'date'      => current_time( 'mysql' ),
+				'deleted'   => isset( $result['count'] ) ? $result['count'] : 0,
+				'remaining' => isset( $result['remaining'] ) ? $result['remaining'] : 0,
+			) );
+		}
 	}
 }
