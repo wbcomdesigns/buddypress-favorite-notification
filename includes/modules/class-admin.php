@@ -81,37 +81,18 @@ class BPFN_Module_Admin {
 	 * Add admin menu
 	 */
 	public function add_admin_menu() {
-		// Main menu
+		// Single main menu page with tabs
 		$hook = add_menu_page(
 			__( 'BP Favorite Notification', 'bp-fav-notification' ),
 			__( 'BP Favorites', 'bp-fav-notification' ),
 			'manage_options',
-			'bpfn-settings',
-			array( $this, 'settings_page' ),
+			'bpfn-dashboard',
+			array( $this, 'admin_page' ),
 			'dashicons-heart',
 			30
 		);
-		
+
 		$this->admin_hooks[] = $hook;
-		
-		// Submenu pages
-		$this->admin_hooks[] = add_submenu_page(
-			'bpfn-settings',
-			__( 'Settings', 'bp-fav-notification' ),
-			__( 'Settings', 'bp-fav-notification' ),
-			'manage_options',
-			'bpfn-settings',
-			array( $this, 'settings_page' )
-		);
-		
-		$this->admin_hooks[] = add_submenu_page(
-			'bpfn-settings',
-			__( 'Tools', 'bp-fav-notification' ),
-			__( 'Tools', 'bp-fav-notification' ),
-			'manage_options',
-			'bpfn-tools',
-			array( $this, 'tools_page' )
-		);
 	}
 
 	/**
@@ -156,7 +137,274 @@ class BPFN_Module_Admin {
 	}
 
 	/**
-	 * Settings page
+	 * Main admin page with tabs
+	 */
+	public function admin_page() {
+		// Get current tab
+		$current_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'dashboard';
+
+		?>
+		<div class="wrap">
+			<h1><?php _e( 'BuddyPress Favorite Notification', 'bp-fav-notification' ); ?></h1>
+
+			<?php
+			// Show success message if settings were saved
+			if ( isset( $_GET['settings_updated'] ) && $_GET['settings_updated'] === 'true' ) :
+				?>
+				<div class="notice notice-success is-dismissible">
+					<p><?php _e( 'Settings saved successfully!', 'bp-fav-notification' ); ?></p>
+				</div>
+				<?php
+			endif;
+			?>
+
+			<!-- Tabs -->
+			<h2 class="nav-tab-wrapper">
+				<a href="?page=bpfn-dashboard&tab=dashboard" class="nav-tab <?php echo $current_tab === 'dashboard' ? 'nav-tab-active' : ''; ?>">
+					<?php _e( 'Dashboard', 'bp-fav-notification' ); ?>
+				</a>
+				<a href="?page=bpfn-dashboard&tab=settings" class="nav-tab <?php echo $current_tab === 'settings' ? 'nav-tab-active' : ''; ?>">
+					<?php _e( 'Settings', 'bp-fav-notification' ); ?>
+				</a>
+				<a href="?page=bpfn-dashboard&tab=tools" class="nav-tab <?php echo $current_tab === 'tools' ? 'nav-tab-active' : ''; ?>">
+					<?php _e( 'Tools', 'bp-fav-notification' ); ?>
+				</a>
+			</h2>
+
+			<div class="bpfn-tab-content">
+				<?php
+				switch ( $current_tab ) {
+					case 'settings':
+						$this->render_settings_tab();
+						break;
+					case 'tools':
+						$this->render_tools_tab();
+						break;
+					case 'dashboard':
+					default:
+						$this->render_dashboard_tab();
+						break;
+				}
+				?>
+			</div>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Render dashboard tab
+	 */
+	private function render_dashboard_tab() {
+		?>
+		<div class="bpfn-dashboard">
+			<style>
+				.bpfn-dashboard { margin-top: 20px; }
+				.bpfn-stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
+				.bpfn-stat-card { background: #fff; border: 1px solid #c3c4c7; border-radius: 4px; padding: 20px; box-shadow: 0 1px 1px rgba(0,0,0,.04); }
+				.bpfn-stat-card h3 { margin: 0 0 10px 0; font-size: 14px; color: #646970; text-transform: uppercase; font-weight: 600; }
+				.bpfn-stat-card .stat-number { font-size: 32px; font-weight: 600; color: #2271b1; margin: 10px 0; }
+				.bpfn-stat-card .stat-label { font-size: 13px; color: #646970; }
+				.bpfn-stat-card .stat-trend { font-size: 12px; margin-top: 8px; padding-top: 8px; border-top: 1px solid #f0f0f1; }
+				.stat-trend.positive { color: #00a32a; }
+				.stat-trend.negative { color: #d63638; }
+			</style>
+
+			<?php
+			// Get stats for last 7 days
+			$stats = $this->get_dashboard_stats();
+			?>
+
+			<div class="bpfn-stat-cards">
+				<!-- Total Favorites -->
+				<div class="bpfn-stat-card">
+					<h3><?php _e( 'Total Favorites', 'bp-fav-notification' ); ?></h3>
+					<div class="stat-number"><?php echo number_format_i18n( $stats['total_favorites'] ); ?></div>
+					<div class="stat-label"><?php _e( 'All time', 'bp-fav-notification' ); ?></div>
+					<?php if ( $stats['favorites_last_7_days'] > 0 ) : ?>
+						<div class="stat-trend positive">
+							↑ <?php printf( __( '+%s in last 7 days', 'bp-fav-notification' ), number_format_i18n( $stats['favorites_last_7_days'] ) ); ?>
+						</div>
+					<?php endif; ?>
+				</div>
+
+				<!-- Total Notifications -->
+				<div class="bpfn-stat-card">
+					<h3><?php _e( 'Notifications Sent', 'bp-fav-notification' ); ?></h3>
+					<div class="stat-number"><?php echo number_format_i18n( $stats['total_notifications'] ); ?></div>
+					<div class="stat-label"><?php _e( 'All time', 'bp-fav-notification' ); ?></div>
+					<?php if ( $stats['notifications_last_7_days'] > 0 ) : ?>
+						<div class="stat-trend positive">
+							↑ <?php printf( __( '+%s in last 7 days', 'bp-fav-notification' ), number_format_i18n( $stats['notifications_last_7_days'] ) ); ?>
+						</div>
+					<?php endif; ?>
+				</div>
+
+				<!-- Active Users -->
+				<div class="bpfn-stat-card">
+					<h3><?php _e( 'Active Users', 'bp-fav-notification' ); ?></h3>
+					<div class="stat-number"><?php echo number_format_i18n( $stats['active_users_7_days'] ); ?></div>
+					<div class="stat-label"><?php _e( 'Last 7 days', 'bp-fav-notification' ); ?></div>
+				</div>
+
+				<!-- Most Liked Activity -->
+				<div class="bpfn-stat-card">
+					<h3><?php _e( 'Most Liked Activity', 'bp-fav-notification' ); ?></h3>
+					<div class="stat-number"><?php echo number_format_i18n( $stats['most_liked_count'] ); ?></div>
+					<div class="stat-label">
+						<?php
+						if ( $stats['most_liked_activity'] ) {
+							printf(
+								__( 'Activity #%d', 'bp-fav-notification' ),
+								$stats['most_liked_activity']
+							);
+						} else {
+							_e( 'No data yet', 'bp-fav-notification' );
+						}
+						?>
+					</div>
+				</div>
+			</div>
+
+			<!-- Recent Activity -->
+			<div class="postbox">
+				<h2 class="hndle"><?php _e( 'Recent Activity (Last 7 Days)', 'bp-fav-notification' ); ?></h2>
+				<div class="inside">
+					<?php $this->render_recent_activity( $stats ); ?>
+				</div>
+			</div>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Get dashboard statistics
+	 */
+	private function get_dashboard_stats() {
+		global $wpdb, $bp;
+
+		$stats = array(
+			'total_favorites'         => 0,
+			'favorites_last_7_days'   => 0,
+			'total_notifications'     => 0,
+			'notifications_last_7_days' => 0,
+			'active_users_7_days'     => 0,
+			'most_liked_activity'     => 0,
+			'most_liked_count'        => 0,
+			'recent_activities'       => array(),
+		);
+
+		// Get total favorites from our table
+		$favorites_table = $wpdb->prefix . 'bp_activity_favorites';
+		if ( $wpdb->get_var( "SHOW TABLES LIKE '{$favorites_table}'" ) === $favorites_table ) {
+			$stats['total_favorites'] = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$favorites_table}" );
+
+			// Favorites in last 7 days
+			$stats['favorites_last_7_days'] = (int) $wpdb->get_var(
+				"SELECT COUNT(*) FROM {$favorites_table}
+				WHERE favorited_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)"
+			);
+
+			// Active users (who liked something in last 7 days)
+			$stats['active_users_7_days'] = (int) $wpdb->get_var(
+				"SELECT COUNT(DISTINCT user_id) FROM {$favorites_table}
+				WHERE favorited_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)"
+			);
+
+			// Most liked activity
+			$most_liked = $wpdb->get_row(
+				"SELECT activity_id, COUNT(*) as count
+				FROM {$favorites_table}
+				GROUP BY activity_id
+				ORDER BY count DESC
+				LIMIT 1"
+			);
+
+			if ( $most_liked ) {
+				$stats['most_liked_activity'] = (int) $most_liked->activity_id;
+				$stats['most_liked_count'] = (int) $most_liked->count;
+			}
+
+			// Recent favorited activities (last 10)
+			$stats['recent_activities'] = $wpdb->get_results(
+				"SELECT activity_id, user_id, favorited_at
+				FROM {$favorites_table}
+				WHERE favorited_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+				ORDER BY favorited_at DESC
+				LIMIT 10"
+			);
+		}
+
+		// Get notification stats
+		if ( bp_is_active( 'notifications' ) ) {
+			$notifications_table = $bp->notifications->table_name;
+			$component = isset( $bp->favorite_notifier ) ? $bp->favorite_notifier->id : 'favorite_notifier';
+
+			$stats['total_notifications'] = (int) $wpdb->get_var( $wpdb->prepare(
+				"SELECT COUNT(*) FROM {$notifications_table} WHERE component_name = %s",
+				$component
+			) );
+
+			$stats['notifications_last_7_days'] = (int) $wpdb->get_var( $wpdb->prepare(
+				"SELECT COUNT(*) FROM {$notifications_table}
+				WHERE component_name = %s
+				AND date_notified >= DATE_SUB(NOW(), INTERVAL 7 DAY)",
+				$component
+			) );
+		}
+
+		return $stats;
+	}
+
+	/**
+	 * Render recent activity
+	 */
+	private function render_recent_activity( $stats ) {
+		if ( empty( $stats['recent_activities'] ) ) {
+			echo '<p>' . esc_html__( 'No favorites in the last 7 days.', 'bp-fav-notification' ) . '</p>';
+			return;
+		}
+
+		echo '<table class="wp-list-table widefat fixed striped">';
+		echo '<thead>';
+		echo '<tr>';
+		echo '<th>' . esc_html__( 'User', 'bp-fav-notification' ) . '</th>';
+		echo '<th>' . esc_html__( 'Activity', 'bp-fav-notification' ) . '</th>';
+		echo '<th>' . esc_html__( 'Date', 'bp-fav-notification' ) . '</th>';
+		echo '</tr>';
+		echo '</thead>';
+		echo '<tbody>';
+
+		foreach ( $stats['recent_activities'] as $activity ) {
+			$user = get_userdata( $activity->user_id );
+			$user_name = $user ? $user->display_name : __( 'Unknown User', 'bp-fav-notification' );
+
+			echo '<tr>';
+			echo '<td>' . esc_html( $user_name ) . '</td>';
+			echo '<td>' . sprintf( esc_html__( 'Activity #%d', 'bp-fav-notification' ), $activity->activity_id ) . '</td>';
+			echo '<td>' . esc_html( human_time_diff( strtotime( $activity->favorited_at ), current_time( 'timestamp' ) ) ) . ' ' . esc_html__( 'ago', 'bp-fav-notification' ) . '</td>';
+			echo '</tr>';
+		}
+
+		echo '</tbody>';
+		echo '</table>';
+	}
+
+	/**
+	 * Render settings tab
+	 */
+	private function render_settings_tab() {
+		$this->settings_page();
+	}
+
+	/**
+	 * Render tools tab
+	 */
+	private function render_tools_tab() {
+		$this->tools_page_content();
+	}
+
+	/**
+	 * Settings page (kept for backward compatibility)
 	 */
 	public function settings_page() {
 		?>
@@ -183,27 +431,13 @@ class BPFN_Module_Admin {
 	}
 
 	/**
-	 * Tools page
+	 * Tools page content (without wrap, used in tab)
 	 */
-	public function tools_page() {
+	public function tools_page_content() {
 		?>
-		<div class="wrap">
-			<h1><?php _e( 'BuddyPress Favorite Notification Tools', 'bp-fav-notification' ); ?></h1>
+		<div class="bpfn-tools-tab" style="margin-top: 20px;">
 
-			<?php
-			// Show success message if settings were saved
-			if ( isset( $_GET['settings_updated'] ) && $_GET['settings_updated'] === 'true' ) :
-				?>
-				<div class="notice notice-success is-dismissible">
-					<p><?php _e( 'Settings saved successfully!', 'bp-fav-notification' ); ?></p>
-				</div>
-				<?php
-			endif;
-			?>
-
-			<div class="postbox-container" style="width: 70%;">
-
-				<!-- Migrate Favorites -->
+			<!-- Migrate Favorites -->
 				<?php
 				require_once BPFN_INCLUDES_PATH . 'migrations/class-favorites-migration.php';
 				$migration = new BPFN_Favorites_Migration();
@@ -380,7 +614,6 @@ class BPFN_Module_Admin {
 					</div>
 				</div>
 
-			</div>
 		</div>
 		<?php
 	}
@@ -510,7 +743,7 @@ class BPFN_Module_Admin {
 		}
 
 		// Redirect with success message
-		wp_redirect( add_query_arg( 'settings_updated', 'true', wp_get_referer() ) );
+		wp_redirect( add_query_arg( array( 'page' => 'bpfn-dashboard', 'tab' => 'tools', 'settings_updated' => 'true' ), admin_url( 'admin.php' ) ) );
 		exit;
 	}
 
@@ -700,7 +933,7 @@ class BPFN_Module_Admin {
 			return;
 		}
 
-		$tools_url = admin_url( 'admin.php?page=bpfn-tools' );
+		$tools_url = admin_url( 'admin.php?page=bpfn-dashboard&tab=tools' );
 		?>
 		<div class="notice notice-info is-dismissible" data-dismissible="bpfn-migration-notice">
 			<p>
