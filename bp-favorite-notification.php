@@ -150,7 +150,6 @@ class BP_Favorite_Notification {
 			'notifications' => 'class-notifications.php',
 			'email' => 'class-email.php',
 			'realtime' => 'class-realtime.php',
-			'settings' => 'class-settings.php',
 			'assets' => 'class-assets.php',
 			'admin' => 'class-admin.php',
 			'favorite_display' => 'class-favorite-display.php',

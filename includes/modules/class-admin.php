@@ -156,9 +156,17 @@ class BPFN_Module_Admin {
 			?>
 
 			<!-- All sections on one page -->
-			<?php $this->render_dashboard_section(); ?>
-			<?php $this->render_settings_section(); ?>
-			<?php $this->render_tools_section(); ?>
+			<div class="bpfn-admin-section">
+				<?php $this->render_dashboard_section(); ?>
+			</div>
+
+			<div class="bpfn-admin-section">
+				<?php $this->render_settings_section(); ?>
+			</div>
+
+			<div class="bpfn-admin-section">
+				<?php $this->render_tools_section(); ?>
+			</div>
 
 		</div>
 		<?php
@@ -169,82 +177,102 @@ class BPFN_Module_Admin {
 	 */
 	private function render_dashboard_section() {
 		?>
-		<div class="bpfn-dashboard" style="margin-bottom: 40px;">
-			<style>
-				.bpfn-dashboard { margin-top: 20px; }
-				.bpfn-stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
-				.bpfn-stat-card { background: #fff; border: 1px solid #c3c4c7; border-radius: 4px; padding: 20px; box-shadow: 0 1px 1px rgba(0,0,0,.04); }
-				.bpfn-stat-card h3 { margin: 0 0 10px 0; font-size: 14px; color: #646970; text-transform: uppercase; font-weight: 600; }
-				.bpfn-stat-card .stat-number { font-size: 32px; font-weight: 600; color: #2271b1; margin: 10px 0; }
-				.bpfn-stat-card .stat-label { font-size: 13px; color: #646970; }
-				.bpfn-stat-card .stat-trend { font-size: 12px; margin-top: 8px; padding-top: 8px; border-top: 1px solid #f0f0f1; }
-				.stat-trend.positive { color: #00a32a; }
-				.stat-trend.negative { color: #d63638; }
-			</style>
+		<h2 class="title"><?php _e( 'Overview', 'bp-fav-notification' ); ?></h2>
 
-			<h2><?php _e( 'Overview', 'bp-fav-notification' ); ?></h2>
+		<?php
+		// Get stats for last 7 days
+		$stats = $this->get_dashboard_stats();
+		?>
 
-			<?php
-			// Get stats for last 7 days
-			$stats = $this->get_dashboard_stats();
-			?>
-
-			<div class="bpfn-stat-cards">
-				<!-- Total Favorites -->
-				<div class="bpfn-stat-card">
-					<h3><?php _e( 'Total Favorites', 'bp-fav-notification' ); ?></h3>
-					<div class="stat-number"><?php echo number_format_i18n( $stats['total_favorites'] ); ?></div>
-					<div class="stat-label"><?php _e( 'All time', 'bp-fav-notification' ); ?></div>
-					<?php if ( $stats['favorites_last_7_days'] > 0 ) : ?>
-						<div class="stat-trend positive">
-							↑ <?php printf( __( '+%s in last 7 days', 'bp-fav-notification' ), number_format_i18n( $stats['favorites_last_7_days'] ) ); ?>
-						</div>
-					<?php endif; ?>
-				</div>
-
-				<!-- Total Notifications -->
-				<div class="bpfn-stat-card">
-					<h3><?php _e( 'Notifications Sent', 'bp-fav-notification' ); ?></h3>
-					<div class="stat-number"><?php echo number_format_i18n( $stats['total_notifications'] ); ?></div>
-					<div class="stat-label"><?php _e( 'All time', 'bp-fav-notification' ); ?></div>
-					<?php if ( $stats['notifications_last_7_days'] > 0 ) : ?>
-						<div class="stat-trend positive">
-							↑ <?php printf( __( '+%s in last 7 days', 'bp-fav-notification' ), number_format_i18n( $stats['notifications_last_7_days'] ) ); ?>
-						</div>
-					<?php endif; ?>
-				</div>
-
-				<!-- Active Users -->
-				<div class="bpfn-stat-card">
-					<h3><?php _e( 'Active Users', 'bp-fav-notification' ); ?></h3>
-					<div class="stat-number"><?php echo number_format_i18n( $stats['active_users_7_days'] ); ?></div>
-					<div class="stat-label"><?php _e( 'Last 7 days', 'bp-fav-notification' ); ?></div>
-				</div>
-
-				<!-- Most Liked Activity -->
-				<div class="bpfn-stat-card">
-					<h3><?php _e( 'Most Liked Activity', 'bp-fav-notification' ); ?></h3>
-					<div class="stat-number"><?php echo number_format_i18n( $stats['most_liked_count'] ); ?></div>
-					<div class="stat-label">
-						<?php
-						if ( $stats['most_liked_activity'] ) {
-							printf(
-								__( 'Activity #%d', 'bp-fav-notification' ),
-								$stats['most_liked_activity']
-							);
-						} else {
-							_e( 'No data yet', 'bp-fav-notification' );
-						}
-						?>
+		<!-- Stats Cards -->
+		<div class="bpfn-stat-cards">
+			<!-- Total Favorites -->
+			<div class="postbox">
+				<div class="inside">
+					<div class="bpfn-stat-content">
+						<h3><?php _e( 'Total Favorites', 'bp-fav-notification' ); ?></h3>
+						<div class="bpfn-stat-number"><?php echo number_format_i18n( $stats['total_favorites'] ); ?></div>
+						<p class="bpfn-stat-label"><?php _e( 'All time', 'bp-fav-notification' ); ?></p>
+						<?php if ( $stats['favorites_last_7_days'] > 0 ) : ?>
+							<p class="bpfn-stat-trend positive">
+								↑ <?php printf( __( '+%s in last 7 days', 'bp-fav-notification' ), number_format_i18n( $stats['favorites_last_7_days'] ) ); ?>
+							</p>
+						<?php endif; ?>
 					</div>
 				</div>
 			</div>
 
-			<!-- Recent Activity -->
+			<!-- Total Notifications -->
 			<div class="postbox">
-				<h2 class="hndle"><?php _e( 'Recent Activity (Last 7 Days)', 'bp-fav-notification' ); ?></h2>
 				<div class="inside">
-					<?php $this->render_recent_activity( $stats ); ?>
+					<div class="bpfn-stat-content">
+						<h3><?php _e( 'Notifications Sent', 'bp-fav-notification' ); ?></h3>
+						<div class="bpfn-stat-number"><?php echo number_format_i18n( $stats['total_notifications'] ); ?></div>
+						<p class="bpfn-stat-label"><?php _e( 'All time', 'bp-fav-notification' ); ?></p>
+						<?php if ( $stats['notifications_last_7_days'] > 0 ) : ?>
+							<p class="bpfn-stat-trend positive">
+								↑ <?php printf( __( '+%s in last 7 days', 'bp-fav-notification' ), number_format_i18n( $stats['notifications_last_7_days'] ) ); ?>
+							</p>
+						<?php endif; ?>
+					</div>
+				</div>
+			</div>
+
+			<!-- Active Users -->
+			<div class="postbox">
+				<div class="inside">
+					<div class="bpfn-stat-content">
+						<h3><?php _e( 'Active Users', 'bp-fav-notification' ); ?></h3>
+						<div class="bpfn-stat-number"><?php echo number_format_i18n( $stats['active_users_7_days'] ); ?></div>
+						<p class="bpfn-stat-label"><?php _e( 'Last 7 days', 'bp-fav-notification' ); ?></p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Most Liked Activity -->
+			<div class="postbox">
+				<div class="inside">
+					<div class="bpfn-stat-content">
+						<h3><?php _e( 'Most Liked Activity', 'bp-fav-notification' ); ?></h3>
+						<div class="bpfn-stat-number"><?php echo number_format_i18n( $stats['most_liked_count'] ); ?></div>
+						<p class="bpfn-stat-label">
+							<?php
+							if ( $stats['most_liked_activity'] ) {
+								printf(
+									__( 'Activity #%d', 'bp-fav-notification' ),
+									$stats['most_liked_activity']
+								);
+							} else {
+								_e( 'No data yet', 'bp-fav-notification' );
+							}
+							?>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Recent Activity -->
+		<div class="postbox">
+			<h2 class="hndle"><?php _e( 'Recent Favorites (Last 7 Days)', 'bp-fav-notification' ); ?></h2>
+			<div class="inside">
+				<?php $this->render_recent_activity( $stats ); ?>
+			</div>
+		</div>
+
+		<!-- Trending Activities -->
+		<div class="bpfn-trending-wrapper">
+			<div class="postbox">
+				<h2 class="hndle"><?php _e( 'Trending Activities (Last 7 Days)', 'bp-fav-notification' ); ?></h2>
+				<div class="inside">
+					<?php $this->render_trending_activities( $stats, 7 ); ?>
+				</div>
+			</div>
+
+			<div class="postbox">
+				<h2 class="hndle"><?php _e( 'Trending Activities (Last 30 Days)', 'bp-fav-notification' ); ?></h2>
+				<div class="inside">
+					<?php $this->render_trending_activities( $stats, 30 ); ?>
 				</div>
 			</div>
 		</div>
@@ -266,6 +294,8 @@ class BPFN_Module_Admin {
 			'most_liked_activity'     => 0,
 			'most_liked_count'        => 0,
 			'recent_activities'       => array(),
+			'trending_7_days'         => array(),
+			'trending_30_days'        => array(),
 		);
 
 		// Get total favorites from our table
@@ -305,6 +335,26 @@ class BPFN_Module_Admin {
 				FROM {$favorites_table}
 				WHERE favorited_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
 				ORDER BY favorited_at DESC
+				LIMIT 10"
+			);
+
+			// Trending activities in last 7 days (most favorites)
+			$stats['trending_7_days'] = $wpdb->get_results(
+				"SELECT activity_id, COUNT(*) as favorite_count
+				FROM {$favorites_table}
+				WHERE favorited_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+				GROUP BY activity_id
+				ORDER BY favorite_count DESC
+				LIMIT 10"
+			);
+
+			// Trending activities in last 30 days (most favorites)
+			$stats['trending_30_days'] = $wpdb->get_results(
+				"SELECT activity_id, COUNT(*) as favorite_count
+				FROM {$favorites_table}
+				WHERE favorited_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+				GROUP BY activity_id
+				ORDER BY favorite_count DESC
 				LIMIT 10"
 			);
 		}
@@ -353,11 +403,81 @@ class BPFN_Module_Admin {
 			$user = get_userdata( $activity->user_id );
 			$user_name = $user ? $user->display_name : __( 'Unknown User', 'bp-fav-notification' );
 
+			// Get activity link
+			$activity_link = bp_activity_get_permalink( $activity->activity_id );
+
 			echo '<tr>';
 			echo '<td>' . esc_html( $user_name ) . '</td>';
-			echo '<td>' . sprintf( esc_html__( 'Activity #%d', 'bp-fav-notification' ), $activity->activity_id ) . '</td>';
+			echo '<td><a href="' . esc_url( $activity_link ) . '" target="_blank">' . sprintf( esc_html__( 'Activity #%d', 'bp-fav-notification' ), $activity->activity_id ) . '</a></td>';
 			echo '<td>' . esc_html( human_time_diff( strtotime( $activity->favorited_at ), current_time( 'timestamp' ) ) ) . ' ' . esc_html__( 'ago', 'bp-fav-notification' ) . '</td>';
 			echo '</tr>';
+		}
+
+		echo '</tbody>';
+		echo '</table>';
+	}
+
+	/**
+	 * Render trending activities
+	 */
+	private function render_trending_activities( $stats, $days = 7 ) {
+		$key = 'trending_' . $days . '_days';
+
+		if ( empty( $stats[ $key ] ) ) {
+			printf(
+				'<p>%s</p>',
+				sprintf(
+					/* translators: %d: number of days */
+					esc_html__( 'No trending activities in the last %d days.', 'bp-fav-notification' ),
+					$days
+				)
+			);
+			return;
+		}
+
+		echo '<table class="wp-list-table widefat fixed striped">';
+		echo '<thead>';
+		echo '<tr>';
+		echo '<th>' . esc_html__( 'Rank', 'bp-fav-notification' ) . '</th>';
+		echo '<th>' . esc_html__( 'Activity', 'bp-fav-notification' ) . '</th>';
+		echo '<th>' . esc_html__( 'Favorites', 'bp-fav-notification' ) . '</th>';
+		echo '<th>' . esc_html__( 'Author', 'bp-fav-notification' ) . '</th>';
+		echo '<th>' . esc_html__( 'Preview', 'bp-fav-notification' ) . '</th>';
+		echo '</tr>';
+		echo '</thead>';
+		echo '<tbody>';
+
+		$rank = 1;
+		foreach ( $stats[ $key ] as $trending ) {
+			// Get activity details
+			$activity = bp_activity_get_specific( array( 'activity_ids' => $trending->activity_id ) );
+
+			if ( ! empty( $activity['activities'][0] ) ) {
+				$activity_obj = $activity['activities'][0];
+				$author = get_userdata( $activity_obj->user_id );
+				$author_name = $author ? $author->display_name : __( 'Unknown', 'bp-fav-notification' );
+
+				// Get activity content preview (first 100 chars)
+				$content = strip_tags( $activity_obj->content );
+				$preview = mb_strlen( $content ) > 100 ? mb_substr( $content, 0, 100 ) . '...' : $content;
+
+				// Activity link
+				$activity_link = bp_activity_get_permalink( $trending->activity_id );
+			} else {
+				$author_name = __( 'Unknown', 'bp-fav-notification' );
+				$preview = __( 'Activity not found', 'bp-fav-notification' );
+				$activity_link = '#';
+			}
+
+			echo '<tr>';
+			echo '<td><strong>#' . esc_html( $rank ) . '</strong></td>';
+			echo '<td><a href="' . esc_url( $activity_link ) . '" target="_blank">' . sprintf( esc_html__( 'Activity #%d', 'bp-fav-notification' ), $trending->activity_id ) . '</a></td>';
+			echo '<td><span class="bpfn-badge">' . number_format_i18n( $trending->favorite_count ) . '</span></td>';
+			echo '<td>' . esc_html( $author_name ) . '</td>';
+			echo '<td class="bpfn-preview">' . esc_html( $preview ) . '</td>';
+			echo '</tr>';
+
+			$rank++;
 		}
 
 		echo '</tbody>';
@@ -369,23 +489,18 @@ class BPFN_Module_Admin {
 	 */
 	private function render_settings_section() {
 		?>
-		<div class="bpfn-settings-section" style="margin-bottom: 40px;">
-			<h2><?php _e( 'Settings', 'bp-fav-notification' ); ?></h2>
-			
-			<div class="bpfn-admin-container">
-				<div class="bpfn-admin-main">
-					<form method="post" action="options.php">
-						<?php
-						settings_fields( 'bpfn_settings' );
-						do_settings_sections( 'bpfn-settings' );
-						submit_button();
-						?>
-					</form>
-				</div>
-				
-				<div class="bpfn-admin-sidebar">
-					<?php $this->render_sidebar(); ?>
-				</div>
+		<h2 class="title"><?php _e( 'Settings', 'bp-fav-notification' ); ?></h2>
+
+		<div class="postbox">
+			<h2 class="hndle"><?php _e( 'Notification Settings', 'bp-fav-notification' ); ?></h2>
+			<div class="inside">
+				<form method="post" action="options.php">
+					<?php
+					settings_fields( 'bpfn_settings' );
+					do_settings_sections( 'bpfn-settings' );
+					submit_button();
+					?>
+				</form>
 			</div>
 		</div>
 		<?php
@@ -396,10 +511,9 @@ class BPFN_Module_Admin {
 	 */
 	private function render_tools_section() {
 		?>
-		<div class="bpfn-tools-section" style="margin-bottom: 40px;">
-			<h2><?php _e( 'Tools & Maintenance', 'bp-fav-notification' ); ?></h2>
+		<h2 class="title"><?php _e( 'Tools & Maintenance', 'bp-fav-notification' ); ?></h2>
 
-			<!-- Migrate Favorites -->
+		<!-- Migrate Favorites -->
 				<?php
 				require_once BPFN_INCLUDES_PATH . 'migrations/class-favorites-migration.php';
 				$migration = new BPFN_Favorites_Migration();
@@ -575,59 +689,6 @@ class BPFN_Module_Admin {
 						<div id="bpfn-clear-result" style="margin-top: 10px;"></div>
 					</div>
 				</div>
-
-		</div>
-		<?php
-	}
-
-	/**
-	 * Render admin sidebar
-	 */
-	private function render_sidebar() {
-		?>
-		<div class="postbox">
-			<h3 class="hndle"><?php _e( 'Quick Stats', 'bp-fav-notification' ); ?></h3>
-			<div class="inside">
-				<?php $this->render_stats(); ?>
-			</div>
-		</div>
-		
-		<div class="postbox">
-			<h3 class="hndle"><?php _e( 'Support', 'bp-fav-notification' ); ?></h3>
-			<div class="inside">
-				<ul>
-					<li><a href="https://wordpress.org/support/plugin/bp-favorite-notification/" target="_blank"><?php _e( 'Support Forum', 'bp-fav-notification' ); ?></a></li>
-					<li><a href="https://wordpress.org/support/plugin/bp-favorite-notification/reviews/" target="_blank"><?php _e( 'Leave Review', 'bp-fav-notification' ); ?></a></li>
-				</ul>
-			</div>
-		</div>
-		<?php
-	}
-
-	/**
-	 * Render stats
-	 */
-	private function render_stats() {
-		$stats = array(
-			'total_notifications' => 0,
-			'active_users' => 0
-		);
-		
-		if ( function_exists( 'bpfn_get_notification_stats' ) ) {
-			$stats = bpfn_get_notification_stats();
-		}
-		
-		?>
-		<table class="widefat">
-			<tr>
-				<td><?php _e( 'Total Notifications:', 'bp-fav-notification' ); ?></td>
-				<td><strong><?php echo number_format_i18n( $stats['total_notifications'] ); ?></strong></td>
-			</tr>
-			<tr>
-				<td><?php _e( 'Active Users:', 'bp-fav-notification' ); ?></td>
-				<td><strong><?php echo number_format_i18n( $stats['active_users'] ); ?></strong></td>
-			</tr>
-		</table>
 		<?php
 	}
 
@@ -751,9 +812,9 @@ class BPFN_Module_Admin {
 	 */
 	public function add_action_links( $links ) {
 		$action_links = array(
-			'settings' => '<a href="' . admin_url( 'admin.php?page=bpfn-settings' ) . '">' . __( 'Settings', 'bp-fav-notification' ) . '</a>',
+			'settings' => '<a href="' . admin_url( 'admin.php?page=bpfn-dashboard' ) . '">' . __( 'Settings', 'bp-fav-notification' ) . '</a>',
 		);
-		
+
 		return array_merge( $action_links, $links );
 	}
 

@@ -113,6 +113,121 @@
 }
 
 /* ========================================
+   Dashboard Stat Cards
+   ======================================== */
+.bpfn-stat-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.bpfn-stat-content {
+    text-align: center;
+    padding: 10px;
+}
+
+.bpfn-stat-content h3 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    color: #646970;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.bpfn-stat-number {
+    font-size: 32px;
+    font-weight: 600;
+    color: #2271b1;
+    margin: 10px 0;
+    line-height: 1.2;
+}
+
+.bpfn-stat-label {
+    font-size: 13px;
+    color: #646970;
+    margin: 5px 0;
+}
+
+.bpfn-stat-trend {
+    font-size: 12px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #f0f0f1;
+}
+
+.bpfn-stat-trend.positive {
+    color: #00a32a;
+}
+
+.bpfn-stat-trend.negative {
+    color: #d63638;
+}
+
+/* Admin Sections */
+.bpfn-admin-section {
+    margin-bottom: 40px;
+}
+
+.bpfn-admin-section:last-child {
+    margin-bottom: 20px;
+}
+
+/* Section Titles */
+h2.title {
+    margin-top: 0;
+    margin-bottom: 20px;
+    padding: 12px 0 12px 12px;
+    border-bottom: 1px solid #c3c4c7;
+    font-size: 20px;
+    font-weight: 600;
+    color: #1d2327;
+}
+
+/* Postbox headings */
+.bpfn-admin-section .postbox h2.hndle,
+.bpfn-admin-section .postbox h3.hndle {
+    padding-left: 16px;
+}
+
+/* Postbox inside content */
+.bpfn-admin-section .postbox .inside {
+    padding: 16px;
+    margin: 0;
+}
+
+/* Trending wrapper - 2 columns side by side */
+.bpfn-trending-wrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+@media (max-width: 1024px) {
+    .bpfn-trending-wrapper {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Trending table styling */
+.bpfn-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #2271b1;
+    color: #fff;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.bpfn-preview {
+    font-size: 13px;
+    color: #646970;
+    max-width: 300px;
+}
+
+/* ========================================
    Settings Sections
    ======================================== */
 .form-table th {
