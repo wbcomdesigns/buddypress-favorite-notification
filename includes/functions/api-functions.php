@@ -242,15 +242,15 @@ function bpfn_register_module( $module_name, $module_instance ) {
  */
 function bpfn_is_feature_enabled( $feature ) {
 	$options = get_option( 'bpfn_options', array() );
-	
+
 	$features = array(
 		'enhanced_notifications' => ! empty( $options['enable_enhanced_notifications'] ),
-		'realtime_notifications' => true, // Always enabled if user has it enabled
+		'realtime_notifications' => true, // Always enabled - users control via their preferences
 		'email_notifications' => true, // Always enabled if user has it enabled
 	);
-	
+
 	$enabled = isset( $features[ $feature ] ) ? $features[ $feature ] : false;
-	
+
 	return apply_filters( 'bpfn_is_feature_enabled', $enabled, $feature );
 }
 

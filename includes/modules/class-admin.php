@@ -60,12 +60,10 @@ class BPFN_Module_Admin {
 	 */
 	private function register_ajax_handlers() {
 		$ajax_actions = array(
-			'send_test_notification',
-			'send_test_email',
 			'clear_old_notifications',
 			'get_stats'
 		);
-		
+
 		foreach ( $ajax_actions as $action ) {
 			add_action( 'wp_ajax_bpfn_' . $action, array( $this, 'ajax_' . $action ) );
 		}
@@ -183,33 +181,9 @@ class BPFN_Module_Admin {
 		?>
 		<div class="wrap">
 			<h1><?php _e( 'BuddyPress Favorite Notification Tools', 'bp-fav-notification' ); ?></h1>
-			
+
 			<div class="postbox-container" style="width: 70%;">
-				
-				<!-- Test Notification -->
-				<div class="postbox">
-					<h3 class="hndle"><?php _e( 'Test Notification', 'bp-fav-notification' ); ?></h3>
-					<div class="inside">
-						<p><?php _e( 'Send a test notification to yourself to verify everything is working.', 'bp-fav-notification' ); ?></p>
-						<button class="button button-primary" id="bpfn-send-test-notification">
-							<?php _e( 'Send Test Notification', 'bp-fav-notification' ); ?>
-						</button>
-						<div id="bpfn-test-result" style="margin-top: 10px;"></div>
-					</div>
-				</div>
-				
-				<!-- Test Email -->
-				<div class="postbox">
-					<h3 class="hndle"><?php _e( 'Test Email', 'bp-fav-notification' ); ?></h3>
-					<div class="inside">
-						<p><?php _e( 'Send a test email to verify email notifications are working.', 'bp-fav-notification' ); ?></p>
-						<button class="button" id="bpfn-send-test-email">
-							<?php _e( 'Send Test Email', 'bp-fav-notification' ); ?>
-						</button>
-						<div id="bpfn-email-result" style="margin-top: 10px;"></div>
-					</div>
-				</div>
-				
+
 				<!-- Clear Old Notifications -->
 				<div class="postbox">
 					<h3 class="hndle"><?php _e( 'Database Maintenance', 'bp-fav-notification' ); ?></h3>
@@ -221,7 +195,7 @@ class BPFN_Module_Admin {
 						<div id="bpfn-clear-result" style="margin-top: 10px;"></div>
 					</div>
 				</div>
-				
+
 			</div>
 		</div>
 		<?php
@@ -336,11 +310,11 @@ class BPFN_Module_Admin {
 	 */
 	public function sanitize_options( $input ) {
 		$sanitized = array();
-		
+
 		if ( isset( $input['enable_enhanced_notifications'] ) ) {
 			$sanitized['enable_enhanced_notifications'] = 1;
 		}
-		
+
 		return $sanitized;
 	}
 
@@ -365,54 +339,6 @@ class BPFN_Module_Admin {
 				esc_attr( $notice['type'] ),
 				wp_kses_post( $notice['message'] )
 			);
-		}
-	}
-
-	/**
-	 * AJAX send test notification
-	 */
-	public function ajax_send_test_notification() {
-		check_ajax_referer( 'bpfn-admin-nonce', 'nonce' );
-		
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'bp-fav-notification' ) ) );
-		}
-		
-		if ( ! function_exists( 'bpfn_send_test_notification' ) ) {
-			wp_send_json_error( array( 'message' => __( 'Test function not available', 'bp-fav-notification' ) ) );
-		}
-		
-		$user_id = get_current_user_id();
-		$result = bpfn_send_test_notification( $user_id );
-		
-		if ( $result ) {
-			wp_send_json_success( array( 'message' => __( 'Test notification sent!', 'bp-fav-notification' ) ) );
-		} else {
-			wp_send_json_error( array( 'message' => __( 'Failed to send test notification', 'bp-fav-notification' ) ) );
-		}
-	}
-
-	/**
-	 * AJAX send test email
-	 */
-	public function ajax_send_test_email() {
-		check_ajax_referer( 'bpfn-admin-nonce', 'nonce' );
-		
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'bp-fav-notification' ) ) );
-		}
-		
-		if ( ! function_exists( 'bpfn_send_test_email' ) ) {
-			wp_send_json_error( array( 'message' => __( 'Test function not available', 'bp-fav-notification' ) ) );
-		}
-		
-		$user_id = get_current_user_id();
-		$result = bpfn_send_test_email( $user_id );
-		
-		if ( $result ) {
-			wp_send_json_success( array( 'message' => __( 'Test email sent!', 'bp-fav-notification' ) ) );
-		} else {
-			wp_send_json_error( array( 'message' => __( 'Failed to send test email', 'bp-fav-notification' ) ) );
 		}
 	}
 

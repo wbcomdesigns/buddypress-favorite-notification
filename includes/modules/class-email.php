@@ -50,10 +50,7 @@ class BPFN_Module_Email {
 	private function setup_hooks() {
 		// Send email when notification is added - use later priority
 		add_action( 'bpfn_after_add_notification', array( $this, 'send_email_notification' ), 20, 4 );
-		
-		// Also hook into the notifications module action
-		add_action( 'bp_activity_add_user_favorite', array( $this, 'check_and_send_email' ), 20, 2 );
-		
+
 		// Email customization hooks
 		add_filter( 'bpfn_email_headers', array( $this, 'set_email_headers' ), 10, 2 );
 		add_filter( 'bpfn_email_subject', array( $this, 'parse_email_tokens' ), 10, 2 );
@@ -62,6 +59,8 @@ class BPFN_Module_Email {
 
 	/**
 	 * Check and send email from favorite action
+	 * Note: Not currently hooked to avoid duplicate emails.
+	 * Email is sent via bpfn_after_add_notification action instead.
 	 */
 	public function check_and_send_email( $activity_id, $user_id ) {
 		// Get activity
@@ -69,13 +68,13 @@ class BPFN_Module_Email {
 		if ( empty( $activity->id ) || $activity->user_id == $user_id ) {
 			return;
 		}
-		
+
 		// Check if email notifications are enabled
 		$activity_type = bpfn_get_activity_type( $activity->id );
 		if ( ! bpfn_is_notification_enabled( $activity->user_id, $activity_type, 'email' ) ) {
 			return;
 		}
-		
+
 		// Trigger email notification
 		$this->send_email_notification( 0, array(), $activity, $user_id );
 	}
@@ -193,36 +192,27 @@ class BPFN_Module_Email {
 	 * Send email
 	 */
 	private function send_email( $email_data ) {
-		// Debug logging
-		error_log( 'BPFN Email: send_email called' );
-		error_log( 'BPFN Email: To: ' . $email_data['to'] );
-		error_log( 'BPFN Email: Subject: ' . ( $email_data['subject'] ?? 'No subject' ) );
-		
 		// Parse subject
 		$subject = $this->parse_email_tokens( $email_data['subject'], $email_data['tokens'] );
 		$subject = apply_filters( 'bpfn_email_subject', $subject, $email_data['tokens'] );
-		
+
 		// Get message
 		$message = $this->get_email_message( $email_data['template'], $email_data['tokens'] );
 		$message = apply_filters( 'bpfn_email_message', $message, $email_data['tokens'] );
-		
+
 		// Set headers
 		$headers = apply_filters( 'bpfn_email_headers', array(
 			'Content-Type: text/html; charset=UTF-8',
 		), $email_data );
-		
+
 		// Add From header
 		$from_name = apply_filters( 'bpfn_email_from_name', get_bloginfo( 'name' ) );
 		$from_email = apply_filters( 'bpfn_email_from_email', get_option( 'admin_email' ) );
 		$headers[] = 'From: ' . $from_name . ' <' . $from_email . '>';
-		
-		error_log( 'BPFN Email: Calling wp_mail' );
-		
+
 		// Send email
 		$sent = wp_mail( $email_data['to'], $subject, $message, $headers );
-		
-		error_log( 'BPFN Email: wp_mail result: ' . ( $sent ? 'success' : 'failed' ) );
-		
+
 		// Log event
 		bpfn_log_event( 'email_sent', array(
 			'to' => $email_data['to'],
@@ -230,10 +220,10 @@ class BPFN_Module_Email {
 			'sent' => $sent,
 			'is_test' => ! empty( $email_data['is_test'] ),
 		) );
-		
+
 		// Trigger action
 		do_action( 'bpfn_after_send_email', $sent, $email_data );
-		
+
 		return $sent;
 	}
 

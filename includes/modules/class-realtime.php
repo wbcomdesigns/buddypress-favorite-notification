@@ -152,14 +152,19 @@ class BPFN_Module_Realtime {
 	 * Check if realtime is enabled for user
 	 */
 	private function is_realtime_enabled_for_user( $user_id ) {
+		// Realtime notifications are always available
+		// Check user preferences only
+		// If user hasn't set preferences, defaults have realtime_enabled: 1
 		$settings = bpfn_get_user_settings( $user_id );
-		
+
+		// Check if user has any notification type with realtime enabled
 		foreach ( $settings as $type => $options ) {
 			if ( ! empty( $options['realtime_enabled'] ) ) {
-				return true;
+				return true;  // User wants realtime notifications
 			}
 		}
-		
+
+		// User has explicitly disabled all realtime notifications
 		return false;
 	}
 

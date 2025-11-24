@@ -186,21 +186,15 @@ class BPFN_Module_Assets {
 	 * Check if real-time assets should be loaded
 	 */
 	private function should_load_realtime() {
+		// Realtime notifications are always available
+		// Load assets for all logged-in users
+		// User preferences control whether notifications are actually shown
 		$user_id = get_current_user_id();
 		if ( ! $user_id ) {
-			return false;
+			return false;  // Not logged in
 		}
-		
-		$settings = bpfn_get_user_settings( $user_id );
-		
-		// Check if any notification type has real-time enabled
-		foreach ( $settings as $type => $options ) {
-			if ( ! empty( $options['realtime_enabled'] ) ) {
-				return true;
-			}
-		}
-		
-		return false;
+
+		return true;
 	}
 
 	/**
