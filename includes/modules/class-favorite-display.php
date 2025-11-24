@@ -253,6 +253,11 @@ class BPFN_Module_Favorite_Display {
 	 * Display favorite count on activity
 	 */
 	public function display_favorite_count() {
+		// Only show to logged-in users
+		if ( ! is_user_logged_in() ) {
+			return;
+		}
+
 		if ( ! bp_is_active( 'activity' ) ) {
 			return;
 		}
