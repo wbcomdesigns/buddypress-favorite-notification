@@ -1,0 +1,34 @@
+{
+  "name": "buddypress-favorite-notification",
+  "version": "2.0.0",
+  "description": "BuddyPress Favorite Notification - Send notifications when activities are favorited",
+  "main": "bp-favorite-notification.php",
+  "scripts": {
+    "build": "grunt build",
+    "makepot": "grunt makepot",
+    "checktextdomain": "grunt checktextdomain",
+    "zip": "grunt compress",
+    "clean": "grunt clean",
+    "watch": "grunt watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wbcomdesigns/buddypress-favorite-notification"
+  },
+  "keywords": [
+    "buddypress",
+    "notifications",
+    "favorites",
+    "wordpress"
+  ],
+  "author": "Wbcom Designs",
+  "license": "GPL-2.0-or-later",
+  "devDependencies": {
+    "grunt": "^1.6.1",
+    "grunt-checktextdomain": "^1.0.1",
+    "grunt-contrib-clean": "^2.0.1",
+    "grunt-contrib-compress": "^2.0.0",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-wp-i18n": "^1.0.3"
+  }
+}

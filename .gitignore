@@ -1,0 +1,27 @@
+# Node modules
+node_modules/
+npm-debug.log*
+
+# Build directory
+dist/
+
+# Composer
+vendor/
+composer.lock
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Test coverage
+coverage/
+.phpunit.result.cache
