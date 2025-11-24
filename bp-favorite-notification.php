@@ -125,9 +125,21 @@ class BP_Favorite_Notification {
 	public function init() {
 		// Load modules - let compat layer handle component setup
 		add_action( 'bp_init', array( $this, 'load_modules' ), 5 );
-		
+
+		// Initialize migration hooks
+		$this->init_migration_hooks();
+
 		// Allow developers to hook into initialization
 		do_action( 'bpfn_init', $this );
+	}
+
+	/**
+	 * Initialize migration hooks
+	 */
+	private function init_migration_hooks() {
+		require_once BPFN_INCLUDES_PATH . 'migrations/class-favorites-migration.php';
+		$migration = new BPFN_Favorites_Migration();
+		$migration->register_hooks();
 	}
 
 	/**
@@ -198,6 +210,17 @@ class BP_Favorite_Notification {
 	public function activate() {
 		$this->create_tables();
 		update_option( 'bpfn_version', BPFN_VERSION );
+
+		// Check if migration is needed
+		require_once BPFN_INCLUDES_PATH . 'migrations/class-favorites-migration.php';
+		$migration = new BPFN_Favorites_Migration();
+		$stats = $migration->get_migration_stats();
+
+		// Set flag if migration is pending
+		if ( $stats['migration_pending'] ) {
+			update_option( 'bpfn_show_migration_notice', true );
+		}
+
 		do_action( 'bpfn_activate' );
 	}
 

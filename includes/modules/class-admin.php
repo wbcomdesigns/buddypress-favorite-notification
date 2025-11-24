@@ -50,7 +50,10 @@ class BPFN_Module_Admin {
 		
 		// Admin assets
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
-		
+
+		// Admin notices
+		add_action( 'admin_notices', array( $this, 'migration_notice' ) );
+
 		// AJAX handlers
 		$this->register_ajax_handlers();
 	}
@@ -62,7 +65,8 @@ class BPFN_Module_Admin {
 		$ajax_actions = array(
 			'clear_old_notifications',
 			'get_stats',
-			'migrate_favorites'
+			'migrate_favorites',
+			'migration_progress'
 		);
 
 		foreach ( $ajax_actions as $action ) {
@@ -462,15 +466,99 @@ class BPFN_Module_Admin {
 		require_once BPFN_INCLUDES_PATH . 'migrations/class-favorites-migration.php';
 		$migration = new BPFN_Favorites_Migration();
 
-		$log = $migration->run_migration();
+		// Check if we should use background processing
+		$stats = $migration->get_migration_stats();
+		$use_background = $stats['users_with_favorites'] > 100; // Use background for 100+ users
 
-		if ( isset( $log['message'] ) ) {
+		if ( $use_background ) {
+			// Start background migration
+			$result = $migration->start_migration();
 			wp_send_json_success( array(
-				'message' => $log['message'],
-				'log'     => $log
+				'message'    => $result['message'],
+				'background' => true,
 			) );
 		} else {
-			wp_send_json_error( array( 'message' => __( 'Migration failed', 'bp-fav-notification' ) ) );
+			// Run synchronously for small sites
+			$log = $migration->run_migration();
+
+			if ( isset( $log['message'] ) ) {
+				wp_send_json_success( array(
+					'message'    => $log['message'],
+					'log'        => $log,
+					'background' => false,
+				) );
+			} else {
+				wp_send_json_error( array( 'message' => __( 'Migration failed', 'bp-fav-notification' ) ) );
+			}
 		}
+	}
+
+	/**
+	 * AJAX handler to check migration progress
+	 */
+	public function ajax_migration_progress() {
+		check_ajax_referer( 'bpfn-admin-nonce', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'bp-fav-notification' ) ) );
+		}
+
+		require_once BPFN_INCLUDES_PATH . 'migrations/class-favorites-migration.php';
+		$migration = new BPFN_Favorites_Migration();
+
+		$progress = $migration->get_migration_progress();
+
+		wp_send_json_success( $progress );
+	}
+
+	/**
+	 * Show migration notice
+	 */
+	public function migration_notice() {
+		// Only show on admin pages
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		// Check if notice should be shown
+		if ( ! get_option( 'bpfn_show_migration_notice', false ) ) {
+			return;
+		}
+
+		require_once BPFN_INCLUDES_PATH . 'migrations/class-favorites-migration.php';
+		$migration = new BPFN_Favorites_Migration();
+		$stats = $migration->get_migration_stats();
+
+		// Don't show if migration is complete
+		if ( $stats['migrated'] || ! $stats['migration_pending'] ) {
+			delete_option( 'bpfn_show_migration_notice' );
+			return;
+		}
+
+		$tools_url = admin_url( 'admin.php?page=bpfn-tools' );
+		?>
+		<div class="notice notice-info is-dismissible" data-dismissible="bpfn-migration-notice">
+			<p>
+				<strong><?php _e( 'BuddyPress Favorite Notification:', 'bp-fav-notification' ); ?></strong>
+				<?php
+				printf(
+					/* translators: 1: number of users, 2: number of favorites, 3: tools page link */
+					__( 'Found %1$d users with %2$d favorites that need to be migrated to the new optimized system. <a href="%3$s">Run migration now</a>', 'bp-fav-notification' ),
+					$stats['users_with_favorites'],
+					$stats['meta_favorites_count'],
+					esc_url( $tools_url )
+				);
+				?>
+			</p>
+		</div>
+		<script>
+		jQuery(document).on('click', '[data-dismissible="bpfn-migration-notice"] .notice-dismiss', function() {
+			jQuery.post(ajaxurl, {
+				action: 'bpfn_dismiss_migration_notice',
+				nonce: '<?php echo wp_create_nonce( 'bpfn-dismiss-notice' ); ?>'
+			});
+		});
+		</script>
+		<?php
 	}
 }

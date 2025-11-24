@@ -225,7 +225,7 @@
             }
 
             $button.prop('disabled', true);
-            $button.html('<span class="dashicons dashicons-update spin"></span> Migrating...');
+            $button.html('<span class="dashicons dashicons-update spin"></span> Starting migration...');
             $result.html('');
 
             $.ajax({
@@ -237,11 +237,27 @@
                 },
                 success: function(response) {
                     if (response.success) {
-                        $result.html('<div class="notice notice-success inline"><p>' + response.data.message + '</p></div>');
-                        // Reload page after 2 seconds to show new stats
-                        setTimeout(function() {
-                            location.reload();
-                        }, 2000);
+                        // Check if background migration
+                        if (response.data.background) {
+                            // Show progress bar
+                            $result.html('<div class="notice notice-info inline">' +
+                                '<p>' + response.data.message + '</p>' +
+                                '<div class="bpfn-progress-wrapper">' +
+                                    '<div class="bpfn-progress-bar">' +
+                                        '<div class="bpfn-progress-fill" style="width: 0%;"></div>' +
+                                    '</div>' +
+                                    '<div class="bpfn-progress-text">0%</div>' +
+                                '</div>' +
+                            '</div>');
+                            // Start polling for progress
+                            self.checkMigrationProgress();
+                        } else {
+                            // Synchronous migration completed
+                            $result.html('<div class="notice notice-success inline"><p>' + response.data.message + '</p></div>');
+                            setTimeout(function() {
+                                location.reload();
+                            }, 2000);
+                        }
                     } else {
                         $result.html('<div class="notice notice-error inline"><p>' + (response.data.message || 'Migration failed.') + '</p></div>');
                         $button.prop('disabled', false);
@@ -252,6 +268,56 @@
                     $result.html('<div class="notice notice-error inline"><p>An error occurred: ' + error + '</p></div>');
                     $button.prop('disabled', false);
                     $button.text(originalText);
+                }
+            });
+        },
+
+        /**
+         * Check migration progress (polling for background migration)
+         */
+        checkMigrationProgress: function() {
+            var self = this;
+            var $result = $('#bpfn-migrate-result');
+
+            $.ajax({
+                url: bpfnAdmin.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'bpfn_migration_progress',
+                    nonce: bpfnAdmin.nonce
+                },
+                success: function(response) {
+                    if (response.success) {
+                        var progress = response.data;
+
+                        // Update progress bar
+                        $('.bpfn-progress-fill').css('width', progress.percent + '%');
+                        $('.bpfn-progress-text').text(progress.percent + '% (' + progress.users_processed + '/' + progress.total_users + ' users)');
+
+                        if (progress.status === 'completed') {
+                            // Migration complete
+                            $result.html('<div class="notice notice-success inline">' +
+                                '<p>Migration completed! Processed ' + progress.users_processed + ' users and added ' + progress.favorites_added + ' favorites.</p>' +
+                            '</div>');
+                            setTimeout(function() {
+                                location.reload();
+                            }, 2000);
+                        } else if (progress.status === 'running') {
+                            // Continue polling
+                            setTimeout(function() {
+                                self.checkMigrationProgress();
+                            }, 2000);
+                        } else {
+                            // Error or cancelled
+                            $result.html('<div class="notice notice-error inline"><p>Migration ' + progress.status + '</p></div>');
+                        }
+                    }
+                },
+                error: function() {
+                    // Retry on error
+                    setTimeout(function() {
+                        self.checkMigrationProgress();
+                    }, 3000);
                 }
             });
         },
