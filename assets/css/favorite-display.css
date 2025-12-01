@@ -264,12 +264,6 @@ body.bpfn-modal-open {
 	padding-top: 8px;
 }
 
-.activity-item .bpfn-favorite-display,
-.activity-inner .bpfn-favorite-display {
-	border-top: 1px solid #eee;
-	margin-top: 10px;
-}
-
 /* BuddyX Theme Specific */
 .buddyx-pro .bpfn-favorite-display {
 	padding: 12px 0;
