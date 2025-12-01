@@ -174,7 +174,7 @@
 }
 
 /* Section Titles */
-h2.title {
+.bpfn-admin-section h2.title {
     margin-top: 0;
     margin-bottom: 20px;
     padding: 12px 0 12px 12px;
@@ -185,9 +185,11 @@ h2.title {
 }
 
 /* Postbox headings */
-.bpfn-admin-section .postbox h2.hndle,
-.bpfn-admin-section .postbox h3.hndle {
-    padding-left: 16px;
+.bpfn-admin-section .postbox h3.title {
+    margin: 0;
+    padding: 12px 0 12px 12px;
+    border-bottom: 1px solid #c3c4c7;
+    color: #1d2327;
 }
 
 /* Postbox inside content */

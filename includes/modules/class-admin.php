@@ -254,7 +254,7 @@ class BPFN_Module_Admin {
 
 		<!-- Recent Activity -->
 		<div class="postbox">
-			<h2 class="hndle"><?php _e( 'Recent Favorites (Last 7 Days)', 'bp-fav-notification' ); ?></h2>
+			<h3 class="title"><?php _e( 'Recent Favorites (Last 7 Days)', 'bp-fav-notification' ); ?></h3>
 			<div class="inside">
 				<?php $this->render_recent_activity( $stats ); ?>
 			</div>
@@ -263,14 +263,14 @@ class BPFN_Module_Admin {
 		<!-- Trending Activities -->
 		<div class="bpfn-trending-wrapper">
 			<div class="postbox">
-				<h2 class="hndle"><?php _e( 'Trending Activities (Last 7 Days)', 'bp-fav-notification' ); ?></h2>
+				<h3 class="title"><?php _e( 'Trending Activities (Last 7 Days)', 'bp-fav-notification' ); ?></h3>
 				<div class="inside">
 					<?php $this->render_trending_activities( $stats, 7 ); ?>
 				</div>
 			</div>
 
 			<div class="postbox">
-				<h2 class="hndle"><?php _e( 'Trending Activities (Last 30 Days)', 'bp-fav-notification' ); ?></h2>
+				<h3 class="title"><?php _e( 'Trending Activities (Last 30 Days)', 'bp-fav-notification' ); ?></h3>
 				<div class="inside">
 					<?php $this->render_trending_activities( $stats, 30 ); ?>
 				</div>
@@ -492,7 +492,7 @@ class BPFN_Module_Admin {
 		<h2 class="title"><?php _e( 'Settings', 'bp-fav-notification' ); ?></h2>
 
 		<div class="postbox">
-			<h2 class="hndle"><?php _e( 'Notification Settings', 'bp-fav-notification' ); ?></h2>
+			<h3 class="title"><?php _e( 'Notification Settings', 'bp-fav-notification' ); ?></h3>
 			<div class="inside">
 				<form method="post" action="options.php">
 					<?php
@@ -520,7 +520,7 @@ class BPFN_Module_Admin {
 				$stats = $migration->get_migration_stats();
 				?>
 				<div class="postbox">
-					<h3 class="hndle"><?php _e( 'Migrate Favorites', 'bp-fav-notification' ); ?></h3>
+					<h3 class="title"><?php _e( 'Migrate Favorites', 'bp-fav-notification' ); ?></h3>
 					<div class="inside">
 						<?php if ( $stats['migrated'] ) : ?>
 							<div class="notice notice-success inline">
@@ -578,7 +578,7 @@ class BPFN_Module_Admin {
 
 				<!-- Clear Old Notifications -->
 				<div class="postbox">
-					<h3 class="hndle"><?php _e( 'Database Maintenance', 'bp-fav-notification' ); ?></h3>
+					<h3 class="title"><?php _e( 'Database Maintenance', 'bp-fav-notification' ); ?></h3>
 					<div class="inside">
 						<p><?php _e( 'Remove read notifications older than a specified period to keep your database clean.', 'bp-fav-notification' ); ?></p>
 
@@ -681,7 +681,7 @@ class BPFN_Module_Admin {
 						<hr style="margin: 20px 0;">
 
 						<!-- Manual Cleanup -->
-						<h4><?php _e( 'Manual Cleanup', 'bp-fav-notification' ); ?></h4>
+						<h3><?php _e( 'Manual Cleanup', 'bp-fav-notification' ); ?></h3>
 						<p><?php _e( 'Run cleanup immediately without waiting for the automatic schedule.', 'bp-fav-notification' ); ?></p>
 						<button class="button" id="bpfn-clear-old-notifications">
 							<?php _e( 'Clear Old Notifications Now', 'bp-fav-notification' ); ?>
