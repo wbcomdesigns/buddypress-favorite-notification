@@ -3,9 +3,9 @@ Contributors: vapvarun, wbcomdesigns
 Donate link: https://wbcomdesigns.com/donate/
 Tags: buddypress, notifications, favorites, activity, realtime
 Requires at least: 5.0
-Tested up to: 6.7
+Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.0.0
+Stable tag: 2.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -181,6 +181,13 @@ Yes! The plugin provides extensive hooks, filters, and a modular architecture de
 
 == Changelog ==
 
+= 2.0.1 - 2026-02-19 =
+* Fixed: WordPress Coding Standards compliance across all PHP files.
+* Fixed: Text domain corrected to match plugin slug.
+* Fixed: Added sanitize callback for register_setting.
+* Fixed: Removed deprecated load_plugin_textdomain call.
+* Updated: Tested up to WordPress 6.9.
+
 = 2.0.0 - 2025-11-24 =
 
 **Major Release - Production Ready with Favorite Display & Analytics**
@@ -310,8 +317,11 @@ This release includes critical bug fixes, enhanced features, comprehensive testi
 
 == Upgrade Notice ==
 
+= 2.0.1 =
+Code quality update with WordPress Coding Standards compliance and Plugin Check fixes.
+
 = 2.0.0 =
-Major update with favorite display, analytics dashboard, and critical bug fixes. This version adds Facebook-style "who liked" display, trending analytics, optimized database with automatic migration, database cleanup tools, and unified admin interface. Fixes duplicate emails and adds enhanced notification styling. Fully tested and production-ready.
+Major update with favorite display, analytics dashboard, optimized database, and critical bug fixes. Fully tested and production-ready.
 
 = 1.2.3 =
 Maintenance update with comprehensive testing and code quality improvements. Recommended for all users.

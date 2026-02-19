@@ -1,11 +1,11 @@
 <?php
 /**
- * Base email template
+ * Base email template.
  *
  * @package BuddyPress_Favorite_Notification
  */
 
-// Exit if accessed directly
+// Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -26,12 +26,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</noscript>
 	<![endif]-->
 	<style>
-		/* Reset styles */
+		/* Reset styles. */
 		body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
 		table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
 		img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
-		
-		/* Main styles */
+
+		/* Main styles. */
 		body {
 			margin: 0 !important;
 			padding: 0 !important;
@@ -41,45 +41,45 @@ if ( ! defined( 'ABSPATH' ) ) {
 			line-height: 1.6;
 			color: #333333;
 		}
-		
-		/* Container */
+
+		/* Container. */
 		.email-container {
 			max-width: 600px;
 			margin: 0 auto;
 			background-color: #ffffff;
 		}
-		
-		/* Header */
+
+		/* Header. */
 		.email-header {
 			background-color: <?php echo esc_attr( $header_color ?? '#1d84b5' ); ?>;
 			padding: 30px;
 			text-align: center;
 		}
-		
+
 		.email-header h1 {
 			margin: 0;
 			color: #ffffff;
 			font-size: 24px;
 			font-weight: normal;
 		}
-		
-		/* Content */
+
+		/* Content. */
 		.email-content {
 			padding: 40px 30px;
 		}
-		
+
 		.email-content h2 {
 			margin-top: 0;
 			margin-bottom: 20px;
 			color: #333333;
 			font-size: 20px;
 		}
-		
+
 		.email-content p {
 			margin: 0 0 20px;
 		}
-		
-		/* Activity excerpt */
+
+		/* Activity excerpt. */
 		.activity-excerpt {
 			background-color: #f8f8f8;
 			border-left: 4px solid <?php echo esc_attr( $accent_color ?? '#ff7b00' ); ?>;
@@ -88,8 +88,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 			font-style: italic;
 			color: #666666;
 		}
-		
-		/* Button */
+
+		/* Button. */
 		.email-button {
 			display: inline-block;
 			padding: 12px 30px;
@@ -100,41 +100,41 @@ if ( ! defined( 'ABSPATH' ) ) {
 			font-weight: bold;
 			margin: 20px 0;
 		}
-		
+
 		.email-button:hover {
 			background-color: <?php echo esc_attr( $button_hover_color ?? '#166b94' ); ?>;
 		}
-		
-		/* User info */
+
+		/* User info. */
 		.user-info {
 			display: table;
 			margin: 20px 0;
 		}
-		
+
 		.user-avatar {
 			display: table-cell;
 			vertical-align: top;
 			padding-right: 15px;
 		}
-		
+
 		.user-avatar img {
 			width: 60px;
 			height: 60px;
 			border-radius: 50%;
 		}
-		
+
 		.user-details {
 			display: table-cell;
 			vertical-align: middle;
 		}
-		
+
 		.user-name {
 			font-weight: bold;
 			color: #333333;
 			margin-bottom: 5px;
 		}
-		
-		/* Footer */
+
+		/* Footer. */
 		.email-footer {
 			background-color: #f8f8f8;
 			padding: 30px;
@@ -142,27 +142,27 @@ if ( ! defined( 'ABSPATH' ) ) {
 			font-size: 14px;
 			color: #666666;
 		}
-		
+
 		.email-footer a {
 			color: <?php echo esc_attr( $link_color ?? '#1d84b5' ); ?>;
 			text-decoration: none;
 		}
-		
+
 		.email-footer a:hover {
 			text-decoration: underline;
 		}
-		
+
 		.email-footer .separator {
 			margin: 0 10px;
 			color: #cccccc;
 		}
-		
-		/* Responsive */
+
+		/* Responsive. */
 		@media screen and (max-width: 600px) {
 			.email-container {
 				width: 100% !important;
 			}
-			
+
 			.email-content {
 				padding: 30px 20px !important;
 			}
@@ -178,29 +178,30 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<div class="email-header">
 						<h1><?php echo esc_html( $site_name ?? get_bloginfo( 'name' ) ); ?></h1>
 					</div>
-					
+
 					<!-- Content -->
 					<div class="email-content">
-						<?php 
-						// Include specific email template content
+						<?php
+						// Include specific email template content.
 						if ( isset( $email_content ) ) {
+							// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Content already escaped in child templates.
 							echo $email_content;
 						}
 						?>
 					</div>
-					
+
 					<!-- Footer -->
 					<div class="email-footer">
 						<p>
-							<?php _e( 'You received this email because you have notifications enabled.', 'bp-fav-notification' ); ?>
+							<?php esc_html_e( 'You received this email because you have notifications enabled.', 'buddypress-favorite-notification' ); ?>
 						</p>
 						<p>
 							<a href="<?php echo esc_url( $settings_link ?? '#' ); ?>">
-								<?php _e( 'Manage Notifications', 'bp-fav-notification' ); ?>
+								<?php esc_html_e( 'Manage Notifications', 'buddypress-favorite-notification' ); ?>
 							</a>
 							<span class="separator">|</span>
 							<a href="<?php echo esc_url( $site_url ?? home_url() ); ?>">
-								<?php _e( 'Visit Site', 'bp-fav-notification' ); ?>
+								<?php esc_html_e( 'Visit Site', 'buddypress-favorite-notification' ); ?>
 							</a>
 						</p>
 					</div>
