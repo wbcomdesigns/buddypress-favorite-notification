@@ -96,3 +96,40 @@ All keys referenced in code post-migration (verified by grep). Option-group/name
 ## Needs human eyes
 
 - Browser smoke per playbook Part 13 (activate on a BuddyPress site, click both Tools buttons, save the Settings tab, save the cleanup form, dismiss the migration nag and reload, verify the BP member Settings → Favorite Notifications subnav renders + saves). This site has the plugin inactive, so the live click-through was not performed.
+
+---
+
+## PERF — Big-site N+1 / scale fixes (2026-06-05)
+
+**Scope:** Performance refactor only. No behavioural / output change for realistic sizes; admin card wrapper, dead-module fix, and dismiss-AJAX from the prior pass are untouched. Targets the two N+1 hot paths flagged in `WRAPPER-AUDIT.md` / `audit/manifest.json` (`static_analysis.n_plus_one_risks`).
+
+### Files + lines changed
+
+1. `includes/modules/class-favorite-display.php`
+   - `get_users_who_favorited()` (~L190-212): added `cache_users( $user_ids )` single-query prime before the `foreach`, so each `get_userdata()` in the loop is a cache hit instead of one query per row. Order preserved (still iterates the DB-ordered `$user_ids`).
+   - `ajax_get_all_favorites()` (~L367-384): replaced the hard `limit 999` with a bounded `apply_filters( 'bpfn_who_favorited_limit', 50, $activity_id )` (floored at 1; default 50). Added a `+N more` footer (`bpfn-favorites-more`) driven by the existing `remaining` value (which derives from the `COUNT(*)` total, not from pulling rows).
+   - Modal markup (~L400-413): added the `+N more` `<p>` rendered only when `remaining > 0`.
+   - `clear_cache()` (~L430-445): now also deletes the bounded modal cache key (`users_{id}_{limit}_0`) and the legacy `_999_0` key, and calls `delete_transient( 'bpfn_dashboard_stats' )` to invalidate the dashboard stats cache on every favorite add/remove (via the existing `sync_favorite_add` / `sync_favorite_remove` hooks).
+
+2. `includes/admin/views/overview.php`
+   - Stats block (~L38-123): wrapped the counts + recent + trending aggregate queries in a short-TTL transient `bpfn_dashboard_stats` (`apply_filters( 'bpfn_dashboard_stats_ttl', 5 * MINUTE_IN_SECONDS )`). Repeated dashboard loads skip the `GROUP BY` scans; invalidated on favorite change (above).
+   - Batch-fetch block (~L129-176): before rendering, collect every activity ID (recent + both trending windows) and resolve them with ONE `bp_activity_get( in => $ids, update_meta_cache => false, display_comments => false )` into `$bpfn_activity_map`, then prime all author/favoriter users with ONE `cache_users( $bpfn_user_ids )`.
+   - `recent_activities` loop (~L261): `get_userdata()` now served from the prime (cache hit, no per-row query).
+   - `$bpfn_render_trending` closure (~L304-326): `use ( $bpfn_activity_map )`; replaced the per-row `bp_activity_get_specific()` with an array lookup into the prebuilt map, and `get_userdata()` is cache-served. Order preserved (still iterates `$rows` in trending rank order).
+
+### Batch / bound / cache approach
+
+- **Bound:** who-favorited fetch limited to a filterable `bpfn_who_favorited_limit` (default 50) instead of 999. Overflow shown as `+N more`, where N = `COUNT(*)` total − shown — no extra rows pulled to compute it.
+- **Batch:** modal/footer user list primes via `cache_users()` (1 query for N users). Dashboard primes activities via 1 `bp_activity_get( in => [...] )` and users via 1 `cache_users( [...] )`. Zero per-row `get_userdata()` / `bp_activity_get_specific()` queries remain in any render loop.
+- **Cache:** per-request repeated dashboard aggregate queries cached in transient `bpfn_dashboard_stats` (5-min TTL, filterable), invalidated on favorite add/remove through `clear_cache()`.
+
+### Verification
+
+- `php -l` — both files: "No syntax errors detected".
+- WPCS (wpcs MCP `wpcs_check_file`) — both files: "No coding standard violations found". (overview.php scope-indent from the new transient `else {` block auto-fixed via `wpcs_fix_file`; re-checked green. No new sniffs.)
+- Grep confirms: `bp_activity_get_specific` no longer called (comment only); `999` only in the legacy cache-key cleanup; the bound/batch/cache constructs (`bpfn_who_favorited_limit`, `cache_users`, `bp_activity_get(`, `delete_transient`, `$bpfn_activity_map`) all present.
+- Not committed / not pushed (per instruction).
+
+### Needs human eyes (perf)
+
+- Live big-site smoke: seed a hot activity with 500+ favorites + a 1000-row favorites table, load the dashboard, and confirm via Query Monitor that the who-liked modal issues one user query and the dashboard issues one `bp_activity_get` + one `cache_users` (plugin is inactive on this sandbox, so the live query count was not captured here).

@@ -172,7 +172,7 @@ class BPFN_Module_Favorite_Display {
 			return $result;
 		}
 
-		// Get user IDs.
+		// Get user IDs (bounded by LIMIT/OFFSET, never an unbounded fetch).
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table with object cache.
 		$user_ids = $wpdb->get_col(
 			$wpdb->prepare(
@@ -187,7 +187,14 @@ class BPFN_Module_Favorite_Display {
 			)
 		);
 
-		// Get user data.
+		// Batch-prime the user cache with a single query so the loop below
+		// resolves each get_userdata() from cache instead of one query per row
+		// (eliminates the N+1 on hot activities / the "show all" modal).
+		if ( ! empty( $user_ids ) ) {
+			cache_users( $user_ids );
+		}
+
+		// Get user data (user objects now served from the primed cache).
 		$users = array();
 		foreach ( $user_ids as $user_id ) {
 			$user = get_userdata( $user_id );
@@ -349,7 +356,22 @@ class BPFN_Module_Favorite_Display {
 			wp_send_json_error( array( 'message' => esc_html__( 'Invalid activity ID', 'buddypress-favorite-notification' ) ) );
 		}
 
-		$users_data = $this->get_users_who_favorited( $activity_id, 999 ); // Get all users.
+		/**
+		 * Filter the maximum number of users loaded into the "who favorited" modal.
+		 *
+		 * Bounds the fetch instead of pulling every row on a hot activity. The
+		 * modal shows up to this many avatars; any beyond it are surfaced as a
+		 * "+N more" count derived from the COUNT(*) total.
+		 *
+		 * @param int $limit       Maximum users to load. Default 50.
+		 * @param int $activity_id The activity ID.
+		 */
+		$modal_limit = (int) apply_filters( 'bpfn_who_favorited_limit', 50, $activity_id );
+		if ( $modal_limit < 1 ) {
+			$modal_limit = 50;
+		}
+
+		$users_data = $this->get_users_who_favorited( $activity_id, $modal_limit );
 
 		ob_start();
 		?>
@@ -377,6 +399,17 @@ class BPFN_Module_Favorite_Display {
 					</li>
 				<?php endforeach; ?>
 			</ul>
+			<?php if ( ! empty( $users_data['remaining'] ) ) : ?>
+				<p class="bpfn-favorites-more">
+					<?php
+					printf(
+						/* translators: %s: Number of additional users who favorited. */
+						esc_html( _n( '+%s more', '+%s more', (int) $users_data['remaining'], 'buddypress-favorite-notification' ) ),
+						esc_html( number_format_i18n( (int) $users_data['remaining'] ) )
+					);
+					?>
+				</p>
+			<?php endif; ?>
 		</div>
 		<?php
 		$html = ob_get_clean();
@@ -397,8 +430,19 @@ class BPFN_Module_Favorite_Display {
 			wp_cache_delete( 'users_' . $activity_id . '_3_' . $i, $this->cache_group );
 		}
 
-		// Clear full list cache.
+		// Clear the bounded "who favorited" modal cache (filterable limit, offset 0).
+		$modal_limit = (int) apply_filters( 'bpfn_who_favorited_limit', 50, $activity_id );
+		if ( $modal_limit < 1 ) {
+			$modal_limit = 50;
+		}
+		wp_cache_delete( 'users_' . $activity_id . '_' . $modal_limit . '_0', $this->cache_group );
+
+		// Clear legacy full-list cache key from pre-2.0.1 (limit 999) builds.
 		wp_cache_delete( 'users_' . $activity_id . '_999_0', $this->cache_group );
+
+		// Invalidate the admin dashboard stats transient so trending / recent
+		// counts reflect this favorite change on the next dashboard load.
+		delete_transient( 'bpfn_dashboard_stats' );
 	}
 
 	/**
