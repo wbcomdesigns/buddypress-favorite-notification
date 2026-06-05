@@ -11,6 +11,126 @@
         return;
     }
 
+    var i18n = (bpfnAdmin && bpfnAdmin.strings) || {};
+
+    /* ─── Toast (no native alert) ─────────────────────────────── */
+
+    function getToastHost() {
+        var host = document.querySelector('.bpfn-toast-host');
+        if (!host) {
+            host = document.createElement('div');
+            host.className = 'bpfn-toast-host';
+            document.body.appendChild(host);
+        }
+        return host;
+    }
+
+    function bpfnToast(message, tone) {
+        tone = tone || 'info';
+        var host = getToastHost();
+        var el = document.createElement('div');
+        el.className = 'bpfn-toast bpfn-toast--' + tone;
+        el.setAttribute('role', 'status');
+        el.textContent = String(message);
+        host.appendChild(el);
+
+        window.requestAnimationFrame(function() {
+            el.classList.add('bpfn-toast--visible');
+        });
+
+        window.setTimeout(function() {
+            el.classList.remove('bpfn-toast--visible');
+            window.setTimeout(function() {
+                if (el.parentNode) {
+                    el.parentNode.removeChild(el);
+                }
+            }, 250);
+        }, 3600);
+    }
+
+    window.bpfnToast = bpfnToast;
+
+    /* ─── Confirm modal (returns a Promise, no native confirm) ── */
+
+    function bpfnConfirm(opts) {
+        opts = opts || {};
+        return new Promise(function(resolve) {
+            var backdrop = document.createElement('div');
+            backdrop.className = 'bpfn-confirm-backdrop';
+
+            var card = document.createElement('div');
+            card.className = 'bpfn-confirm';
+            card.setAttribute('role', 'dialog');
+            card.setAttribute('aria-modal', 'true');
+
+            var title = document.createElement('h2');
+            title.className = 'bpfn-confirm__title';
+            title.textContent = opts.title || '';
+            if (opts.title) {
+                card.appendChild(title);
+            }
+
+            var desc = document.createElement('p');
+            desc.className = 'bpfn-confirm__desc';
+            desc.textContent = opts.message || i18n.confirm_danger || '';
+            if (opts.message || i18n.confirm_danger) {
+                card.appendChild(desc);
+            }
+
+            var actions = document.createElement('div');
+            actions.className = 'bpfn-confirm__actions';
+
+            var cancelBtn = document.createElement('button');
+            cancelBtn.type = 'button';
+            cancelBtn.className = 'bpfn-btn bpfn-btn-secondary';
+            cancelBtn.textContent = opts.cancelLabel || i18n.confirm_cancel || 'Cancel';
+
+            var confirmBtn = document.createElement('button');
+            confirmBtn.type = 'button';
+            confirmBtn.className = 'bpfn-btn ' + ('danger' === opts.tone ? 'bpfn-btn-danger' : 'bpfn-btn-primary');
+            confirmBtn.textContent = opts.confirmLabel || i18n.confirm_continue || 'Continue';
+
+            actions.appendChild(cancelBtn);
+            actions.appendChild(confirmBtn);
+            card.appendChild(actions);
+            backdrop.appendChild(card);
+            document.body.appendChild(backdrop);
+
+            function cleanup(result) {
+                document.removeEventListener('keydown', onKey);
+                if (backdrop.parentNode) {
+                    backdrop.parentNode.removeChild(backdrop);
+                }
+                resolve(result);
+            }
+
+            function onKey(e) {
+                if ('Escape' === e.key) {
+                    cleanup(false);
+                }
+                if ('Enter' === e.key) {
+                    cleanup(true);
+                }
+            }
+
+            cancelBtn.addEventListener('click', function() {
+                cleanup(false);
+            });
+            confirmBtn.addEventListener('click', function() {
+                cleanup(true);
+            });
+            backdrop.addEventListener('click', function(e) {
+                if (e.target === backdrop) {
+                    cleanup(false);
+                }
+            });
+            document.addEventListener('keydown', onKey);
+            confirmBtn.focus();
+        });
+    }
+
+    window.bpfnConfirm = bpfnConfirm;
+
     /**
      * Admin handler
      */
@@ -217,12 +337,23 @@
          */
         migrateFavorites: function($button) {
             var self = this;
+            bpfnConfirm({
+                title: i18n.confirm_migrate_title || 'Run migration?',
+                message: i18n.confirm_migrate || 'This will migrate all existing favorites to the new optimized table. Continue?'
+            }).then(function(ok) {
+                if (ok) {
+                    self.runMigrateFavorites($button);
+                }
+            });
+        },
+
+        /**
+         * Run favorites migration (after confirm).
+         */
+        runMigrateFavorites: function($button) {
+            var self = this;
             var originalText = $button.text();
             var $result = $('#bpfn-migrate-result');
-
-            if (!confirm('This will migrate all existing favorites to the new optimized table. Continue?')) {
-                return;
-            }
 
             $button.prop('disabled', true);
             $button.html('<span class="dashicons dashicons-update spin"></span> Starting migration...');
@@ -327,12 +458,24 @@
          */
         clearOldNotifications: function($button) {
             var self = this;
+            bpfnConfirm({
+                title: i18n.confirm_clear_title || 'Clear old notifications?',
+                message: i18n.confirm_clear_old || 'Are you sure you want to clear all read notifications older than 30 days? This cannot be undone.',
+                tone: 'danger'
+            }).then(function(ok) {
+                if (ok) {
+                    self.runClearOldNotifications($button);
+                }
+            });
+        },
+
+        /**
+         * Run clear old notifications (after confirm).
+         */
+        runClearOldNotifications: function($button) {
+            var self = this;
             var originalText = $button.text();
-            
-            if (!confirm('Are you sure you want to clear all read notifications older than 30 days? This cannot be undone.')) {
-                return;
-            }
-            
+
             $button.prop('disabled', true);
             $button.html('<span class="bpfn-spinner"></span> Clearing...');
             
@@ -410,12 +553,23 @@
          */
         bulkUpdateSettings: function($button) {
             var self = this;
+            bpfnConfirm({
+                title: i18n.confirm_bulk_title || 'Update all users?',
+                message: i18n.confirm_bulk || 'This will update notification settings for all users. Continue?'
+            }).then(function(ok) {
+                if (ok) {
+                    self.runBulkUpdateSettings($button);
+                }
+            });
+        },
+
+        /**
+         * Run bulk settings update (after confirm).
+         */
+        runBulkUpdateSettings: function($button) {
+            var self = this;
             var originalText = $button.text();
-            
-            if (!confirm('This will update notification settings for all users. Continue?')) {
-                return;
-            }
-            
+
             $button.prop('disabled', true).text('Updating...');
             
             $.ajax({

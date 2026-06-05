@@ -182,6 +182,11 @@ Yes! The plugin provides extensive hooks, filters, and a modular architecture de
 == Changelog ==
 
 = 2.0.1 - 2026-02-19 =
+* New: Rebuilt the admin into the unified Wbcom card-panel UI under the shared "WB Plugins" menu.
+* Fixed: Per-user notification preferences (BuddyPress member Settings > Favorite Notifications) now load and save correctly — the settings module was previously never loaded.
+* Fixed: Migration-notice dismissal now persists (added the missing AJAX handler).
+* Fixed: Replaced native browser confirm() dialogs in the admin with an accessible confirm modal.
+* Fixed: Removed a duplicate registration of the bpfn_options setting.
 * Fixed: WordPress Coding Standards compliance across all PHP files.
 * Fixed: Text domain corrected to match plugin slug.
 * Fixed: Added sanitize callback for register_setting.

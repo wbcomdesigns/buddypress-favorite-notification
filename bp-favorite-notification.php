@@ -127,6 +127,18 @@ class BP_Favorite_Notification {
 				require_once $path;
 			}
 		}
+
+		// Card-panel admin controller (menu + settings + enqueue + render).
+		// Owns the single registration of the `bpfn_options` Settings API
+		// option and the WB Plugins hub submenu. Admin context only.
+		if ( is_admin() ) {
+			$admin_controller = BPFN_INCLUDES_PATH . 'admin/class-bpfn-admin.php';
+			if ( file_exists( $admin_controller ) ) {
+				require_once $admin_controller;
+				$panel = new BPFN_Admin();
+				$panel->register();
+			}
+		}
 	}
 
 	/**
@@ -162,6 +174,7 @@ class BP_Favorite_Notification {
 			'realtime'         => 'class-realtime.php',
 			'assets'           => 'class-assets.php',
 			'admin'            => 'class-admin.php',
+			'settings'         => 'class-settings.php',
 			'favorite_display' => 'class-favorite-display.php',
 		);
 

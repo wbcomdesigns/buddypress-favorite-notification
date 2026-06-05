@@ -34,18 +34,19 @@ class BPFN_Module_Settings {
 	 * Setup hooks.
 	 */
 	private function setup_hooks() {
-		// Add settings navigation.
+		// Add settings navigation (BP member Settings > Favorite Notifications).
 		add_action( 'bp_setup_nav', array( $this, 'setup_nav' ), 100 );
 
-		// Handle settings save.
+		// Handle per-user settings save.
 		add_action( 'bp_actions', array( $this, 'handle_settings_save' ) );
 
-		// Add to notification settings.
+		// Add to BP notification settings table.
 		add_action( 'bp_notification_settings', array( $this, 'notification_settings' ) );
 
-		// Admin settings.
-		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
-		add_action( 'admin_init', array( $this, 'admin_init' ) );
+		// NOTE: This module no longer registers an admin options page or the
+		// `bpfn_options` Settings API option. Those are owned solely by
+		// BPFN_Admin (includes/admin/class-bpfn-admin.php) as of 2.0.0. This
+		// class is now FRONT-END ONLY (per-user notification preferences).
 
 		// Custom hooks.
 		do_action( 'bpfn_settings_setup_hooks', $this );
@@ -228,112 +229,5 @@ class BPFN_Module_Settings {
 				),
 			)
 		);
-	}
-
-	/**
-	 * Admin menu.
-	 */
-	public function admin_menu() {
-		add_options_page(
-			esc_html__( 'BP Favorite Notification', 'buddypress-favorite-notification' ),
-			esc_html__( 'BP Favorite Notification', 'buddypress-favorite-notification' ),
-			'manage_options',
-			'bpfn-settings',
-			array( $this, 'admin_page' )
-		);
-	}
-
-	/**
-	 * Admin init.
-	 */
-	public function admin_init() {
-		register_setting(
-			'bpfn_settings',
-			'bpfn_options',
-			array(
-				'sanitize_callback' => array( $this, 'sanitize_options' ),
-			)
-		);
-
-		// Add sections and fields.
-		add_settings_section(
-			'bpfn_general',
-			esc_html__( 'General Settings', 'buddypress-favorite-notification' ),
-			array( $this, 'section_general' ),
-			'bpfn-settings'
-		);
-
-		add_settings_field(
-			'enable_enhanced_notifications',
-			esc_html__( 'Enable Enhanced Notifications', 'buddypress-favorite-notification' ),
-			array( $this, 'field_checkbox' ),
-			'bpfn-settings',
-			'bpfn_general',
-			array(
-				'name'  => 'enable_enhanced_notifications',
-				'label' => esc_html__( 'Display enhanced notification content with activity excerpts and user avatars', 'buddypress-favorite-notification' ),
-			)
-		);
-
-		do_action( 'bpfn_admin_init_settings' );
-	}
-
-	/**
-	 * Admin page.
-	 */
-	public function admin_page() {
-		?>
-		<div class="wrap">
-			<h1><?php esc_html_e( 'BuddyPress Favorite Notification Settings', 'buddypress-favorite-notification' ); ?></h1>
-
-			<form method="post" action="options.php">
-				<?php
-				settings_fields( 'bpfn_settings' );
-				do_settings_sections( 'bpfn-settings' );
-				submit_button();
-				?>
-			</form>
-		</div>
-		<?php
-	}
-
-	/**
-	 * General section description.
-	 */
-	public function section_general() {
-		echo '<p>' . esc_html__( 'Configure global settings for BuddyPress Favorite Notifications.', 'buddypress-favorite-notification' ) . '</p>';
-	}
-
-	/**
-	 * Checkbox field.
-	 *
-	 * @param array $args Field arguments.
-	 */
-	public function field_checkbox( $args ) {
-		$options = get_option( 'bpfn_options', array() );
-		$value   = isset( $options[ $args['name'] ] ) ? $options[ $args['name'] ] : 0;
-
-		?>
-		<label>
-			<input type="checkbox" name="bpfn_options[<?php echo esc_attr( $args['name'] ); ?>]" value="1" <?php checked( $value, 1 ); ?> />
-			<?php echo esc_html( $args['label'] ); ?>
-		</label>
-		<?php
-	}
-
-	/**
-	 * Sanitize plugin options.
-	 *
-	 * @param array $input Raw input options.
-	 * @return array Sanitized options.
-	 */
-	public function sanitize_options( $input ) {
-		$sanitized = array();
-
-		if ( isset( $input['enable_enhanced_notifications'] ) ) {
-			$sanitized['enable_enhanced_notifications'] = absint( $input['enable_enhanced_notifications'] );
-		}
-
-		return apply_filters( 'bpfn_sanitize_options', $sanitized, $input );
 	}
 }
