@@ -40,6 +40,11 @@ class BPFN_Module_Admin {
 		// Admin init — only the Tools-tab cleanup save handler now.
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 
+		// Register the custom "monthly" cron interval BEFORE anything tries to
+		// schedule on it — wp_schedule_event() silently fails on an unknown
+		// recurrence, which left the auto-cleanup cron uncreated.
+		add_filter( 'cron_schedules', array( $this, 'register_cron_schedule' ) ); // phpcs:ignore WordPress.WP.CronInterval.ChangeDetected -- Monthly interval is intentional for retention cleanup.
+
 		// Automatic cleanup cron registration.
 		$this->setup_automatic_cleanup();
 
@@ -137,7 +142,15 @@ class BPFN_Module_Admin {
 			wp_send_json_error( array( 'message' => esc_html__( 'Function not available', 'buddypress-favorite-notification' ) ) );
 		}
 
-		$result = bpfn_clear_old_notifications();
+		// Honour the configured retention period instead of the hard-coded
+		// 30-day default, so the manual "Clear Old Notifications Now" action
+		// matches the Automatic Cleanup setting shown on the Tools tab.
+		$days = absint( get_option( 'bpfn_auto_cleanup_days', 30 ) );
+		if ( $days < 7 ) {
+			$days = 7;
+		}
+
+		$result = bpfn_clear_old_notifications( $days );
 
 		if ( isset( $result['count'] ) ) {
 			wp_send_json_success(
@@ -229,6 +242,25 @@ class BPFN_Module_Admin {
 		$progress = $migration->get_migration_progress();
 
 		wp_send_json_success( $progress );
+	}
+
+	/**
+	 * Register the custom "monthly" cron interval.
+	 *
+	 * WordPress only ships hourly/twicedaily/daily/weekly, so scheduling the
+	 * auto-cleanup event on 'monthly' failed until this interval was added.
+	 *
+	 * @param array $schedules Existing cron schedules.
+	 * @return array Schedules including a 'monthly' interval.
+	 */
+	public function register_cron_schedule( $schedules ) {
+		if ( ! isset( $schedules['monthly'] ) ) {
+			$schedules['monthly'] = array(
+				'interval' => MONTH_IN_SECONDS,
+				'display'  => __( 'Once Monthly', 'buddypress-favorite-notification' ),
+			);
+		}
+		return $schedules;
 	}
 
 	/**

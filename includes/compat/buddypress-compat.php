@@ -54,20 +54,21 @@ function bpfn_compat_setup_globals() {
  * @param int    $secondary_item_id The secondary item ID.
  * @param int    $total_items       The total number of items.
  * @param string $format            The notification format.
+ * @param int    $id                The notification id (passed by BuddyPress for mark-as-read).
  * @return string|array|false The formatted notification.
  */
-function bpfn_compat_format_notifications( $action, $item_id, $secondary_item_id, $total_items, $format = 'string' ) {
+function bpfn_compat_format_notifications( $action, $item_id, $secondary_item_id, $total_items, $format = 'string', $id = 0 ) {
 	// Get the main plugin instance.
 	$plugin = bpfn();
 
 	// If we have the notifications module, use it.
 	$notifications_module = $plugin ? $plugin->get_module( 'notifications' ) : null;
 	if ( $notifications_module ) {
-		return $notifications_module->format_notification( $action, $item_id, $secondary_item_id, $total_items, $format );
+		return $notifications_module->format_notification( $action, $item_id, $secondary_item_id, $total_items, $format, $id );
 	}
 
 	// Fallback formatting if module not available.
-	return bpfn_compat_fallback_format( $action, $item_id, $secondary_item_id, $total_items, $format );
+	return bpfn_compat_fallback_format( $action, $item_id, $secondary_item_id, $total_items, $format, $id );
 }
 
 /**
@@ -78,10 +79,14 @@ function bpfn_compat_format_notifications( $action, $item_id, $secondary_item_id
  * @param int    $secondary_item_id The secondary item ID.
  * @param int    $total_items       The total number of items.
  * @param string $format            The notification format.
+ * @param int    $id                The notification id (for mark-as-read on click).
  * @return string|array|false The formatted notification.
  */
-function bpfn_compat_fallback_format( $action, $item_id, $secondary_item_id, $total_items, $format = 'string' ) {
+function bpfn_compat_fallback_format( $action, $item_id, $secondary_item_id, $total_items, $format = 'string', $id = 0 ) {
 	$link = bp_activity_get_permalink( $item_id );
+	if ( $id > 0 ) {
+		$link = add_query_arg( 'rid', (int) $id, $link );
+	}
 	$text = '';
 
 	// Check if this is a favorite notification.

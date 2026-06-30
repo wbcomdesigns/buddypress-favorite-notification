@@ -191,8 +191,9 @@ class BPFN_Module_Notifications {
 			return $action;
 		}
 
-		// Format and return our notification.
-		$formatted = $this->format_notification( $component_action, $item_id, $secondary_item_id, $total_items, $format );
+		// Format and return our notification (pass the notification id so the
+		// link can carry `rid` and be marked read on click).
+		$formatted = $this->format_notification( $component_action, $item_id, $secondary_item_id, $total_items, $format, $id );
 
 		// If we have a valid formatted notification, return it.
 		if ( false !== $formatted ) {
@@ -211,9 +212,10 @@ class BPFN_Module_Notifications {
 	 * @param int    $secondary_item_id The secondary item ID.
 	 * @param int    $total_items       Total items.
 	 * @param string $format            The format.
+	 * @param int    $id                The notification id (for mark-as-read on click).
 	 * @return string|array|false The formatted notification.
 	 */
-	public function format_notification( $action, $item_id, $secondary_item_id, $total_items, $format = 'string' ) {
+	public function format_notification( $action, $item_id, $secondary_item_id, $total_items, $format = 'string', $id = 0 ) {
 		// Get activity.
 		$activity = new BP_Activity_Activity( $item_id );
 		if ( empty( $activity->id ) ) {
@@ -232,8 +234,13 @@ class BPFN_Module_Notifications {
 			$text      = sprintf( $config['labels']['single'], $user_name );
 		}
 
-		// Build link.
+		// Build link. Carry the notification id as `rid` so BuddyPress core
+		// (bp_activity_screen_single_activity_permalink) marks this
+		// notification read when the recipient opens the activity.
 		$link = bp_activity_get_permalink( $item_id );
+		if ( $id > 0 ) {
+			$link = add_query_arg( 'rid', (int) $id, $link );
+		}
 
 		// Return formatted notification.
 		if ( 'string' === $format ) {

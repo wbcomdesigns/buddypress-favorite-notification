@@ -12,6 +12,11 @@
    Design Tokens
    ═══════════════════════════════════════════════════════════ */
 
+/* Defined on :root as well as .bpfn-admin so body-appended UI (the JS confirm
+   modal lives directly under <body>, outside .bpfn-admin) can resolve these
+   tokens — otherwise its background/colours fell back to transparent and the
+   popup rendered see-through over the page. */
+:root,
 .bpfn-admin {
 	/* Accent */
 	--bpfn-admin-accent: #2563eb;

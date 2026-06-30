@@ -52,7 +52,14 @@ class BPFN_Module_Favorite_Display {
 	 */
 	private function setup_hooks() {
 		// Display favorite count on activities.
+		// `bp_activity_before_post_footer_content` is a BuddyX/BuddyX Pro/Reign
+		// theme action, so on every other theme the count never rendered. Also
+		// hook the core `bp_activity_entry_content` action (fired by BuddyPress
+		// Nouveau and Legacy templates) so the count shows on all themes; a
+		// per-activity guard in display_favorite_count() prevents a double
+		// render if a theme happens to fire both.
 		add_action( 'bp_activity_before_post_footer_content', array( $this, 'display_favorite_count' ), 10 );
+		add_action( 'bp_activity_entry_content', array( $this, 'display_favorite_count' ), 20 );
 
 		// Sync with BuddyPress favorite actions.
 		add_action( 'bp_activity_add_user_favorite', array( $this, 'sync_favorite_add' ), 10, 2 );
@@ -267,6 +274,12 @@ class BPFN_Module_Favorite_Display {
 		$names = array();
 		$shown = min( 2, count( $users ) );
 
+		// The "and N others" count must reflect the names actually shown (2),
+		// not the fetch LIMIT (3). Deriving it from the fetch limit produced an
+		// off-by-one ("user1, user2 and 1" for 4 likes) and, when the total was
+		// exactly 3, dropped the third liker into a plain "user1 and user2".
+		$remaining = max( 0, $total - $shown );
+
 		for ( $i = 0; $i < $shown; $i++ ) {
 			if ( isset( $users[ $i ] ) ) {
 				$names[] = sprintf(
@@ -311,6 +324,14 @@ class BPFN_Module_Favorite_Display {
 		if ( ! $activity_id ) {
 			return;
 		}
+
+		// Render the count once per activity per request, even if more than one
+		// supported hook fires for it (theme footer action + core entry action).
+		static $rendered = array();
+		if ( isset( $rendered[ $activity_id ] ) ) {
+			return;
+		}
+		$rendered[ $activity_id ] = true;
 
 		$count = $this->get_favorite_count( $activity_id );
 
