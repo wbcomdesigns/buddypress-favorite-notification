@@ -56,6 +56,17 @@ class BPFN_Module_Assets {
 
 		// Favorite display assets.
 		$this->enqueue_favorite_display_assets();
+
+		// Member "Settings > Favorite Notifications" screen styles
+		// (templates/settings/notifications.php, BPFN_Module_Settings).
+		if ( function_exists( 'bp_is_settings_component' ) && bp_is_settings_component() && bp_is_current_action( 'notifications' ) ) {
+			wp_enqueue_style(
+				'bpfn-settings',
+				BPFN_ASSETS_URL . 'css/settings.css',
+				array( 'bpfn-notifications' ),
+				BPFN_VERSION
+			);
+		}
 	}
 
 	/**
