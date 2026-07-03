@@ -32,27 +32,47 @@ follows **`/ux-foundation`**; audit drift with **`/ux-audit`**. Onboarding artef
 - No REST, no blocks, no shortcodes, no CPTs.
 
 ## Admin UI
-- ONE active admin page: top-level **`bpfn-dashboard`** (cap `manage_options`, hook
-  `toplevel_page_bpfn-dashboard`), rendered by `BPFN_Module_Admin::admin_page`, three inline
-  sections (Overview / Settings / Tools). Uses classic WP `postbox`/`wp-list-table` markup —
-  NOT the modern Wbcom card shell; a future UI pass should align it to `/ux-foundation`.
-- A SECOND options page (`bpfn-settings`, `BPFN_Module_Settings`) exists in code but is
-  **DEAD** — the module is never loaded.
+- ONE admin page: submenu **`bpfn-dashboard`** under the shared **WB Plugins hub**
+  (`wbcomplugins`), cap `manage_options`, rendered by `BPFN_Admin::render_page()`
+  (`includes/admin/class-bpfn-admin.php`) with the modern card-panel shell
+  (`includes/admin/views/shell.php` + `overview.php` / `tools.php`). Two tabs:
+  **Overview** (stats, trending, quick actions) and **Tools** (migration, cleanup).
+- There is NO Settings API options page. The former Settings tab's only field
+  ("Enhanced Notifications", option `bpfn_options`) was removed on branch 2.0.0: its
+  enhanced template could never render — BuddyPress kses-strips notification
+  descriptions to `<a href class>` on every surface.
+- `BPFN_Module_Settings` (`includes/modules/class-settings.php`) is **front-end only**
+  and IS loaded: BP member **Settings → Favorite Notifications** subnav + per-user
+  save handler (template `templates/settings/notifications.php`, styles
+  `assets/css/settings.css`).
 
 ## Settings / options
-- Settings API: option `bpfn_options` (group `bpfn_settings`), single field
-  `enable_enhanced_notifications`.
 - Standalone options: `bpfn_auto_cleanup_enabled`, `bpfn_auto_cleanup_days`,
   `bpfn_last_auto_cleanup`, `bpfn_version`, `bpfn_show_migration_notice`,
   `bpfn_favorites_migrated`, `bpfn_migration_status`, `bpfn_migration_log`.
+- `bpfn_options` (group `bpfn_settings`) is RETIRED — no longer registered or read.
 - Per-user prefs: `{prefix}bp_favorite_notification_prefs` via `bpfn_get/save_user_settings`.
 
-## Known issues (baseline 2026-06-05)
-1. `BPFN_Module_Settings` is dead code (unloaded) — its admin page + BP Settings subnav +
-   front-end per-user save handler never run.
-2. `assets/js/admin.js:223,332,415` use native `confirm()` — banned by admin-UX Rule 10.
-3. `wp_ajax_bpfn_dismiss_migration_notice` posted by inline JS has no PHP handler (dead).
-4. N+1 in `get_users_who_favorited` (limit 999 modal) and `render_trending_activities`.
+## Frontend assets / design tokens
+- Shared `--bpfn-*` design tokens live in `assets/css/notifications.css` (the style
+  dependency of favorite-display.css, realtime.css, and settings.css). Light values
+  consume BuddyX `--bx-color-*` vars with light fallbacks; `[data-bx-mode="dark"]`
+  and the `auto` + `prefers-color-scheme: dark` blocks redeclare them with
+  DARK-appropriate fallback literals because **Reign 8.0.3 sets `data-bx-mode` but
+  does not define `--bx-color-*`** — the fallback literal is what renders there.
+- `assets/js/notifications.js` was deleted on 2.0.0 (100% dead: wrong selectors,
+  AJAX actions without handlers). Frontend JS is favorite-display.js + realtime.js.
+
+## Known issues (updated 2026-07-03)
+All four baseline (2026-06-05) issues are FIXED on branch 2.0.0: (1) the settings
+module is loaded (front-end only), (2) native `confirm()` replaced by the
+`bpfnConfirm` modal, (3) `bpfn_dismiss_migration_notice` has a real handler in
+`BPFN_Admin`, (4) who-favorited/trending N+1 eliminated (batched, capped, cached).
+The 2026-07-03 audit's Blocker (dead "Enhanced Notifications" toggle) and Major
+findings (dead legacy admin.js + notifications.js, inline member-settings styles,
+untokenized realtime.css, Reign dark-mode contrast) are also fixed. No known open
+issues. `audit/manifest.json` and `AUDIT-VERDICT.md` predate these removals —
+refresh via `/wp-plugin-onboard --refresh` at next release.
 
 ## Conventions
 - Prefix everything `bpfn_` / `BPFN_`. Text domain `buddypress-favorite-notification`.
