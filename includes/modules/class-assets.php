@@ -27,11 +27,9 @@ class BPFN_Module_Assets {
 	 * Setup hooks.
 	 */
 	private function setup_hooks() {
-		// Frontend assets.
+		// Frontend assets. Admin assets are owned by BPFN_Admin::enqueue_assets()
+		// (includes/admin/class-bpfn-admin.php) — do not duplicate them here.
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_assets' ) );
-
-		// Admin assets.
-		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
 	}
 
 	/**
@@ -43,25 +41,13 @@ class BPFN_Module_Assets {
 			return;
 		}
 
-		// Core styles.
+		// Core styles (shared --bpfn-* tokens + count badge / loading state).
 		wp_enqueue_style(
 			'bpfn-notifications',
 			BPFN_ASSETS_URL . 'css/notifications.css',
 			array(),
 			BPFN_VERSION
 		);
-
-		// Core scripts.
-		wp_enqueue_script(
-			'bpfn-notifications',
-			BPFN_ASSETS_URL . 'js/notifications.js',
-			array( 'jquery' ),
-			BPFN_VERSION,
-			true
-		);
-
-		// Localize main script.
-		wp_localize_script( 'bpfn-notifications', 'BPFN', $this->get_localized_data() );
 
 		// Real-time notifications.
 		if ( $this->should_load_realtime() ) {
@@ -88,7 +74,7 @@ class BPFN_Module_Assets {
 		wp_enqueue_script(
 			'bpfn-favorite-display',
 			BPFN_ASSETS_URL . 'js/favorite-display.js',
-			array( 'jquery', 'bpfn-notifications' ),
+			array( 'jquery' ),
 			BPFN_VERSION,
 			true
 		);
@@ -129,7 +115,7 @@ class BPFN_Module_Assets {
 		wp_enqueue_script(
 			'bpfn-realtime',
 			BPFN_ASSETS_URL . 'js/realtime.js',
-			array( 'jquery', 'heartbeat', 'bpfn-notifications' ),
+			array( 'jquery', 'heartbeat' ),
 			BPFN_VERSION,
 			true
 		);
@@ -174,53 +160,6 @@ class BPFN_Module_Assets {
 	}
 
 	/**
-	 * Enqueue admin assets.
-	 *
-	 * @param string $hook The admin page hook.
-	 */
-	public function enqueue_admin_assets( $hook ) {
-		// Check if we're on one of our admin pages.
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Page slug check only.
-		if ( ! ( isset( $_GET['page'] ) && false !== strpos( sanitize_text_field( wp_unslash( $_GET['page'] ) ), 'bpfn' ) ) ) {
-			return;
-		}
-
-		// Admin styles.
-		wp_enqueue_style(
-			'bpfn-admin',
-			BPFN_ASSETS_URL . 'css/admin.css',
-			array(),
-			BPFN_VERSION
-		);
-
-		// Admin scripts.
-		wp_enqueue_script(
-			'bpfn-admin',
-			BPFN_ASSETS_URL . 'js/admin.js',
-			array( 'jquery' ),
-			BPFN_VERSION,
-			true
-		);
-
-		// Localization for admin script.
-		wp_localize_script(
-			'bpfn-admin',
-			'bpfnAdmin',
-			array(
-				'ajax_url' => admin_url( 'admin-ajax.php' ),
-				'nonce'    => wp_create_nonce( 'bpfn-admin-nonce' ),
-				'strings'  => array(
-					'testing'       => esc_html__( 'Sending test...', 'buddypress-favorite-notification' ),
-					'test_success'  => esc_html__( 'Test sent successfully!', 'buddypress-favorite-notification' ),
-					'test_error'    => esc_html__( 'Test failed.', 'buddypress-favorite-notification' ),
-					'confirm_clear' => esc_html__( 'Are you sure?', 'buddypress-favorite-notification' ),
-					'clearing'      => esc_html__( 'Clearing...', 'buddypress-favorite-notification' ),
-				),
-			)
-		);
-	}
-
-	/**
 	 * Check if assets should be loaded.
 	 *
 	 * @return bool Whether to load assets.
@@ -253,27 +192,4 @@ class BPFN_Module_Assets {
 		return true;
 	}
 
-	/**
-	 * Get localized data for scripts.
-	 *
-	 * @return array Localized data.
-	 */
-	private function get_localized_data() {
-		global $bp;
-
-		return array(
-			'ajax_url'     => admin_url( 'admin-ajax.php' ),
-			'nonce'        => wp_create_nonce( 'bpfn-nonce' ),
-			'user_id'      => get_current_user_id(),
-			'component_id' => isset( $bp->favorite_notifier ) ? $bp->favorite_notifier->id : '',
-			'strings'      => array(
-				'loading'      => esc_html__( 'Loading...', 'buddypress-favorite-notification' ),
-				'error'        => esc_html__( 'An error occurred', 'buddypress-favorite-notification' ),
-				'favoriting'   => esc_html__( 'Adding to favorites...', 'buddypress-favorite-notification' ),
-				'unfavoriting' => esc_html__( 'Removing from favorites...', 'buddypress-favorite-notification' ),
-				'favorited'    => esc_html__( 'Added to favorites!', 'buddypress-favorite-notification' ),
-				'unfavorited'  => esc_html__( 'Removed from favorites!', 'buddypress-favorite-notification' ),
-			),
-		);
-	}
 }

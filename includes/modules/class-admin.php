@@ -8,7 +8,7 @@
  * BPFN_Admin (includes/admin/class-bpfn-admin.php) and its views.
  *
  * What it still owns (all reachable):
- *  - The four admin AJAX handlers (clear/get_stats/migrate/progress).
+ *  - The three admin AJAX handlers (clear/migrate/progress).
  *  - The Tools-tab cleanup settings save handler (nonce bpfn_cleanup_settings).
  *  - The monthly auto-cleanup cron registration + runner.
  *
@@ -58,7 +58,6 @@ class BPFN_Module_Admin {
 	private function register_ajax_handlers() {
 		$ajax_actions = array(
 			'clear_old_notifications',
-			'get_stats',
 			'migrate_favorites',
 			'migration_progress',
 		);
@@ -164,24 +163,6 @@ class BPFN_Module_Admin {
 		} else {
 			wp_send_json_error( array( 'message' => esc_html__( 'Failed to clear notifications', 'buddypress-favorite-notification' ) ) );
 		}
-	}
-
-	/**
-	 * AJAX get stats.
-	 */
-	public function ajax_get_stats() {
-		check_ajax_referer( 'bpfn-admin-nonce', 'nonce' );
-
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error();
-		}
-
-		$stats = array();
-		if ( function_exists( 'bpfn_get_notification_stats' ) ) {
-			$stats = bpfn_get_notification_stats();
-		}
-
-		wp_send_json_success( $stats );
 	}
 
 	/**

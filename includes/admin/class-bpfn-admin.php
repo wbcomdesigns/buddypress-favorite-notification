@@ -158,10 +158,20 @@ class BPFN_Admin {
 				'ajax_url' => admin_url( 'admin-ajax.php' ),
 				'nonce'    => wp_create_nonce( 'bpfn-admin-nonce' ),
 				'strings'  => array(
-					'testing'               => __( 'Sending test...', 'buddypress-favorite-notification' ),
-					'test_success'          => __( 'Test sent successfully!', 'buddypress-favorite-notification' ),
-					'test_error'            => __( 'Test failed.', 'buddypress-favorite-notification' ),
 					'clearing'              => __( 'Clearing...', 'buddypress-favorite-notification' ),
+					/* translators: %s: Number of notifications cleared. */
+					'cleared'               => __( 'Successfully cleared %s old notifications.', 'buddypress-favorite-notification' ),
+					/* translators: %s: Number of notifications remaining. */
+					'remaining'             => __( '%s notifications remaining', 'buddypress-favorite-notification' ),
+					'clear_failed'          => __( 'Failed to clear notifications.', 'buddypress-favorite-notification' ),
+					'migrating'             => __( 'Starting migration...', 'buddypress-favorite-notification' ),
+					'migrate_failed'        => __( 'Migration failed.', 'buddypress-favorite-notification' ),
+					/* translators: 1: Number of users processed, 2: Number of favorites added. */
+					'migration_complete'    => __( 'Migration completed! Processed %1$s users and added %2$s favorites.', 'buddypress-favorite-notification' ),
+					/* translators: %s: Migration status keyword (e.g. failed, cancelled). */
+					'migration_status'      => __( 'Migration %s', 'buddypress-favorite-notification' ),
+					'users'                 => __( 'users', 'buddypress-favorite-notification' ),
+					'error_generic'         => __( 'An error occurred:', 'buddypress-favorite-notification' ),
 					'confirm_continue'      => __( 'Continue', 'buddypress-favorite-notification' ),
 					'confirm_cancel'        => __( 'Cancel', 'buddypress-favorite-notification' ),
 					'confirm_danger'        => __( 'Are you sure? This cannot be undone.', 'buddypress-favorite-notification' ),
@@ -169,8 +179,6 @@ class BPFN_Admin {
 					'confirm_migrate'       => __( 'This will migrate all existing favorites to the new optimized table. Continue?', 'buddypress-favorite-notification' ),
 					'confirm_clear_title'   => __( 'Clear old notifications?', 'buddypress-favorite-notification' ),
 					'confirm_clear_old'     => __( 'Are you sure you want to clear all read notifications older than the retention period? This cannot be undone.', 'buddypress-favorite-notification' ),
-					'confirm_bulk_title'    => __( 'Update all users?', 'buddypress-favorite-notification' ),
-					'confirm_bulk'          => __( 'This will update notification settings for all users. Continue?', 'buddypress-favorite-notification' ),
 				),
 			)
 		);
