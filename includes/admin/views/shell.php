@@ -4,14 +4,11 @@
  *
  * Receives from BPFN_Admin::render_page():
  *
- * @var array  $bpfn_tabs           Tab registry keyed by slug.
- * @var string $active              Active tab slug.
- * @var string $page_url            Base URL (admin.php?page=bpfn-dashboard).
- * @var array  $settings            bpfn_options option.
- * @var string $view                View slug (e.g. 'overview', 'settings-general').
- * @var string $view_path           Absolute path to the partial.
- * @var bool   $in_settings_group   True when the active tab is the Settings API tab.
- * @var string $settings_form_group register_setting() group to pass to settings_fields().
+ * @var array  $bpfn_tabs Tab registry keyed by slug.
+ * @var string $active    Active tab slug.
+ * @var string $page_url  Base URL (admin.php?page=bpfn-dashboard).
+ * @var string $view      View slug (e.g. 'overview', 'tools').
+ * @var string $view_path Absolute path to the partial.
  *
  * @package BuddyPress_Favorite_Notification
  * @since   2.0.0
@@ -102,26 +99,11 @@ $version = defined( 'BPFN_VERSION' ) ? BPFN_VERSION : '';
 			 * aligns with the panel chrome (playbook Part 10.2).
 			 */
 			settings_errors();
+
+			if ( file_exists( $view_path ) ) {
+				include $view_path;
+			}
 			?>
-			<?php if ( $in_settings_group ) : ?>
-				<form method="post" action="options.php" id="bpfn-settings-form">
-					<?php settings_fields( $settings_form_group ); ?>
-					<?php
-					if ( file_exists( $view_path ) ) {
-						include $view_path;
-					}
-					?>
-					<div class="bpfn-save-bar">
-						<?php submit_button( __( 'Save Settings', 'buddypress-favorite-notification' ), 'primary bpfn-btn bpfn-btn-primary', 'submit', false ); ?>
-					</div>
-				</form>
-			<?php else : ?>
-				<?php
-				if ( file_exists( $view_path ) ) {
-					include $view_path;
-				}
-				?>
-			<?php endif; ?>
 		</div>
 
 	</div>

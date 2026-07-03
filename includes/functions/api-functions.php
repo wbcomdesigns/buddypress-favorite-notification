@@ -235,26 +235,6 @@ function bpfn_register_module( $module_name, $module_instance ) {
 }
 
 /**
- * Check if a feature is enabled.
- *
- * @param string $feature Feature name.
- * @return bool Whether the feature is enabled.
- */
-function bpfn_is_feature_enabled( $feature ) {
-	$options = get_option( 'bpfn_options', array() );
-
-	$features = array(
-		'enhanced_notifications' => ! empty( $options['enable_enhanced_notifications'] ),
-		'realtime_notifications' => true,
-		'email_notifications'    => true,
-	);
-
-	$enabled = isset( $features[ $feature ] ) ? $features[ $feature ] : false;
-
-	return apply_filters( 'bpfn_is_feature_enabled', $enabled, $feature );
-}
-
-/**
  * Get plugin version.
  *
  * @return string Plugin version.

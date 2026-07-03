@@ -12,12 +12,6 @@
 
 defined( 'ABSPATH' ) || exit;
 
-/**
- * Parent view provides $settings.
- *
- * @var array $settings bpfn_options already loaded by render_page().
- */
-
 global $wpdb, $bp;
 
 $bpfn_stats = array(
@@ -122,9 +116,7 @@ if ( is_array( $bpfn_stats_cached ) ) {
 	set_transient( $bpfn_stats_cache_key, $bpfn_stats, $bpfn_stats_ttl );
 } // End transient-miss block.
 
-$bpfn_enhanced_on  = ! empty( $settings['enable_enhanced_notifications'] );
-$bpfn_settings_url = admin_url( 'admin.php?page=' . BPFN_Admin::MENU_SLUG . '&tab=settings' );
-$bpfn_tools_url    = admin_url( 'admin.php?page=' . BPFN_Admin::MENU_SLUG . '&tab=tools' );
+$bpfn_tools_url = admin_url( 'admin.php?page=' . BPFN_Admin::MENU_SLUG . '&tab=tools' );
 
 /*
  * Batch-fetch activities and users for the recent + trending tables.
@@ -372,10 +364,6 @@ $bpfn_render_trending = function ( $rows ) use ( $bpfn_activity_map ) {
 	</div>
 	<div class="bpfn-card__body">
 		<div class="bpfn-save-bar" style="flex-wrap: wrap;">
-			<a href="<?php echo esc_url( $bpfn_settings_url ); ?>" class="bpfn-btn bpfn-btn-secondary">
-				<span class="dashicons dashicons-admin-settings" aria-hidden="true"></span>
-				<?php esc_html_e( 'Configure Settings', 'buddypress-favorite-notification' ); ?>
-			</a>
 			<a href="<?php echo esc_url( $bpfn_tools_url ); ?>" class="bpfn-btn bpfn-btn-secondary">
 				<span class="dashicons dashicons-admin-tools" aria-hidden="true"></span>
 				<?php esc_html_e( 'Tools & Maintenance', 'buddypress-favorite-notification' ); ?>

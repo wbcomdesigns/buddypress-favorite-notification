@@ -7,8 +7,11 @@
  * wp-plugin-development skill Part 6 card-panel pattern and the
  * references/wbcom-wrapper-migration.md playbook (Parts 5, 6, 15).
  *
- * This class is the SINGLE owner of the `bpfn_options` Settings API
- * registration. The legacy admin/settings modules no longer register it.
+ * As of 2.0.0 the plugin has no Settings API options page: the former
+ * "Enhanced Notifications" toggle (option `bpfn_options`) was removed because
+ * its enhanced template could never render — BuddyPress escapes notification
+ * descriptions through wp_kses() allowing only `<a href class>`, so the rich
+ * markup was stripped on every surface (member screen, toolbar).
  *
  * @package BuddyPress_Favorite_Notification
  * @since 2.0.0
@@ -34,14 +37,6 @@ class BPFN_Admin {
 	const MENU_SLUG = 'bpfn-dashboard';
 
 	/**
-	 * Settings API option group + option name.
-	 *
-	 * @var string
-	 */
-	const OPTION_GROUP = 'bpfn_settings';
-	const OPTION_NAME  = 'bpfn_options';
-
-	/**
 	 * All sidebar tabs rendered inside the one admin page.
 	 *
 	 * @return array<string, array{label:string, icon:string, group:string}>
@@ -52,11 +47,6 @@ class BPFN_Admin {
 				'label' => __( 'Overview', 'buddypress-favorite-notification' ),
 				'icon'  => 'dashicons-chart-bar',
 				'group' => 'main',
-			),
-			'settings' => array(
-				'label' => __( 'Settings', 'buddypress-favorite-notification' ),
-				'icon'  => 'dashicons-admin-settings',
-				'group' => 'settings',
 			),
 			'tools'    => array(
 				'label' => __( 'Tools', 'buddypress-favorite-notification' ),
@@ -76,7 +66,6 @@ class BPFN_Admin {
 		// reclaim the hub landing render when a legacy wbcom-wrapper plugin
 		// registered the wbcomplugins top-level first. See playbook Part 15.
 		add_action( 'admin_menu', array( $this, 'takeover_hub_landing' ), 999 );
-		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 		add_action( 'in_admin_header', array( $this, 'suppress_foreign_notices' ), 1 );
 
@@ -131,45 +120,6 @@ class BPFN_Admin {
 		}
 		remove_all_actions( 'toplevel_page_wbcomplugins' );
 		add_action( 'toplevel_page_wbcomplugins', array( $this, 'render_hub' ) );
-	}
-
-	/**
-	 * Register the Settings API option used by the Settings tab.
-	 *
-	 * This is the ONE AND ONLY registration of `bpfn_options` in the plugin.
-	 * The legacy BPFN_Module_Admin and BPFN_Module_Settings no longer call
-	 * register_setting(). See playbook Part 7 (sanitizer delegation).
-	 */
-	public function register_settings() {
-		register_setting(
-			self::OPTION_GROUP,
-			self::OPTION_NAME,
-			array(
-				'type'              => 'array',
-				'sanitize_callback' => array( $this, 'sanitize_settings' ),
-				'default'           => array(),
-			)
-		);
-	}
-
-	/**
-	 * Sanitize the `bpfn_options` array.
-	 *
-	 * Single-tab settings page (the Settings tab is the only writer of this
-	 * option), so the whole option is rebuilt from $input consistently — no
-	 * sentinel merge needed (playbook Part 7.1 "when this rule doesn't apply").
-	 *
-	 * @param mixed $input Raw form input.
-	 * @return array Sanitized options.
-	 */
-	public function sanitize_settings( $input ) {
-		$sanitized = array();
-
-		if ( is_array( $input ) && isset( $input['enable_enhanced_notifications'] ) ) {
-			$sanitized['enable_enhanced_notifications'] = 1;
-		}
-
-		return $sanitized;
 	}
 
 	/**
@@ -277,17 +227,13 @@ class BPFN_Admin {
 		}
 
 		$page_url = admin_url( 'admin.php?page=' . self::MENU_SLUG );
-		$settings = get_option( self::OPTION_NAME, array() );
 
 		$view_map = array(
 			'overview' => 'overview',
-			'settings' => 'settings-general',
 			'tools'    => 'tools',
 		);
 
-		$view                = isset( $view_map[ $active ] ) ? $view_map[ $active ] : 'overview';
-		$in_settings_group   = ( 'settings' === $active );
-		$settings_form_group = self::OPTION_GROUP;
+		$view = isset( $view_map[ $active ] ) ? $view_map[ $active ] : 'overview';
 
 		$view_path = BPFN_INCLUDES_PATH . 'admin/views/' . $view . '.php';
 		$shell     = BPFN_INCLUDES_PATH . 'admin/views/shell.php';
