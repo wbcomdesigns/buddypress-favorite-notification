@@ -100,6 +100,12 @@ class BPFN_Module_Assets {
 			array(
 				'ajax_url' => admin_url( 'admin-ajax.php' ),
 				'nonce'    => wp_create_nonce( 'bpfn-favorite-nonce' ),
+				'strings'  => array(
+					'loading'    => esc_html__( 'Loading…', 'buddypress-favorite-notification' ),
+					'loadFailed' => esc_html__( 'Failed to load favorites list.', 'buddypress-favorite-notification' ),
+					'loadError'  => esc_html__( 'An error occurred while loading favorites.', 'buddypress-favorite-notification' ),
+					'close'      => esc_attr__( 'Close', 'buddypress-favorite-notification' ),
+				),
 			)
 		);
 	}
