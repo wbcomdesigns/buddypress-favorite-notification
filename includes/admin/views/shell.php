@@ -86,7 +86,7 @@ $version = defined( 'BPFN_VERSION' ) ? BPFN_VERSION : '';
 
 				<div class="bpfn-snav-divider" role="separator"></div>
 				<p class="bpfn-snav-section-label"><?php esc_html_e( 'Resources', 'buddypress-favorite-notification' ); ?></p>
-				<a href="https://docs.wbcomdesigns.com/" class="bpfn-snav-link" target="_blank" rel="noopener noreferrer">
+				<a href="https://docs.wbcomdesigns.com/docs/buddypress-favorite-notification/" class="bpfn-snav-link" target="_blank" rel="noopener noreferrer">
 					<span class="dashicons dashicons-book" aria-hidden="true"></span>
 					<?php esc_html_e( 'Documentation', 'buddypress-favorite-notification' ); ?>
 					<span class="dashicons dashicons-external bpfn-snav-link__ext" aria-hidden="true"></span>

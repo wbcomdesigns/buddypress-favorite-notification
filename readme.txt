@@ -342,7 +342,7 @@ Adds email notification support. Recommended for users who want email alerts for
 For support inquiries, please visit:
 * [Wbcom Designs Support](https://wbcomdesigns.com/support/)
 * [WordPress.org Support Forum](https://wordpress.org/support/plugin/bp-favorite-notification/)
-* [Plugin Documentation](http://www.wbcomdesigns.com/plugins/buddypress-favorite-notification/)
+* [Plugin Documentation](https://docs.wbcomdesigns.com/docs/buddypress-favorite-notification/)
 
 == Contributing ==
 
