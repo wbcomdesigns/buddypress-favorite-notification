@@ -3,7 +3,53 @@
  *
  * ONLY styles for plugin-specific elements
  * Does NOT modify theme or BuddyPress elements
+ *
+ * This file is the shared style dependency of favorite-display.css and
+ * realtime.css, so it owns the plugin's --bpfn-* design tokens.
  */
+
+/* ========================================
+   Design tokens (--bpfn-*)
+
+   Theme-aware: BuddyX / BuddyX Pro publish --bx-color-* custom properties
+   on :root and flip them per color mode, so we consume those with literal
+   fallbacks. Reign 8.0.3 sets data-bx-mode on the root element but does
+   NOT define the --bx-color-* variables, which means the fallback literal
+   is what actually renders there. The dark-scoped blocks below therefore
+   use DARK-appropriate fallback literals - never the light values -
+   otherwise Reign dark mode renders light-gray-on-dark-navy text.
+   ======================================== */
+:root {
+    --bpfn-surface: var(--bx-color-bg-elevated, #ffffff);
+    --bpfn-surface-hover: var(--bx-color-bg-muted, #f5f5f5);
+    --bpfn-text: var(--bx-color-fg, #333333);
+    --bpfn-text-muted: var(--bx-color-fg-muted, #666666);
+    --bpfn-border: var(--bx-color-border, #e0e0e0);
+    --bpfn-link: var(--bx-color-link, #1d84b5);
+    --bpfn-heart: #ff4458;
+}
+
+/* Manual dark toggle (BuddyX/Reign set data-bx-mode="dark" on <html>). */
+:root[data-bx-mode="dark"] {
+    --bpfn-surface: var(--bx-color-bg-elevated, #1f2430);
+    --bpfn-surface-hover: var(--bx-color-bg-muted, #2a3040);
+    --bpfn-text: var(--bx-color-fg, #e4e6eb);
+    --bpfn-text-muted: var(--bx-color-fg-muted, #a0a0a0);
+    --bpfn-border: var(--bx-color-border, #3b4254);
+    --bpfn-link: var(--bx-color-link, #7cb8e0);
+}
+
+/* Auto mode: follow the OS preference. */
+@media (prefers-color-scheme: dark) {
+    :root[data-bx-mode="auto"] {
+        --bpfn-surface: var(--bx-color-bg-elevated, #1f2430);
+        --bpfn-surface-hover: var(--bx-color-bg-muted, #2a3040);
+        --bpfn-text: var(--bx-color-fg, #e4e6eb);
+        --bpfn-text-muted: var(--bx-color-fg-muted, #a0a0a0);
+        --bpfn-border: var(--bx-color-border, #3b4254);
+        --bpfn-link: var(--bx-color-link, #7cb8e0);
+    }
+}
 
 /* ========================================
    Notification Count Badge

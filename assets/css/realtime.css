@@ -1,6 +1,11 @@
 /**
  * BuddyPress Favorite Notification - Realtime Styles
- * Version: 1.2.3
+ *
+ * Consumes the shared --bpfn-* design tokens defined in notifications.css
+ * (this stylesheet's registered dependency). The tokens flip to dark values
+ * under [data-bx-mode="dark"] / auto + prefers-color-scheme, so the toasts
+ * follow both a theme's manual dark toggle AND the OS preference - no
+ * duplicated per-rule dark block needed here.
  */
 
 /* ========================================
@@ -39,7 +44,7 @@
 .bpfn-realtime-notification {
     width: 320px;
     margin-bottom: 15px;
-    background-color: #ffffff;
+    background-color: var(--bpfn-surface, #ffffff);
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     transform: translateX(120%);
@@ -136,7 +141,7 @@
     flex: 1;
     font-size: 14px;
     line-height: 1.5;
-    color: #333333;
+    color: var(--bpfn-text, #333333);
 }
 
 .bpfn-realtime-message strong {
@@ -146,7 +151,7 @@
 
 .bpfn-realtime-time {
     font-size: 12px;
-    color: #999999;
+    color: var(--bpfn-text-muted, #999999);
     margin-top: 5px;
 }
 
@@ -157,8 +162,8 @@
     display: flex;
     gap: 10px;
     padding: 12px 15px;
-    background-color: #f8f8f8;
-    border-top: 1px solid #eeeeee;
+    background-color: var(--bpfn-surface-hover, #f8f8f8);
+    border-top: 1px solid var(--bpfn-border, #eeeeee);
 }
 
 .bpfn-realtime-action {
@@ -182,13 +187,13 @@
 }
 
 .bpfn-realtime-action.secondary {
-    background-color: #ffffff;
-    color: #666666;
-    border: 1px solid #dddddd;
+    background-color: var(--bpfn-surface, #ffffff);
+    color: var(--bpfn-text-muted, #666666);
+    border: 1px solid var(--bpfn-border, #dddddd);
 }
 
 .bpfn-realtime-action.secondary:hover {
-    background-color: #f5f5f5;
+    background-color: var(--bpfn-surface-hover, #f5f5f5);
 }
 
 /* ========================================
@@ -221,7 +226,7 @@
     width: 20px;
     height: 20px;
     margin: -10px 0 0 -10px;
-    border: 2px solid var(--bpfn-primary-color);
+    border: 2px solid var(--bpfn-primary-color, #ff7b00);
     border-top-color: transparent;
     border-radius: 50%;
     animation: bpfn-spin 0.8s linear infinite;
@@ -287,34 +292,9 @@
     }
 }
 
-/* ========================================
-   Dark Mode Support
-   ======================================== */
-@media (prefers-color-scheme: dark) {
-    .bpfn-realtime-notification {
-        background-color: #2a2a2a;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-    }
-    
-    .bpfn-realtime-message {
-        color: #f0f0f0;
-    }
-    
-    .bpfn-realtime-actions {
-        background-color: #1a1a1a;
-        border-top-color: #444444;
-    }
-    
-    .bpfn-realtime-action.secondary {
-        background-color: #333333;
-        color: #cccccc;
-        border-color: #555555;
-    }
-    
-    .bpfn-realtime-action.secondary:hover {
-        background-color: #444444;
-    }
-}
+/* Dark mode: handled by the --bpfn-* token flip in notifications.css
+   ([data-bx-mode="dark"] and auto + prefers-color-scheme) - the rules
+   above consume tokens, so no duplicated dark block is needed. */
 
 /* ========================================
    Accessibility

@@ -2,23 +2,14 @@
  * Favorite Display Styles
  * BuddyPress Favorite Notification Plugin
  *
- * Theme-aware color tokens: BuddyX, BuddyX Pro and Reign (8.0+) publish
- * `--bx-color-*` custom properties on :root and flip them under
- * `:root[data-bx-mode="dark"]` (and `data-bx-mode="auto"` +
- * prefers-color-scheme: dark). Consuming those tokens with light fallbacks
- * means the inline display AND the "who liked this" modal automatically
- * follow the active color mode on those themes, while every other theme
- * gets the original light palette from the fallbacks.
+ * Consumes the shared --bpfn-* design tokens defined in notifications.css
+ * (this stylesheet's registered dependency). The tokens are theme-aware
+ * (BuddyX --bx-color-* vars) and carry dark-appropriate fallbacks under
+ * [data-bx-mode="dark"] / auto + prefers-color-scheme, so the inline
+ * display AND the "who liked this" modal follow the active color mode on
+ * BuddyX AND on Reign (which sets the mode attribute without defining the
+ * --bx-color-* variables).
  */
-:root {
-	--bpfn-surface: var(--bx-color-bg-elevated, #ffffff);
-	--bpfn-surface-hover: var(--bx-color-bg-muted, #f5f5f5);
-	--bpfn-text: var(--bx-color-fg, #333333);
-	--bpfn-text-muted: var(--bx-color-fg-muted, #666666);
-	--bpfn-border: var(--bx-color-border, #e0e0e0);
-	--bpfn-link: var(--bx-color-link, #1d84b5);
-	--bpfn-heart: #ff4458;
-}
 
 /* Favorite Count Display */
 .bpfn-favorite-display {
