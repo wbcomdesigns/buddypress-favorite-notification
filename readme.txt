@@ -92,6 +92,16 @@ Professional HTML email templates with:
 
 For support, please visit [Wbcom Designs Support](https://wbcomdesigns.com/support/) or use the WordPress.org support forums.
 
+== More Free Tools from Wbcom Designs ==
+
+Favorite Notification closes the loop the second a member's activity gets liked, turning small moments of appreciation into the real-time nudges that pull people back to your site. That retention loop pays off most when there is a community worth returning to, and these free Wbcom Designs plugins help you build one:
+
+* **[BuddyNext](https://wbcomdesigns.com/downloads/buddynext/)** - Spin up a complete WordPress social network with activity feeds, member profiles, groups, and private messaging.
+* **[Jetonomy](https://wbcomdesigns.com/downloads/jetonomy/)** - Add forums, Q&A, and idea boards that moderate themselves through member trust levels and stay fast well past 100,000 topics.
+* **[Mediaverse](https://wbcomdesigns.com/downloads/mediaverse/)** - Let members share photos and video in a media community that AI keeps clean without constant manual review.
+* **[Listora](https://wbcomdesigns.com/downloads/listora/)** - Publish searchable directories across ten listing types, from businesses and events to jobs and rentals.
+* **[Learnomy](https://wbcomdesigns.com/downloads/learnomy/)** - Run a full learning platform with courses, lessons, quizzes, and certificates, all free.
+
 == Installation ==
 
 = Automatic Installation =
