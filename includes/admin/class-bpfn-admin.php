@@ -53,6 +53,11 @@ class BPFN_Admin {
 				'icon'  => 'dashicons-admin-tools',
 				'group' => 'settings',
 			),
+			'discover' => array(
+				'label' => __( 'Discover', 'buddypress-favorite-notification' ),
+				'icon'  => 'dashicons-heart',
+				'group' => 'settings',
+			),
 		);
 		return apply_filters( 'bpfn_admin_tabs', $tabs );
 	}
@@ -239,6 +244,7 @@ class BPFN_Admin {
 		$view_map = array(
 			'overview' => 'overview',
 			'tools'    => 'tools',
+			'discover' => 'discover',
 		);
 
 		$view = isset( $view_map[ $active ] ) ? $view_map[ $active ] : 'overview';
