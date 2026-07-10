@@ -3,8 +3,9 @@ Contributors: vapvarun, wbcomdesigns
 Donate link: https://wbcomdesigns.com/donate/
 Tags: buddypress, notifications, favorites, activity, realtime
 Requires at least: 5.0
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 7.4
+Requires Plugins: buddypress
 Stable tag: 2.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -181,27 +182,30 @@ Yes! The plugin provides extensive hooks, filters, and a modular architecture de
 
 == Screenshots ==
 
-1. Enhanced notification display with card-style layout, avatars, and action buttons
-2. Realtime popup notification appearing instantly when activity is favorited
-3. Admin settings page with global notification controls
-4. User notification preferences in BuddyPress profile settings
-5. Email notification with HTML template and activity preview
-6. Tools page with database maintenance and statistics
-7. BuddyPress notifications dropdown with favorite notifications
+1. Admin dashboard with favorite and notification statistics.
+2. Tools tab - favorites migration and database maintenance options.
+3. Activity favorite (heart) control showing active and inactive states.
+4. Notifications screen listing a favorite notification.
+5. Discover - more free tools from Wbcom Designs.
 
 == Changelog ==
 
-= 2.0.1 - 2026-02-19 =
-* New: Rebuilt the admin into the unified Wbcom card-panel UI under the shared "WB Plugins" menu.
-* Fixed: Per-user notification preferences (BuddyPress member Settings > Favorite Notifications) now load and save correctly — the settings module was previously never loaded.
-* Fixed: Migration-notice dismissal now persists (added the missing AJAX handler).
-* Fixed: Replaced native browser confirm() dialogs in the admin with an accessible confirm modal.
-* Fixed: Removed a duplicate registration of the bpfn_options setting.
-* Fixed: WordPress Coding Standards compliance across all PHP files.
-* Fixed: Text domain corrected to match plugin slug.
-* Fixed: Added sanitize callback for register_setting.
-* Fixed: Removed deprecated load_plugin_textdomain call.
-* Updated: Tested up to WordPress 6.9.
+= 2.0.1 - July 2026 =
+
+* New      - Rebuilt the admin into the unified Wbcom card-panel UI under the shared "WB Plugins" menu.
+* Improve  - Frontend design tokens now chain through the active theme palette (BuddyX --bx-color-*, then block-theme colour presets) so the heart, notification count badge, and realtime toasts pick up the site's brand colours instead of fixed literals.
+* Improve  - Added a shared --bpfn-primary / secondary / tertiary accent scale and defined the realtime toast stacking z-index token, so activity, comment, and mention toasts keep three distinct hues on every theme.
+* Improve  - Converted directional CSS to logical properties (margin-inline, inset, text-align:start) across the frontend and admin so every surface mirrors correctly under RTL.
+* Improve  - Admin action buttons now meet the 40px minimum tap target and show a disabled/processing state while their request is running, preventing double submits.
+* Improve  - Added keyboard focus-visible rings to the who-liked list links, realtime toast action links, and the permission role chips.
+* Fix      - Activity-favorite email now uses one coherent orange accent for header, excerpt, and button instead of a blue header paired with orange buttons.
+* Fix      - Per-user notification preferences (member Settings > Favorite Notifications) now load and save correctly - the settings module was previously never loaded.
+* Fix      - Migration-notice dismissal now persists (added the missing AJAX handler).
+* Fix      - Replaced native browser confirm() dialogs in the admin with an accessible confirm modal.
+* Fix      - Removed a duplicate registration of the bpfn_options setting and corrected the text domain to match the plugin slug.
+* Fix      - Added a sanitize callback for register_setting and removed the deprecated load_plugin_textdomain call.
+* Dev      - WordPress Coding Standards compliance across all PHP files.
+* Compat   - Tested up to WordPress 7.0.
 
 = 2.0.0 - 2025-11-24 =
 

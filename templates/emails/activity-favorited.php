@@ -120,6 +120,16 @@ if ( ! empty( $social_links ) ) :
 <?php
 $email_content = ob_get_clean();
 
+// Activity-favorite emails use one coherent orange accent (header, excerpt,
+// button) so the header no longer inherits the blue base default while the
+// inline buttons render orange. The comment-favorite email uses blue - the two
+// notification types keep the same per-type colour language as the realtime
+// toasts (favorite = orange, comment = blue).
+$header_color       = '#ff7b00';
+$accent_color       = '#ff7b00';
+$button_color       = '#ff7b00';
+$button_hover_color = '#e56f00';
+
 // Include base template.
 require BPFN_TEMPLATES_PATH . 'emails/base.php';
 ?>

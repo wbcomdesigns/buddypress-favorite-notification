@@ -89,7 +89,7 @@
 }
 
 .bpfn-realtime-title i {
-    margin-right: 8px;
+    margin-inline-end: 8px;
     font-size: 16px;
 }
 
@@ -127,7 +127,7 @@
 
 .bpfn-realtime-avatar {
     flex-shrink: 0;
-    margin-right: 12px;
+    margin-inline-end: 12px;
 }
 
 .bpfn-realtime-avatar img {
@@ -177,6 +177,11 @@
     transition: all 0.2s;
 }
 
+.bpfn-realtime-action:focus-visible {
+    outline: 2px solid var(--bpfn-link, #1d84b5);
+    outline-offset: 2px;
+}
+
 .bpfn-realtime-action.primary {
     background-color: var(--bpfn-secondary-color, #1d84b5);
     color: #ffffff;
@@ -208,7 +213,7 @@
 }
 
 .bpfn-realtime-notification.type-mention .bpfn-realtime-header {
-    background-color: #8b5cf6;
+    background-color: var(--bpfn-tertiary-color, #8b5cf6);
 }
 
 /* ========================================

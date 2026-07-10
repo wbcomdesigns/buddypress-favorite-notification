@@ -25,8 +25,22 @@
     --bpfn-text: var(--bx-color-fg, #333333);
     --bpfn-text-muted: var(--bx-color-fg-muted, #666666);
     --bpfn-border: var(--bx-color-border, #e0e0e0);
-    --bpfn-link: var(--bx-color-link, #1d84b5);
-    --bpfn-heart: #ff4458;
+    --bpfn-link: var(--bx-color-link, var(--wp--preset--color--primary, #1d84b5));
+    /* Heart follows the theme brand accent (BuddyX, then Reign, then a
+       block-theme preset) and only lands on the pink literal when the theme
+       publishes nothing. */
+    --bpfn-heart: var(--bx-color-accent, var(--reign-colors-theme, var(--wp--preset--color--primary, #ff4458)));
+
+    /* Brand accent scale shared by the realtime toasts + notification count
+       badge. Each chains through the active theme's palette and only falls
+       back to the plugin's own literal when the theme defines nothing - so
+       favorite / comment / mention keep three distinct hues on every theme. */
+    --bpfn-primary-color: var(--bx-color-accent, var(--wp--preset--color--primary, #ff7b00));
+    --bpfn-secondary-color: var(--bx-color-link, var(--wp--preset--color--secondary, #1d84b5));
+    --bpfn-tertiary-color: var(--bx-color-accent-secondary, #8b5cf6);
+
+    /* Overlay stacking for the fixed realtime toast container. */
+    --bpfn-z-index-notification: 9999;
 }
 
 /* Manual dark toggle (BuddyX/Reign set data-bx-mode="dark" on <html>). */
@@ -50,12 +64,12 @@
     min-width: 20px;
     height: 20px;
     padding: 0 6px;
-    background-color: #ff7b00;
-    color: white;
+    background-color: var(--bpfn-primary-color, #ff7b00);
+    color: var(--bx-color-fg-inverse, #ffffff);
     font-size: 11px;
     font-weight: bold;
     border-radius: 10px;
-    margin-left: 5px;
+    margin-inline-start: 5px;
 }
 
 /* ========================================

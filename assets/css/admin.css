@@ -64,7 +64,8 @@
    ═══════════════════════════════════════════════════════════ */
 
 .bpfn-admin {
-	margin: 0 20px 0 0;
+	margin: 0;
+	margin-inline-end: 20px;
 	color: var(--bpfn-admin-text);
 	font-size: 13px;
 	line-height: 1.5;
@@ -288,7 +289,7 @@
 .bpfn-settings-main {
 	flex: 1;
 	min-width: 0;
-	margin-left: var(--bpfn-admin-gap-lg);
+	margin-inline-start: var(--bpfn-admin-gap-lg);
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -502,6 +503,13 @@
 	border-color: var(--bpfn-admin-border-strong);
 }
 
+/* The chip is a <label> wrapping the checkbox, so keyboard focus lands on the
+   inner checkbox - surface a visible ring on the whole chip via :focus-within. */
+.bpfn-role-chip:focus-within {
+	outline: 2px solid var(--bpfn-admin-accent);
+	outline-offset: 2px;
+}
+
 .bpfn-role-chip input[type="checkbox"] {
 	margin: 0;
 	flex-shrink: 0;
@@ -531,7 +539,7 @@
 
 .bpfn-inline-hint {
 	display: inline-block;
-	margin-left: 8px;
+	margin-inline-start: 8px;
 	color: var(--bpfn-admin-text-3);
 	font-size: 12px;
 	font-weight: 400;
@@ -572,8 +580,43 @@
 	cursor: pointer;
 	text-decoration: none;
 	transition: background 0.12s, border-color 0.12s, color 0.12s;
-	min-height: 36px;
+	min-height: 40px;
 	box-shadow: none;
+}
+
+/* Disabled + loading affordance. admin.js flips `disabled` on the migration
+   and clear-notifications buttons while their AJAX request is in flight, so
+   the button needs a visible processing state (prevents double-clicks). */
+.bpfn-btn:disabled,
+.bpfn-btn[disabled],
+.bpfn-btn.is-loading {
+	opacity: 0.6;
+	cursor: not-allowed;
+	pointer-events: none;
+}
+
+.bpfn-btn.is-loading {
+	position: relative;
+	color: transparent !important;
+}
+
+.bpfn-btn.is-loading::after {
+	content: "";
+	position: absolute;
+	top: 50%;
+	inset-inline-start: 50%;
+	width: 14px;
+	height: 14px;
+	margin: -7px 0 0 -7px;
+	border: 2px solid currentColor;
+	border-top-color: transparent;
+	border-radius: 50%;
+	color: #fff;
+	animation: bpfn-btn-spin 0.7s linear infinite;
+}
+
+@keyframes bpfn-btn-spin {
+	to { transform: rotate(360deg); }
 }
 
 .bpfn-btn-primary {
@@ -870,14 +913,14 @@
 	}
 
 	.bpfn-settings-main {
-		margin-left: 0;
+		margin-inline-start: 0;
 		margin-top: var(--bpfn-admin-gap-md);
 	}
 }
 
 @media (max-width: 640px) {
 	.bpfn-admin {
-		margin-right: 0;
+		margin-inline-end: 0;
 	}
 
 	.bpfn-page-header {
@@ -1035,12 +1078,12 @@
 
 /* Restore the dismiss button into the new padding rhythm. */
 .bpfn-admin .notice.is-dismissible {
-	padding-right: 38px;
+	padding-inline-end: 38px;
 }
 
 .bpfn-admin .notice .notice-dismiss {
 	top: 8px;
-	right: 8px;
+	inset-inline-end: 8px;
 }
 
 /* ════════════════════════════════════════════════
@@ -1099,7 +1142,7 @@
 .bpfn-license-meta strong {
 	color: var(--bpfn-admin-text);
 	font-weight: 600;
-	margin-right: 4px;
+	margin-inline-end: 4px;
 }
 
 .bpfn-license-meta-sep {
