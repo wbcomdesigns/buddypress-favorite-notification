@@ -317,7 +317,7 @@ class BPFN_Module_Email {
 <head>
 	<meta charset="UTF-8">
 	<style>
-		body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background: #f4f4f4; margin: 0; padding: 0; }
+		body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; background: #f4f4f4; margin: 0; padding: 0; }
 		.container { max-width: 600px; margin: 20px auto; background: #fff; }
 		.header { background: #ff7b00; color: white; padding: 20px; text-align: center; }
 		.content { padding: 30px; }
