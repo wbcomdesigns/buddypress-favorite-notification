@@ -80,6 +80,12 @@ module.exports = function(grunt) {
             build: {
                 src: [
                     '**',
+                    // Dev-only tooling (PHPStan + stubs). Never ship these.
+                    '!vendor/**',
+                    '!composer.json',
+                    '!composer.lock',
+                    '!phpstan.neon',
+                    '!phpstan-baseline.neon',
                     '!node_modules/**',
                     '!vendor/**',
                     '!dist/**',
