@@ -2,7 +2,7 @@
 Contributors: vapvarun, wbcomdesigns
 Donate link: https://wbcomdesigns.com/donate/
 Tags: buddypress, notifications, favorites, activity, realtime
-Requires at least: 5.0
+Requires at least: 6.9
 Tested up to: 7.0
 Requires PHP: 7.4
 Requires Plugins: buddypress
