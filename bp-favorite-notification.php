@@ -4,7 +4,9 @@
  * Plugin URI: http://www.wbcomdesigns.com/
  * Description: Adds notification for the activity Favorite for the activity user.
  * Version: 2.0.1
- * Requires at least: 6.9
+ * Requires at least: 6.1
+ * Requires PHP: 7.4
+ * Requires Plugins: buddypress
  * Text Domain: buddypress-favorite-notification
  * Author: Wbcom Designs<admin@wbcomdesigns.com>
  * Author URI: http://www.wbcomdesigns.com/
