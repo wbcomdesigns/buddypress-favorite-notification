@@ -32,6 +32,30 @@ define( 'BPFN_INCLUDES_PATH', BPFN_PLUGIN_PATH . 'includes/' );
 define( 'BPFN_TEMPLATES_PATH', BPFN_PLUGIN_PATH . 'templates/' );
 
 /**
+ * Load the plugin text domain for translation.
+ *
+ * WordPress only auto-loads language packs that exist on
+ * translate.wordpress.org; it never reads a plugin's own languages/ folder.
+ * This plugin ships its own translations, so the domain must be registered
+ * here. load_plugin_textdomain() checks the WordPress.org pack first and falls
+ * back to the bundled file, so both paths work.
+ *
+ * Runs on init: loading a text domain earlier triggers
+ * _load_textdomain_just_in_time on WordPress 6.7+.
+ *
+ * @since 2.0.1
+ * @return void
+ */
+function bpfn_load_textdomain() {
+	load_plugin_textdomain(
+		'buddypress-favorite-notification',
+		false,
+		basename( BPFN_PLUGIN_PATH ) . '/languages/'
+	);
+}
+add_action( 'init', 'bpfn_load_textdomain' );
+
+/**
  * Main plugin class
  */
 class BP_Favorite_Notification {
