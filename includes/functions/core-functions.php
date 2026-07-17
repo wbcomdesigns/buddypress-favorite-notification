@@ -130,12 +130,21 @@ function bpfn_get_activity_type( $activity_id ) {
 		return 'activity_post';
 	}
 
-	// Map activity types to our notification types.
+	// Map BuddyPress activity types onto the two preference keys the settings
+	// screen actually writes: activity_comment and activity_post.
+	//
+	// This map used to send 'activity_update' (a normal BuddyPress post, and the
+	// most common type there is) to an 'activity_update' preference key. That key
+	// exists in the defaults but the settings screen never renders or saves it, so
+	// the lookup always found the default 1 and email notifications ignored the
+	// member's choice. Web notifications were unaffected because
+	// BPFN_Module_Notifications resolves the type itself, to activity_post.
+	// Keep this map in step with BPFN_Module_Settings::get_notification_types().
 	$type_map = apply_filters(
 		'bpfn_activity_type_map',
 		array(
 			'activity_comment' => 'activity_comment',
-			'activity_update'  => 'activity_update',
+			'activity_update'  => 'activity_post',
 		)
 	);
 
@@ -151,17 +160,15 @@ function bpfn_get_activity_type( $activity_id ) {
  * @return bool Whether the notification is enabled.
  */
 function bpfn_is_notification_enabled( $user_id, $type, $channel = 'web' ) {
-	// During initial setup or testing, default to enabled.
-	if ( defined( 'DOING_AJAX' ) || defined( 'WP_SETUP_CONFIG' ) ) {
-		return true;
-	}
-
+	// NOTE: there used to be a `defined( 'DOING_AJAX' ) return true` short-circuit
+	// here, meant to "default to enabled during setup or testing". It made this
+	// function useless: BuddyPress favouriting always posts through admin-ajax, so
+	// DOING_AJAX is defined for essentially every favourite and every caller got
+	// true regardless of what the member had chosen. Do not reintroduce it.
 	$settings = bpfn_get_user_settings( $user_id );
 
 	// If no settings exist for this type, default to enabled.
 	if ( ! isset( $settings[ $type ] ) ) {
-		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging.
-		error_log( 'BPFN: No settings found for user ' . $user_id . ' type ' . $type . ', defaulting to enabled' );
 		return true;
 	}
 
@@ -177,9 +184,6 @@ function bpfn_is_notification_enabled( $user_id, $type, $channel = 'web' ) {
 			$enabled = ! empty( $settings[ $type ]['is_enabled'] );
 			break;
 	}
-
-	// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging.
-	error_log( 'BPFN: Notification enabled check - User: ' . $user_id . ', Type: ' . $type . ', Channel: ' . $channel . ', Enabled: ' . ( $enabled ? 'yes' : 'no' ) );
 
 	return $enabled;
 }

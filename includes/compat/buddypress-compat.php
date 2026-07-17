@@ -155,6 +155,24 @@ function bpfn_compat_add_notification( $activity_id, $user_id ) {
 		return;
 	}
 
+	// Respect the recipient's preference.
+	//
+	// This safety net runs at priority 15, after BPFN_Module_Notifications at 10.
+	// It used to check only whether a notification row already existed - so when
+	// the module correctly skipped a member who had turned favourite
+	// notifications off, there was no row, and this function added one anyway.
+	// The member's choice was silently undone.
+	//
+	// Resolve the type exactly the way the module does
+	// (BPFN_Module_Notifications::get_activity_notification_type): comments map to
+	// activity_comment, everything else to activity_post. Do not use
+	// bpfn_get_activity_type() here - it is filterable and could resolve to a key
+	// the module never checks, which would put the two handlers back out of step.
+	$activity_type = ( 'activity_comment' === $activity->type ) ? 'activity_comment' : 'activity_post';
+	if ( ! bpfn_is_notification_enabled( $activity->user_id, $activity_type, 'web' ) ) {
+		return;
+	}
+
 	// Check if we should create notification.
 	$existing = BP_Notifications_Notification::get(
 		array(
