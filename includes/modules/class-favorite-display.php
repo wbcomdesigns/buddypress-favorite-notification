@@ -262,11 +262,18 @@ class BPFN_Module_Favorite_Display {
 
 		if ( 2 === $total && isset( $users[0], $users[1] ) ) {
 			return sprintf(
-				'<a href="%s" class="bpfn-user-link">%s</a> and <a href="%s" class="bpfn-user-link">%s</a>',
-				esc_url( $users[0]['link'] ),
-				esc_html( $users[0]['name'] ),
-				esc_url( $users[1]['link'] ),
-				esc_html( $users[1]['name'] )
+				/* translators: 1: Link to the first person who favorited, 2: Link to the second person who favorited. */
+				__( '%1$s and %2$s', 'buddypress-favorite-notification' ),
+				sprintf(
+					'<a href="%s" class="bpfn-user-link">%s</a>',
+					esc_url( $users[0]['link'] ),
+					esc_html( $users[0]['name'] )
+				),
+				sprintf(
+					'<a href="%s" class="bpfn-user-link">%s</a>',
+					esc_url( $users[1]['link'] ),
+					esc_html( $users[1]['name'] )
+				)
 			);
 		}
 
@@ -291,20 +298,41 @@ class BPFN_Module_Favorite_Display {
 		}
 
 		if ( $remaining > 0 ) {
-			return sprintf(
-				'%s, and <a href="#" class="bpfn-others-count" data-activity-id="%d">%d %s</a>',
-				implode( ', ', $names ),
-				$activity_id,
-				$remaining,
-				_n( 'other', 'others', $remaining, 'buddypress-favorite-notification' )
+			// The whole "N others" phrase is one _n() string (not a number
+			// concatenated to a bare "other"/"others"), so translators control
+			// word order and plural form. It is then placed into the link, and
+			// the link into a second full-phrase string.
+			$others_label = sprintf(
+				/* translators: %s: Number of additional people who favorited. */
+				_n( '%s other', '%s others', $remaining, 'buddypress-favorite-notification' ),
+				number_format_i18n( $remaining )
 			);
-		} else {
-			$last = array_pop( $names );
-			if ( ! empty( $names ) ) {
-				return implode( ', ', $names ) . ' and ' . $last;
-			}
-			return $last;
+
+			$others_link = sprintf(
+				'<a href="#" class="bpfn-others-count" data-activity-id="%d">%s</a>',
+				$activity_id,
+				esc_html( $others_label )
+			);
+
+			return sprintf(
+				/* translators: 1: Comma-separated links to the people who favorited, 2: Link reading "N others". */
+				__( '%1$s and %2$s', 'buddypress-favorite-notification' ),
+				implode( ', ', $names ),
+				$others_link
+			);
 		}
+
+		$last = array_pop( $names );
+		if ( ! empty( $names ) ) {
+			return sprintf(
+				/* translators: 1: Comma-separated links to the people who favorited, 2: Link to the last person who favorited. */
+				__( '%1$s and %2$s', 'buddypress-favorite-notification' ),
+				implode( ', ', $names ),
+				$last
+			);
+		}
+
+		return $last;
 	}
 
 	/**

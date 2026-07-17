@@ -305,7 +305,7 @@
             var self = this;
             bpfnConfirm({
                 title: str('confirm_clear_title', 'Clear old notifications?'),
-                message: str('confirm_clear_old', 'Are you sure you want to clear all read notifications older than 30 days? This cannot be undone.'),
+                message: str('confirm_clear_old', 'Are you sure you want to clear all read notifications older than the retention period? This cannot be undone.'),
                 tone: 'danger'
             }).then(function(ok) {
                 if (ok) {
@@ -356,7 +356,7 @@
          * Show admin notice
          */
         showNotice: function(message, type) {
-            var $notice = $('<div class="notice notice-' + type + ' is-dismissible"><p>' + message + '</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button></div>');
+            var $notice = $('<div class="notice notice-' + type + ' is-dismissible"><p>' + message + '</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">' + str('dismiss_notice', 'Dismiss this notice.') + '</span></button></div>');
 
             $('.wrap h1').first().after($notice);
 

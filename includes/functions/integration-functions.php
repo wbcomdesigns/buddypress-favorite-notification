@@ -234,7 +234,7 @@ function bpfn_send_test_notification( $user_id, $type = 'favorite' ) {
 		$activity_id = bp_activity_post_update(
 			array(
 				'user_id' => $user_id,
-				'content' => 'Test activity for notification',
+				'content' => __( 'Test activity for notification', 'buddypress-favorite-notification' ),
 			)
 		);
 
@@ -337,7 +337,11 @@ function bpfn_send_test_email( $user_id, $type = 'activity_favorited' ) {
 	// Prepare test email data.
 	$email_data = array(
 		'to'       => $user->user_email,
-		'subject'  => '[Test] ' . get_bloginfo( 'name' ) . ' - Favorite Notification Test',
+		'subject'  => sprintf(
+			/* translators: %s: Site name. */
+			__( '[Test] %s - Favorite Notification Test', 'buddypress-favorite-notification' ),
+			get_bloginfo( 'name' )
+		),
 		'template' => 'emails/' . str_replace( '_', '-', $type ) . '.php',
 		'tokens'   => array(
 			'site_name'         => get_bloginfo( 'name' ),
@@ -390,7 +394,11 @@ function bpfn_send_test_email_direct( $user_id, $type = 'activity_favorited' ) {
 	$current_user = wp_get_current_user();
 
 	// Email subject.
-	$subject = '[Test] ' . get_bloginfo( 'name' ) . ' - Favorite Notification Test';
+	$subject = sprintf(
+		/* translators: %s: Site name. */
+		__( '[Test] %s - Favorite Notification Test', 'buddypress-favorite-notification' ),
+		get_bloginfo( 'name' )
+	);
 
 	// Build HTML email based on type.
 	if ( 'comment_favorited' === $type ) {

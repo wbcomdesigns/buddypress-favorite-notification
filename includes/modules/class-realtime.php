@@ -256,7 +256,11 @@ class BPFN_Module_Realtime {
 			$formatted,
 			array(
 				'notification_id' => $notification->id,
-				'time_ago'        => human_time_diff( strtotime( $notification->date_notified ), time() ) . ' ' . esc_html__( 'ago', 'buddypress-favorite-notification' ),
+				'time_ago'        => sprintf(
+					/* translators: %s: Human-readable time difference, e.g. "5 mins". */
+					esc_html__( '%s ago', 'buddypress-favorite-notification' ),
+					human_time_diff( strtotime( $notification->date_notified ), time() )
+				),
 				'timestamp'       => strtotime( $notification->date_notified ),
 			)
 		);

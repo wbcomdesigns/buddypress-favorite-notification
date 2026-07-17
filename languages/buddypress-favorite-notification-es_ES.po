@@ -3,939 +3,1002 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: BuddyPress Favorite Notification 2.0.1\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/buddypress-favorite-notification\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
+"Report-Msgid-Bugs-To: "
+"https://wordpress.org/support/plugin/buddypress-favorite-notification\n"
 "POT-Creation-Date: 2026-07-16T13:55:50+00:00\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2026-07-16T11:32:19+00:00\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: buddypress-favorite-notification\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#: bp-favorite-notification.php bp-favorite-notification.php:251
+#: includes/admin/class-bpfn-admin.php:108 includes/admin/views/shell.php:27
 #. Plugin Name of the plugin
-#: bp-favorite-notification.php
-#: bp-favorite-notification.php:251
-#: includes/admin/class-bpfn-admin.php:108
-#: includes/admin/views/shell.php:27
 msgid "BuddyPress Favorite Notification"
-msgstr ""
+msgstr "Notificación de Favoritos de BuddyPress"
 
+#: bp-favorite-notification.php
 #. Plugin URI of the plugin
 #. Author URI of the plugin
-#: bp-favorite-notification.php
 msgid "http://www.wbcomdesigns.com/"
-msgstr ""
+msgstr "http://www.wbcomdesigns.com/"
 
+#: bp-favorite-notification.php
 #. Description of the plugin
-#: bp-favorite-notification.php
 msgid "Adds notification for the activity Favorite for the activity user."
-msgstr ""
+msgstr "Añade notificaciones cuando tu actividad recibe un favorito."
 
-#. Author of the plugin
 #: bp-favorite-notification.php
+#. Author of the plugin
 msgid "Wbcom Designs<admin@wbcomdesigns.com>"
-msgstr ""
+msgstr "Wbcom Designs<admin@wbcomdesigns.com>"
 
-#. translators: 1: Plugin name, 2: BuddyPress.
 #: bp-favorite-notification.php:250
+#. translators: 1: Plugin name, 2: BuddyPress.
 #, php-format
 msgid "%1$s is ineffective now as it requires %2$s to be installed and active."
-msgstr ""
+msgstr "%1$s no es efectivo ahora ya que requiere que %2$s esté instalado y activo."
 
 #: bp-favorite-notification.php:252
 msgid "BuddyPress"
-msgstr ""
+msgstr "BuddyPress"
 
 #: includes/admin/class-bpfn-admin.php:47
 msgid "Overview"
-msgstr ""
+msgstr "Descripción general"
 
 #: includes/admin/class-bpfn-admin.php:52
 msgid "Tools"
-msgstr ""
+msgstr "Herramientas"
 
 #: includes/admin/class-bpfn-admin.php:57
 msgid "Discover"
-msgstr ""
+msgstr "Descubrir"
 
 #: includes/admin/class-bpfn-admin.php:96
-#: includes/admin/class-bpfn-admin.php:97
-#: includes/admin/views/hub.php:56
+#: includes/admin/class-bpfn-admin.php:97 includes/admin/views/hub.php:56
 msgid "WB Plugins"
-msgstr ""
+msgstr "WB Plugins"
 
-#: includes/admin/class-bpfn-admin.php:109
-#: includes/admin/views/shell.php:56
+#: includes/admin/class-bpfn-admin.php:109 includes/admin/views/shell.php:56
 #: includes/modules/class-settings.php:66
 msgid "Favorite Notifications"
-msgstr ""
+msgstr "Notificaciones de Favoritos"
 
 #: includes/admin/class-bpfn-admin.php:166
 msgid "Clearing..."
-msgstr ""
+msgstr "Limpiando..."
 
-#. translators: %s: Number of notifications cleared.
 #: includes/admin/class-bpfn-admin.php:168
+#. translators: %s: Number of notifications cleared.
 #, php-format
 msgid "Successfully cleared %s old notifications."
-msgstr ""
+msgstr "Se han eliminado exitosamente %s notificaciones antiguas."
 
-#. translators: %s: Number of notifications remaining.
 #: includes/admin/class-bpfn-admin.php:170
+#. translators: %s: Number of notifications remaining.
 #, php-format
 msgid "%s notifications remaining"
-msgstr ""
+msgstr "%s notificaciones restantes"
 
 #: includes/admin/class-bpfn-admin.php:171
 msgid "Failed to clear notifications."
-msgstr ""
+msgstr "Error al limpiar notificaciones."
 
 #: includes/admin/class-bpfn-admin.php:172
 msgid "Starting migration..."
-msgstr ""
+msgstr "Iniciando migración..."
 
 #: includes/admin/class-bpfn-admin.php:173
 msgid "Migration failed."
-msgstr ""
+msgstr "Error en la migración."
 
-#. translators: 1: Number of users processed, 2: Number of favorites added.
 #: includes/admin/class-bpfn-admin.php:175
+#. translators: 1: Number of users processed, 2: Number of favorites added.
 #, php-format
 msgid "Migration completed! Processed %1$s users and added %2$s favorites."
 msgstr ""
+"¡Migración completada! Se procesaron %1$s usuarios y se añadieron %2$s "
+"favoritos."
 
-#. translators: %s: Migration status keyword (e.g. failed, cancelled).
 #: includes/admin/class-bpfn-admin.php:177
+#. translators: %s: Migration status keyword (e.g. failed, cancelled).
 #, php-format
 msgid "Migration %s"
-msgstr ""
+msgstr "Migración %s"
 
 #: includes/admin/class-bpfn-admin.php:178
 msgid "users"
-msgstr ""
+msgstr "usuarios"
 
 #: includes/admin/class-bpfn-admin.php:179
 msgid "An error occurred:"
-msgstr ""
+msgstr "Ocurrió un error:"
 
 #: includes/admin/class-bpfn-admin.php:180
 msgid "Dismiss this notice."
-msgstr ""
+msgstr "Descarta este aviso."
 
 #: includes/admin/class-bpfn-admin.php:181
 msgid "Continue"
-msgstr ""
+msgstr "Continuar"
 
 #: includes/admin/class-bpfn-admin.php:182
 msgid "Cancel"
-msgstr ""
+msgstr "Cancelar"
 
 #: includes/admin/class-bpfn-admin.php:183
 msgid "Are you sure? This cannot be undone."
-msgstr ""
+msgstr "¿Estás seguro? Esto no se puede deshacer."
 
 #: includes/admin/class-bpfn-admin.php:184
 msgid "Run migration?"
-msgstr ""
+msgstr "¿Ejecutar migración?"
 
 #: includes/admin/class-bpfn-admin.php:185
-msgid "This will migrate all existing favorites to the new optimized table. Continue?"
+msgid ""
+"This will migrate all existing favorites to the new optimized table. "
+"Continue?"
 msgstr ""
+"Esto migrará todos tus favoritos existentes a la nueva tabla optimizada. "
+"¿Continuar?"
 
 #: includes/admin/class-bpfn-admin.php:186
 msgid "Clear old notifications?"
-msgstr ""
+msgstr "¿Limpiar notificaciones antiguas?"
 
 #: includes/admin/class-bpfn-admin.php:187
-msgid "Are you sure you want to clear all read notifications older than the retention period? This cannot be undone."
+msgid ""
+"Are you sure you want to clear all read notifications older than the "
+"retention period? This cannot be undone."
 msgstr ""
+"¿Estás seguro de que deseas limpiar todas las notificaciones leídas más "
+"antiguas que el período de retención? Esto no se puede deshacer."
 
 #: includes/admin/class-bpfn-admin.php:267
 msgid "Settings"
-msgstr ""
+msgstr "Configuración"
 
 #: includes/admin/class-bpfn-admin.php:298
 msgid "BuddyPress Favorite Notification:"
-msgstr ""
+msgstr "Notificación de Favoritos de BuddyPress:"
 
-#. translators: 1: Number of users, 2: Number of favorites, 3: Tools page link.
 #: includes/admin/class-bpfn-admin.php:303
+#. translators: 1: Number of users, 2: Number of favorites, 3: Tools page link.
 #, php-format
-msgid "Found %1$d users with %2$d favorites that need to be migrated to the new optimized system. <a href=\"%3$s\">Run migration now</a>"
+msgid ""
+"Found %1$d users with %2$d favorites that need to be migrated to the new "
+"optimized system. <a href=\"%3$s\">Run migration now</a>"
 msgstr ""
+"Se encontraron %1$d usuarios con %2$d favoritos que necesitan ser migrados "
+"al nuevo sistema optimizado. <a href=\"%3$s\">Ejecutar migración ahora</a>"
 
-#: includes/admin/class-bpfn-admin.php:334
-#: includes/modules/class-admin.php:137
-#: includes/modules/class-admin.php:175
-#: includes/modules/class-admin.php:217
+#: includes/admin/class-bpfn-admin.php:334 includes/modules/class-admin.php:137
+#: includes/modules/class-admin.php:175 includes/modules/class-admin.php:217
 msgid "Insufficient permissions"
-msgstr ""
+msgstr "Permisos insuficientes"
 
 #: includes/admin/views/discover.php:24
 msgid "BuddyNext"
-msgstr ""
+msgstr "BuddyNext"
 
 #: includes/admin/views/discover.php:26
-msgid "A full WordPress social network with feeds, profiles, groups, and private messaging."
+msgid ""
+"A full WordPress social network with feeds, profiles, groups, and private "
+"messaging."
 msgstr ""
+"Una red social WordPress completa con feeds, perfiles, grupos y mensajería "
+"privada."
 
 #: includes/admin/views/discover.php:30
 msgid "Jetonomy"
-msgstr ""
+msgstr "Jetonomy"
 
 #: includes/admin/views/discover.php:32
 msgid "Self-moderating forums and Q&A that stay fast into six-figure topic counts."
 msgstr ""
+"Foros autogestionados y preguntas y respuestas que se mantienen rápidos "
+"incluso con cientos de miles de temas."
 
 #: includes/admin/views/discover.php:36
 msgid "Mediaverse"
-msgstr ""
+msgstr "Mediaverse"
 
 #: includes/admin/views/discover.php:38
 msgid "A photo and video community with AI moderation built in."
-msgstr ""
+msgstr "Una comunidad de fotos y videos con modulación IA integrada."
 
 #: includes/admin/views/discover.php:42
 msgid "Listora"
-msgstr ""
+msgstr "Listora"
 
 #: includes/admin/views/discover.php:44
 msgid "Searchable directories with ten ready-made listing types."
-msgstr ""
+msgstr "Directorios buscables con diez tipos de listados prehechos."
 
 #: includes/admin/views/discover.php:48
 msgid "Learnomy"
-msgstr ""
+msgstr "Learnomy"
 
 #: includes/admin/views/discover.php:50
 msgid "A free LMS with courses, quizzes, and certificates."
-msgstr ""
+msgstr "Un LMS gratuito con cursos, pruebas y certificados."
 
 #: includes/admin/views/discover.php:58
 msgid "More Free Tools from Wbcom Designs"
-msgstr ""
+msgstr "Más Herramientas Gratuitas de Wbcom Designs"
 
 #: includes/admin/views/discover.php:59
-msgid "Favorite Notification keeps members coming back when their activity gets liked. These free Wbcom Designs plugins give them more worth coming back to, from the network itself to forums, media, directories, and courses."
+msgid ""
+"Favorite Notification keeps members coming back when their activity gets "
+"liked. These free Wbcom Designs plugins give them more worth coming back "
+"to, from the network itself to forums, media, directories, and courses."
 msgstr ""
+"Notificación de Favoritos mantiene a los miembros regresando cuando sus "
+"actividades reciben favoritos. Estos complementos gratuitos de Wbcom "
+"Designs les dan más razones para volver, desde la red misma hasta foros, "
+"medios, directorios y cursos."
 
 #: includes/admin/views/discover.php:71
 msgid "Get it free"
-msgstr ""
+msgstr "Obtenerlo gratis"
 
-#. translators: %s: product name.
 #: includes/admin/views/discover.php:76
+#. translators: %s: product name.
 #, php-format
 msgid "%s (opens in a new tab)"
-msgstr ""
+msgstr "%s (se abre en una pestaña nueva)"
 
-#. translators: %d: active Wbcom plugin count
 #: includes/admin/views/hub.php:62
+#. translators: %d: active Wbcom plugin count
 #, php-format
 msgid "%d Wbcom plugin active on this site."
 msgid_plural "%d Wbcom plugins active on this site."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d complemento Wbcom activo en este sitio."
+msgstr[1] "%d complementos Wbcom activos en este sitio."
 
 #: includes/admin/views/hub.php:82
 msgid "No Wbcom plugins attached to this hub yet"
-msgstr ""
+msgstr "Ningún complemento Wbcom conectado a este hub aún"
 
 #: includes/admin/views/hub.php:84
 msgid "Activate one or more Wbcom plugins and they will appear here automatically."
-msgstr ""
+msgstr "Activa uno o más complementos Wbcom y aparecerán aquí automáticamente."
 
 #: includes/admin/views/hub.php:99
 msgid "Open settings"
-msgstr ""
+msgstr "Abrir configuración"
 
 #: includes/admin/views/hub.php:109
 msgid "About WB Plugins"
-msgstr ""
+msgstr "Acerca de WB Plugins"
 
 #: includes/admin/views/hub.php:113
-msgid "This hub is the single entry point for every Wbcom Designs plugin installed on your site. Each plugin lives on its own page under this menu and keeps its own settings and data."
+msgid ""
+"This hub is the single entry point for every Wbcom Designs plugin installed "
+"on your site. Each plugin lives on its own page under this menu and keeps "
+"its own settings and data."
 msgstr ""
+"Este hub es el único punto de entrada para cada complemento de Wbcom "
+"Designs instalado en tu sitio. Cada complemento tiene su propia página bajo "
+"este menú y mantiene su propia configuración y datos."
 
 #: includes/admin/views/hub.php:117
 msgid "Visit wbcomdesigns.com for more plugins and themes →"
-msgstr ""
+msgstr "Visita wbcomdesigns.com para más complementos y temas →"
 
 #: includes/admin/views/overview.php:173
 #: templates/emails/comment-favorited.php:137
 msgid "Total Favorites"
-msgstr ""
+msgstr "Total de Favoritos"
 
+#: includes/admin/views/overview.php:181 includes/admin/views/overview.php:200
 #. translators: %s: Number of new favorites.
 #. translators: %s: Number of new notifications.
-#: includes/admin/views/overview.php:181
-#: includes/admin/views/overview.php:200
 #, php-format
 msgid "+%s in last 7 days"
-msgstr ""
+msgstr "+%s en los últimos 7 días"
 
-#: includes/admin/views/overview.php:186
-#: includes/admin/views/overview.php:205
+#: includes/admin/views/overview.php:186 includes/admin/views/overview.php:205
 msgid "All time"
-msgstr ""
+msgstr "Todo el tiempo"
 
 #: includes/admin/views/overview.php:192
 msgid "Notifications Sent"
-msgstr ""
+msgstr "Notificaciones Enviadas"
 
 #: includes/admin/views/overview.php:211
 msgid "Active Users"
-msgstr ""
+msgstr "Usuarios Activos"
 
 #: includes/admin/views/overview.php:213
 msgid "Last 7 days"
-msgstr ""
+msgstr "Últimos 7 días"
 
 #: includes/admin/views/overview.php:216
 msgid "Most Liked Activity"
-msgstr ""
+msgstr "Actividad Más Favorita"
 
-#. translators: %d: Activity ID.
-#: includes/admin/views/overview.php:223
-#: includes/admin/views/overview.php:265
+#: includes/admin/views/overview.php:223 includes/admin/views/overview.php:265
 #: includes/admin/views/overview.php:329
+#. translators: %d: Activity ID.
 #, php-format
 msgid "Activity #%d"
-msgstr ""
+msgstr "Actividad #%d"
 
 #: includes/admin/views/overview.php:227
 msgid "No data yet"
-msgstr ""
+msgstr "Sin datos aún"
 
 #: includes/admin/views/overview.php:236
 msgid "Recent Favorites (Last 7 Days)"
-msgstr ""
+msgstr "Favoritos Recientes (Últimos 7 Días)"
 
 #: includes/admin/views/overview.php:240
 msgid "No favorites in the last 7 days."
-msgstr ""
+msgstr "Sin favoritos en los últimos 7 días."
 
 #: includes/admin/views/overview.php:245
 msgid "User"
-msgstr ""
+msgstr "Usuario"
 
-#: includes/admin/views/overview.php:246
-#: includes/admin/views/overview.php:304
+#: includes/admin/views/overview.php:246 includes/admin/views/overview.php:304
 msgid "Activity"
-msgstr ""
+msgstr "Actividad"
 
 #: includes/admin/views/overview.php:247
 msgid "Date"
-msgstr ""
+msgstr "Fecha"
 
 #: includes/admin/views/overview.php:255
 msgid "Unknown User"
-msgstr ""
+msgstr "Usuario Desconocido"
 
-#. translators: %s: human-readable time difference.
-#. translators: %s: Human-readable time difference, e.g. "5 mins".
 #: includes/admin/views/overview.php:276
 #: includes/modules/class-realtime.php:261
+#. translators: %s: human-readable time difference.
+#. translators: %s: Human-readable time difference, e.g. "5 mins".
 #, php-format
 msgid "%s ago"
-msgstr ""
+msgstr "hace %s"
 
 #: includes/admin/views/overview.php:298
 msgid "No trending activities in this window yet."
-msgstr ""
+msgstr "Sin actividades tendencia en esta ventana aún."
 
 #: includes/admin/views/overview.php:303
 msgid "Rank"
-msgstr ""
+msgstr "Clasificación"
 
 #: includes/admin/views/overview.php:305
 #: includes/modules/class-settings.php:183
 msgid "Favorites"
-msgstr ""
+msgstr "Favoritos"
 
 #: includes/admin/views/overview.php:306
 msgid "Author"
-msgstr ""
+msgstr "Autor"
 
 #: includes/admin/views/overview.php:307
 msgid "Preview"
-msgstr ""
+msgstr "Vista previa"
 
-#: includes/admin/views/overview.php:311
-#: includes/admin/views/overview.php:319
+#: includes/admin/views/overview.php:311 includes/admin/views/overview.php:319
 msgid "Unknown"
-msgstr ""
+msgstr "Desconocido"
 
 #: includes/admin/views/overview.php:312
 msgid "Activity not found"
-msgstr ""
+msgstr "Actividad no encontrada"
 
 #: includes/admin/views/overview.php:345
 msgid "Trending Activities (Last 7 Days)"
-msgstr ""
+msgstr "Actividades Tendencia (Últimos 7 Días)"
 
 #: includes/admin/views/overview.php:354
 msgid "Trending Activities (Last 30 Days)"
-msgstr ""
+msgstr "Actividades Tendencia (Últimos 30 Días)"
 
 #: includes/admin/views/overview.php:363
 msgid "Quick Actions"
-msgstr ""
+msgstr "Acciones Rápidas"
 
 #: includes/admin/views/overview.php:369
 msgid "Tools & Maintenance"
-msgstr ""
+msgstr "Herramientas y Mantenimiento"
 
 #: includes/admin/views/shell.php:28
-msgid "Notify members when their activity is favorited, with email, real-time, and a \"X and N others liked this\" display."
+msgid ""
+"Notify members when their activity is favorited, with email, real-time, and "
+"a \"X and N others liked this\" display."
 msgstr ""
+"Notifica a los miembros cuando su actividad recibe un favorito, con correo "
+"electrónico, tiempo real y una pantalla \"X y N otros dieron like a esto\"."
 
 #: includes/admin/views/shell.php:57
 msgid "Plugin"
-msgstr ""
+msgstr "Complemento"
 
 #: includes/admin/views/shell.php:60
 msgid "Favorite Notification navigation"
-msgstr ""
+msgstr "Navegación de Notificación de Favoritos"
 
 #: includes/admin/views/shell.php:64
 msgid "Configuration"
-msgstr ""
+msgstr "Configuración"
 
 #: includes/admin/views/shell.php:85
 msgid "Resources"
-msgstr ""
+msgstr "Recursos"
 
 #: includes/admin/views/shell.php:88
 msgid "Documentation"
-msgstr ""
+msgstr "Documentación"
 
 #: includes/admin/views/shell.php:90
 msgid "(opens in a new tab)"
-msgstr ""
+msgstr "(se abre en una pestaña nueva)"
 
 #: includes/admin/views/tools.php:31
 msgid "Settings saved successfully!"
-msgstr ""
+msgstr "¡Configuración guardada exitosamente!"
 
 #: includes/admin/views/tools.php:37
 msgid "Migrate Favorites"
-msgstr ""
+msgstr "Migrar Favoritos"
 
 #: includes/admin/views/tools.php:38
 msgid "Move legacy usermeta favorites into the optimized custom table."
-msgstr ""
+msgstr "Mueve los favoritos usermeta heredados a la tabla personalizada optimizada."
 
 #: includes/admin/views/tools.php:43
 msgid "Migration completed."
-msgstr ""
+msgstr "Migración completada."
 
-#. translators: 1: Number of users, 2: Number of favorites.
 #: includes/admin/views/tools.php:53
+#. translators: 1: Number of users, 2: Number of favorites.
 #, php-format
 msgid "Processed %1$d users and migrated %2$d favorites."
-msgstr ""
+msgstr "Se procesaron %1$d usuarios y se migraron %2$d favoritos."
 
-#. translators: 1: Number of users, 2: Number of favorites.
 #: includes/admin/views/tools.php:65
+#. translators: 1: Number of users, 2: Number of favorites.
 #, php-format
 msgid "Found %1$d users with %2$d favorites to migrate."
-msgstr ""
+msgstr "Se encontraron %1$d usuarios con %2$d favoritos para migrar."
 
 #: includes/admin/views/tools.php:73
 msgid "Run Migration"
-msgstr ""
+msgstr "Ejecutar Migración"
 
 #: includes/admin/views/tools.php:78
 msgid "No favorites found to migrate."
-msgstr ""
+msgstr "No se encontraron favoritos para migrar."
 
 #: includes/admin/views/tools.php:85
 msgid "Database Maintenance"
-msgstr ""
+msgstr "Mantenimiento de Base de Datos"
 
 #: includes/admin/views/tools.php:86
-msgid "Remove read notifications older than the retention period to keep the database lean."
+msgid ""
+"Remove read notifications older than the retention period to keep the "
+"database lean."
 msgstr ""
+"Elimina notificaciones leídas más antiguas que el período de retención para "
+"mantener la base de datos optimizada."
 
 #: includes/admin/views/tools.php:94
 msgid "Automatic Cleanup"
-msgstr ""
+msgstr "Limpieza Automática"
 
 #: includes/admin/views/tools.php:103
 msgid "Enable automatic monthly cleanup"
-msgstr ""
+msgstr "Habilitar limpieza automática mensual"
 
 #: includes/admin/views/tools.php:105
 msgid "Automatically remove old read notifications once per month via WP Cron."
 msgstr ""
+"Elimina automáticamente las notificaciones antiguas leídas una vez al mes a "
+"través de WP Cron."
 
 #: includes/admin/views/tools.php:110
 msgid "Retention Period"
-msgstr ""
+msgstr "Período de Retención"
 
-#. translators: %d: number of days.
 #: includes/admin/views/tools.php:119
+#. translators: %d: number of days.
 #, php-format
 msgid "%d days"
-msgstr ""
+msgstr "%d días"
 
 #: includes/admin/views/tools.php:126
 msgid "Only read/dismissed notifications older than this will be deleted."
 msgstr ""
+"Solo las notificaciones leídas/descartadas más antiguas que esto serán "
+"eliminadas."
 
-#: includes/admin/views/tools.php:132
-#: templates/settings/notifications.php:94
+#: includes/admin/views/tools.php:132 templates/settings/notifications.php:94
 msgid "Save Settings"
-msgstr ""
+msgstr "Guardar Configuración"
 
 #: includes/admin/views/tools.php:140
 msgid "Last automatic cleanup:"
-msgstr ""
+msgstr "Última limpieza automática:"
 
-#. translators: 1: Date, 2: Number deleted, 3: Number remaining.
 #: includes/admin/views/tools.php:144
+#. translators: 1: Date, 2: Number deleted, 3: Number remaining.
 #, php-format
 msgid "%1$s — deleted %2$d notifications, %3$d remaining."
-msgstr ""
+msgstr "%1$s — se eliminaron %2$d notificaciones, %3$d restantes."
 
 #: includes/admin/views/tools.php:145
 msgid "N/A"
-msgstr ""
+msgstr "N/A"
 
-#. translators: %s: Next cleanup date/time.
 #: includes/admin/views/tools.php:160
+#. translators: %s: Next cleanup date/time.
 #, php-format
 msgid "Next automatic cleanup: %s"
-msgstr ""
+msgstr "Próxima limpieza automática: %s"
 
 #: includes/admin/views/tools.php:172
 msgid "Manual Cleanup"
-msgstr ""
+msgstr "Limpieza Manual"
 
 #: includes/admin/views/tools.php:173
 msgid "Run cleanup immediately without waiting for the automatic schedule."
-msgstr ""
+msgstr "Ejecuta la limpieza inmediatamente sin esperar la programación automática."
 
 #: includes/admin/views/tools.php:178
 msgid "Clear Old Notifications Now"
-msgstr ""
+msgstr "Limpiar Notificaciones Antiguas Ahora"
 
-#. translators: %d: Number of members.
 #: includes/compat/buddypress-compat.php:96
+#. translators: %d: Number of members.
 #, php-format
 msgid "%d members favorited your activity"
-msgstr ""
+msgstr "%d miembros dieron favorito a tu actividad"
 
-#. translators: %s: User display name.
 #: includes/compat/buddypress-compat.php:100
 #: includes/functions/integration-functions.php:410
 #: includes/modules/class-notifications.php:49
+#. translators: %s: User display name.
 #, php-format
 msgid "%s favorited your activity"
-msgstr ""
+msgstr "%s dio favorito a tu actividad"
 
-#. translators: %s: Current time.
 #: includes/functions/integration-functions.php:214
+#. translators: %s: Current time.
 #, php-format
 msgid "Test activity for notification testing created at %s"
-msgstr ""
+msgstr "Actividad de prueba para prueba de notificación creada en %s"
 
 #: includes/functions/integration-functions.php:237
 msgid "Test activity for notification"
-msgstr ""
+msgstr "Actividad de prueba para notificación"
 
-#. translators: %s: Site name.
 #: includes/functions/integration-functions.php:342
 #: includes/functions/integration-functions.php:399
+#. translators: %s: Site name.
 #, php-format
 msgid "[Test] %s - Favorite Notification Test"
-msgstr ""
+msgstr "[Test] %s - Prueba de Notificación de Favorito"
 
 #: includes/functions/integration-functions.php:351
 #: includes/functions/integration-functions.php:443
-msgid "This is a test activity content to show how your notifications will look when someone favorites your activity posts."
+msgid ""
+"This is a test activity content to show how your notifications will look "
+"when someone favorites your activity posts."
 msgstr ""
+"Este es contenido de actividad de prueba para mostrar cómo se verán tus "
+"notificaciones cuando alguien de favorito a tus publicaciones de actividad."
 
-#. translators: %s: User display name.
 #: includes/functions/integration-functions.php:406
 #: includes/modules/class-notifications.php:58
+#. translators: %s: User display name.
 #, php-format
 msgid "%s favorited your comment"
-msgstr ""
+msgstr "%s dio favorito a tu comentario"
 
 #: includes/functions/integration-functions.php:407
 #: templates/emails/comment-favorited.php:101
 msgid "Your Comment:"
-msgstr ""
+msgstr "Tu Comentario:"
 
 #: includes/functions/integration-functions.php:411
 #: templates/emails/activity-favorited.php:76
 msgid "Your Activity:"
-msgstr ""
+msgstr "Tu Actividad:"
 
-#. translators: %s: User display name.
-#. translators: %s: Recipient name.
 #: includes/functions/integration-functions.php:437
 #: includes/modules/class-email.php:335
 #: templates/emails/activity-favorited.php:41
 #: templates/emails/comment-favorited.php:54
+#. translators: %s: User display name.
+#. translators: %s: Recipient name.
 #, php-format
 msgid "Hi %s!"
-msgstr ""
+msgstr "¡Hola %s!"
 
 #: includes/functions/integration-functions.php:438
 msgid "This is a test email from BuddyPress Favorite Notification plugin."
 msgstr ""
+"Este es un correo de prueba del complemento BuddyPress Favorite "
+"Notification."
 
 #: includes/functions/integration-functions.php:447
-#: includes/modules/class-assets.php:151
-#: includes/modules/class-email.php:347
+#: includes/modules/class-assets.php:151 includes/modules/class-email.php:347
 msgid "View Activity"
-msgstr ""
+msgstr "Ver Actividad"
 
 #: includes/functions/integration-functions.php:450
 msgid "If you received this email, your email notifications are working correctly!"
 msgstr ""
+"¡Si recibiste este correo, tus notificaciones por correo funcionan "
+"correctamente!"
 
 #: includes/functions/integration-functions.php:453
-msgid "You received this test email because you initiated a test from the admin panel."
+msgid ""
+"You received this test email because you initiated a test from the admin "
+"panel."
 msgstr ""
+"Recibiste este correo de prueba porque iniciaste una prueba desde el panel "
+"de administración."
 
 #: includes/migrations/class-favorites-migration.php:58
 msgid "Migration started. Processing in background..."
-msgstr ""
+msgstr "Migración iniciada. Procesando en segundo plano..."
 
-#. translators: 1: Number of users, 2: Number of favorites.
 #: includes/migrations/class-favorites-migration.php:167
 #: includes/migrations/class-favorites-migration.php:266
+#. translators: 1: Number of users, 2: Number of favorites.
 #, php-format
 msgid "Migration complete! Processed %1$d users and added %2$d favorites."
 msgstr ""
+"¡Migración completada! Se procesaron %1$d usuarios y se añadieron %2$d "
+"favoritos."
 
 #: includes/migrations/class-favorites-migration.php:204
 msgid "No favorites found to migrate"
-msgstr ""
+msgstr "No se encontraron favoritos para migrar"
 
 #: includes/migrations/class-favorites-migration.php:405
 msgid "Migration cancelled."
-msgstr ""
+msgstr "Migración cancelada."
 
 #: includes/modules/class-admin.php:141
 msgid "Function not available"
-msgstr ""
+msgstr "Función no disponible"
 
-#. translators: %d: Number of cleared notifications.
 #: includes/modules/class-admin.php:158
+#. translators: %d: Number of cleared notifications.
 #, php-format
 msgid "Cleared %d old notifications"
-msgstr ""
+msgstr "Se eliminaron %d notificaciones antiguas"
 
 #: includes/modules/class-admin.php:164
 msgid "Failed to clear notifications"
-msgstr ""
+msgstr "Error al limpiar notificaciones"
 
 #: includes/modules/class-admin.php:205
 msgid "Migration failed"
-msgstr ""
+msgstr "Error en la migración"
 
 #: includes/modules/class-admin.php:241
 msgid "Once Monthly"
-msgstr ""
+msgstr "Una Vez al Mes"
 
 #: includes/modules/class-assets.php:101
 msgid "Loading…"
-msgstr ""
+msgstr "Cargando…"
 
 #: includes/modules/class-assets.php:102
 msgid "Failed to load favorites list."
-msgstr ""
+msgstr "Error al cargar la lista de favoritos."
 
 #: includes/modules/class-assets.php:103
 msgid "An error occurred while loading favorites."
-msgstr ""
+msgstr "Ocurrió un error al cargar favoritos."
 
 #: includes/modules/class-assets.php:104
 msgid "Close"
-msgstr ""
+msgstr "Cerrar"
 
 #: includes/modules/class-assets.php:150
 msgid "New notification"
-msgstr ""
+msgstr "Nueva notificación"
 
 #: includes/modules/class-assets.php:152
 msgid "Dismiss"
-msgstr ""
+msgstr "Descartar"
 
 #: includes/modules/class-assets.php:156
 msgid "just now"
-msgstr ""
+msgstr "hace poco"
 
 #: includes/modules/class-assets.php:157
 msgid "Someone favorited your activity"
-msgstr ""
+msgstr "Alguien marcó tu actividad como favorita"
 
 #: includes/modules/class-email.php:42
 msgid "[{site_name}] {user_name} favorited your activity"
-msgstr ""
+msgstr "[{site_name}] {user_name} dio favorito a tu actividad"
 
 #: includes/modules/class-email.php:46
 msgid "[{site_name}] {user_name} favorited your comment"
-msgstr ""
+msgstr "[{site_name}] {user_name} dio favorito a tu comentario"
 
 #: includes/modules/class-email.php:201
 msgid "[Test] Favorite Notification"
-msgstr ""
+msgstr "[Test] Notificación de Favorito"
 
-#. translators: %s: Recipient name.
 #: includes/modules/class-email.php:335
+#. translators: %s: Recipient name.
 msgid "there"
-msgstr ""
+msgstr "allí"
 
-#. translators: %s: Name of user who favorited.
 #: includes/modules/class-email.php:337
+#. translators: %s: Name of user who favorited.
 #, php-format
 msgid "%s favorited your activity."
-msgstr ""
+msgstr "%s dio favorito a tu actividad."
 
-#. translators: %s: Name of user who favorited.
 #: includes/modules/class-email.php:337
 #: includes/modules/class-notifications.php:291
 #: includes/modules/class-notifications.php:308
+#. translators: %s: Name of user who favorited.
 msgid "Someone"
-msgstr ""
+msgstr "Alguien"
 
-#: includes/modules/class-email.php:351
-#: templates/emails/base.php:196
+#: includes/modules/class-email.php:351 templates/emails/base.php:196
 msgid "You received this email because you have notifications enabled."
-msgstr ""
+msgstr "Recibiste este correo porque tienes notificaciones habilitadas."
 
-#: includes/modules/class-email.php:353
-#: templates/emails/base.php:200
+#: includes/modules/class-email.php:353 templates/emails/base.php:200
 msgid "Manage Notifications"
-msgstr ""
+msgstr "Administrar Notificaciones"
 
-#. translators: 1: Link to the first person who favorited, 2: Link to the second person who favorited.
-#. translators: 1: Comma-separated links to the people who favorited, 2: Link reading "N others".
-#. translators: 1: Comma-separated links to the people who favorited, 2: Link to the last person who favorited.
 #: includes/modules/class-favorite-display.php:266
 #: includes/modules/class-favorite-display.php:319
 #: includes/modules/class-favorite-display.php:329
+#. translators: 1: Link to the first person who favorited, 2: Link to the second person who favorited.
+#. translators: 1: Comma-separated links to the people who favorited, 2: Link reading "N others".
+#. translators: 1: Comma-separated links to the people who favorited, 2: Link to the last person who favorited.
 #, php-format
 msgid "%1$s and %2$s"
-msgstr ""
+msgstr "%1$s y %2$s"
 
-#. translators: %s: Number of additional people who favorited.
 #: includes/modules/class-favorite-display.php:307
+#. translators: %s: Number of additional people who favorited.
 #, php-format
 msgid "%s other"
 msgid_plural "%s others"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%s otro"
+msgstr[1] "%s otros"
 
 #: includes/modules/class-favorite-display.php:405
 #: includes/modules/class-favorite-display.php:506
 msgid "Invalid activity ID"
-msgstr ""
+msgstr "ID de actividad inválido"
 
-#. translators: %d: Number of likes.
 #: includes/modules/class-favorite-display.php:432
+#. translators: %d: Number of likes.
 #, php-format
 msgid "%d Like"
 msgid_plural "%d Likes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d Like"
+msgstr[1] "%d Likes"
 
-#. translators: %s: Number of additional users who favorited.
 #: includes/modules/class-favorite-display.php:456
+#. translators: %s: Number of additional users who favorited.
 #, php-format
 msgid "+%s more"
 msgid_plural "+%s more"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "+%s más"
+msgstr[1] "+%s más"
 
-#. translators: %d: Number of people.
 #: includes/modules/class-notifications.php:51
+#. translators: %d: Number of people.
 #, php-format
 msgid "%d people favorited your activity"
-msgstr ""
+msgstr "%d personas dieron favorito a tu actividad"
 
-#. translators: %d: Number of people.
 #: includes/modules/class-notifications.php:60
+#. translators: %d: Number of people.
 #, php-format
 msgid "%d people favorited your comment"
-msgstr ""
+msgstr "%d personas dieron favorito a tu comentario"
 
 #: includes/modules/class-realtime.php:99
 #: includes/modules/class-realtime.php:126
 msgid "Security check failed"
-msgstr ""
+msgstr "Verificación de seguridad falló"
 
 #: includes/modules/class-realtime.php:103
 #: includes/modules/class-realtime.php:130
 msgid "Not logged in"
-msgstr ""
+msgstr "No has iniciado sesión"
 
 #: includes/modules/class-realtime.php:136
 msgid "Invalid notification ID"
-msgstr ""
+msgstr "ID de notificación inválido"
 
 #: includes/modules/class-realtime.php:148
 msgid "Notification not found"
-msgstr ""
+msgstr "Notificación no encontrada"
 
 #: includes/modules/class-realtime.php:156
 msgid "Notification dismissed"
-msgstr ""
+msgstr "Notificación descartada"
 
 #: includes/modules/class-realtime.php:161
 msgid "Failed to dismiss notification"
-msgstr ""
+msgstr "Error al descartar notificación"
 
 #: includes/modules/class-settings.php:98
 msgid "Favorite Notification Settings"
-msgstr ""
+msgstr "Configuración de Notificación de Favoritos"
 
 #: includes/modules/class-settings.php:158
 msgid "Settings saved successfully."
-msgstr ""
+msgstr "Configuración guardada exitosamente."
 
 #: includes/modules/class-settings.php:160
 msgid "There was a problem saving your settings."
-msgstr ""
+msgstr "Hubo un problema al guardar tu configuración."
 
 #: includes/modules/class-settings.php:184
 msgid "Yes"
-msgstr ""
+msgstr "Sí"
 
 #: includes/modules/class-settings.php:185
 msgid "No"
-msgstr ""
+msgstr "No"
 
 #: includes/modules/class-settings.php:192
 msgid "A member favorites your activity"
-msgstr ""
+msgstr "Un miembro da favorito a tu actividad"
 
 #: includes/modules/class-settings.php:196
 msgid "Yes, send email"
-msgstr ""
+msgstr "Sí, enviar correo"
 
 #: includes/modules/class-settings.php:202
 msgid "No, do not send email"
-msgstr ""
+msgstr "No, no enviar correo"
 
 #: includes/modules/class-settings.php:223
 msgid "Activity post favorites"
-msgstr ""
+msgstr "Favoritos de publicaciones de actividad"
 
 #: includes/modules/class-settings.php:224
 msgid "Notify me when someone favorites my activity posts"
-msgstr ""
+msgstr "Notifícame cuando alguien de favorito a mis publicaciones de actividad"
 
 #: includes/modules/class-settings.php:227
 msgid "Comment favorites"
-msgstr ""
+msgstr "Favoritos de comentarios"
 
 #: includes/modules/class-settings.php:228
 msgid "Notify me when someone favorites my comments"
-msgstr ""
+msgstr "Notifícame cuando alguien de favorito a mis comentarios"
 
 #: templates/emails/activity-favorited.php:46
 msgid "Great news! Someone just favorited your activity."
-msgstr ""
+msgstr "¡Buenas noticias! Alguien acaba de dar favorito a tu actividad."
 
 #: templates/emails/activity-favorited.php:65
 msgid "favorited your activity"
-msgstr ""
+msgstr "dio favorito a tu actividad"
 
 #: templates/emails/activity-favorited.php:89
 msgid "View Your Activity"
-msgstr ""
+msgstr "Ver Tu Actividad"
 
 #: templates/emails/activity-favorited.php:96
 msgid "Did you know?"
-msgstr ""
+msgstr "¿Sabías que?"
 
 #: templates/emails/activity-favorited.php:99
-msgid "Activities with more favorites get better visibility in the community. Keep creating engaging content!"
+msgid ""
+"Activities with more favorites get better visibility in the community. Keep "
+"creating engaging content!"
 msgstr ""
+"Las actividades con más favoritos obtienen mejor visibilidad en la "
+"comunidad. ¡Sigue creando contenido atractivo!"
 
 #: templates/emails/activity-favorited.php:109
 msgid "Connect with us:"
-msgstr ""
+msgstr "Conéctate con nosotros:"
 
 #: templates/emails/base.php:204
 msgid "Visit Site"
-msgstr ""
+msgstr "Visitar Sitio"
 
 #: templates/emails/comment-favorited.php:59
 msgid "Your comment just got some love!"
-msgstr ""
+msgstr "¡Tu comentario acaba de recibir amor!"
 
 #: templates/emails/comment-favorited.php:78
 msgid "favorited your comment"
-msgstr ""
+msgstr "dio favorito a tu comentario"
 
 #: templates/emails/comment-favorited.php:89
 msgid "On this activity:"
-msgstr ""
+msgstr "En esta actividad:"
 
 #: templates/emails/comment-favorited.php:115
 msgid "View Conversation"
-msgstr ""
+msgstr "Ver Conversación"
 
 #: templates/emails/comment-favorited.php:122
 msgid "Your Comment Stats"
-msgstr ""
+msgstr "Tus Estadísticas de Comentarios"
 
 #: templates/emails/comment-favorited.php:149
 msgid "Comments"
-msgstr ""
+msgstr "Comentarios"
 
 #: templates/emails/comment-favorited.php:159
 msgid "Pro tip:"
-msgstr ""
+msgstr "Consejo profesional:"
 
 #: templates/emails/comment-favorited.php:160
-msgid "Engaging comments that add value to discussions tend to receive more favorites. Keep contributing thoughtfully!"
+msgid ""
+"Engaging comments that add value to discussions tend to receive more "
+"favorites. Keep contributing thoughtfully!"
 msgstr ""
+"Los comentarios atractivos que añaden valor a las discusiones tienden a "
+"recibir más favoritos. ¡Sigue contribuyendo con reflexión!"
 
 #: templates/settings/notifications.php:17
 msgid "Choose how you want to receive favorite notifications:"
-msgstr ""
+msgstr "Elige cómo deseas recibir notificaciones de favoritos:"
 
 #: templates/settings/notifications.php:24
 msgid "Notification Type"
-msgstr ""
+msgstr "Tipo de Notificación"
 
 #: templates/settings/notifications.php:25
 msgid "Web"
-msgstr ""
+msgstr "Web"
 
 #: templates/settings/notifications.php:26
 msgid "Email"
-msgstr ""
+msgstr "Correo"
 
 #: templates/settings/notifications.php:27
 msgid "Real-time"
-msgstr ""
+msgstr "Tiempo Real"
 
-#. translators: %s: Notification type label.
 #: templates/settings/notifications.php:50
+#. translators: %s: Notification type label.
 #, php-format
 msgid "Enable web notifications for %s"
-msgstr ""
+msgstr "Habilitar notificaciones web para %s"
 
-#. translators: %s: Notification type label.
 #: templates/settings/notifications.php:65
+#. translators: %s: Notification type label.
 #, php-format
 msgid "Enable email notifications for %s"
-msgstr ""
+msgstr "Habilitar notificaciones por correo para %s"
 
-#. translators: %s: Notification type label.
 #: templates/settings/notifications.php:80
+#. translators: %s: Notification type label.
 #, php-format
 msgid "Enable real-time notifications for %s"
-msgstr ""
+msgstr "Habilitar notificaciones en tiempo real para %s"
+
+#~ msgid "other"
+#~ msgid_plural "others"
+#~ msgstr[0] "otro"
+#~ msgstr[1] "otros"
+
+#~ msgid "ago"
+#~ msgstr "hace"

@@ -177,6 +177,7 @@ class BPFN_Admin {
 					'migration_status'      => __( 'Migration %s', 'buddypress-favorite-notification' ),
 					'users'                 => __( 'users', 'buddypress-favorite-notification' ),
 					'error_generic'         => __( 'An error occurred:', 'buddypress-favorite-notification' ),
+					'dismiss_notice'        => __( 'Dismiss this notice.', 'buddypress-favorite-notification' ),
 					'confirm_continue'      => __( 'Continue', 'buddypress-favorite-notification' ),
 					'confirm_cancel'        => __( 'Cancel', 'buddypress-favorite-notification' ),
 					'confirm_danger'        => __( 'Are you sure? This cannot be undone.', 'buddypress-favorite-notification' ),

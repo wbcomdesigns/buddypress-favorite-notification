@@ -150,6 +150,11 @@ class BPFN_Module_Assets {
 					'new_notification' => esc_html__( 'New notification', 'buddypress-favorite-notification' ),
 					'view_activity'    => esc_html__( 'View Activity', 'buddypress-favorite-notification' ),
 					'dismiss'          => esc_html__( 'Dismiss', 'buddypress-favorite-notification' ),
+					// Fallbacks realtime.js renders when the server payload has no
+					// `time_ago` / `text` of its own. Previously JS-only literals,
+					// so they stayed English on every locale.
+					'just_now'         => esc_html__( 'just now', 'buddypress-favorite-notification' ),
+					'default_message'  => esc_html__( 'Someone favorited your activity', 'buddypress-favorite-notification' ),
 				),
 			)
 		);

@@ -198,7 +198,7 @@ class BPFN_Module_Email {
 		// Ensure we have all required data.
 		$defaults = array(
 			'to'       => '',
-			'subject'  => '[Test] Favorite Notification',
+			'subject'  => __( '[Test] Favorite Notification', 'buddypress-favorite-notification' ),
 			'template' => 'emails/activity-favorited.php',
 			'tokens'   => array(),
 		);
@@ -332,9 +332,9 @@ class BPFN_Module_Email {
 		</div>
 		<div class="content">
 			' . /* translators: %s: Recipient name. */
-			'<h2>' . sprintf( esc_html__( 'Hi %s!', 'buddypress-favorite-notification' ), esc_html( $tokens['recipient_name'] ?? 'there' ) ) . '</h2>
+			'<h2>' . sprintf( esc_html__( 'Hi %s!', 'buddypress-favorite-notification' ), esc_html( $tokens['recipient_name'] ?? __( 'there', 'buddypress-favorite-notification' ) ) ) . '</h2>
 			' . /* translators: %s: Name of user who favorited. */
-			'<p>' . sprintf( esc_html__( '%s favorited your activity.', 'buddypress-favorite-notification' ), esc_html( $tokens['favorited_by'] ?? 'Someone' ) ) . '</p>';
+			'<p>' . sprintf( esc_html__( '%s favorited your activity.', 'buddypress-favorite-notification' ), esc_html( $tokens['favorited_by'] ?? __( 'Someone', 'buddypress-favorite-notification' ) ) ) . '</p>';
 
 		if ( ! empty( $tokens['activity_content'] ) ) {
 			$html .= '<blockquote style="background: #f8f9fa; border-left: 4px solid #ff7b00; padding: 15px; margin: 20px 0;">' .

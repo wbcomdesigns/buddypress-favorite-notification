@@ -1,0 +1,52 @@
+{
+  "domain": "buddypress-favorite-notification",
+  "potFile": "languages/buddypress-favorite-notification.pot",
+  "languagesDir": "languages",
+  "engine": "claude",
+  "model": "haiku",
+  "batch": 400,
+  "makeJson": true,
+  "protect": [
+    "Wbcom",
+    "BuddyPress",
+    "BuddyBoss",
+    "WordPress",
+    "Pro",
+    "REST",
+    "API",
+    "URL",
+    "HTML",
+    "CSV",
+    "AI",
+    "ID",
+    "Heartbeat",
+    "AJAX"
+  ],
+  "locales": [
+    {
+      "locale": "de_DE",
+      "name": "German",
+      "register": "informal (du)"
+    },
+    {
+      "locale": "fr_FR",
+      "name": "French",
+      "register": "informal (tu)"
+    },
+    {
+      "locale": "es_ES",
+      "name": "Spanish",
+      "register": "informal (tú)"
+    },
+    {
+      "locale": "pt_BR",
+      "name": "Portuguese (Brazil)",
+      "register": "informal (você)"
+    },
+    {
+      "locale": "it_IT",
+      "name": "Italian",
+      "register": "informal (tu)"
+    }
+  ]
+}

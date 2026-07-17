@@ -235,6 +235,7 @@ No. The plugin does not collect, store, or share personal data outside your Word
 
 = 2.0.1 - July 2026 =
 
+* New      - Added German, Spanish, French, Italian and Portuguese (Brazil) translations.
 * Improve  - Rebuilt the admin into the unified Wbcom card-panel UI under the shared "WB Plugins" menu, with Overview, Tools, and Discover tabs.
 * Improve  - Removed the "Enhanced Notifications" toggle. BuddyPress escapes notification descriptions down to a plain link, so the setting could never change what members saw.
 * Improve  - Frontend design tokens now chain through the active theme palette (BuddyX --bx-color-*, then block-theme colour presets) so the heart, notification count badge, and realtime toasts pick up the site's brand colours instead of fixed literals.
@@ -242,6 +243,9 @@ No. The plugin does not collect, store, or share personal data outside your Word
 * Improve  - Converted directional CSS to logical properties (margin-inline, inset, text-align:start) across the frontend and admin so every surface mirrors correctly under RTL.
 * Improve  - Admin action buttons now meet the 40px minimum tap target and show a disabled/processing state while their request is running, preventing double submits.
 * Improve  - Added keyboard focus-visible rings to the who-liked list links, realtime toast action links, and the permission role chips.
+* Fix      - The plugin never registered its text domain, so bundled translations could never load. Added the Domain Path header, which WordPress 6.7+ needs to find them.
+* Fix      - The 'and N others' summary and the 'x ago' timestamp were assembled from separate fragments, which cannot be translated correctly in every language. Each is now a single translatable phrase.
+* Fix      - Toast and screen-reader strings in the realtime notifier had no translatable source.
 * Fix      - Activity-favorite email now uses one coherent orange accent for header, excerpt, and button instead of a blue header paired with orange buttons.
 * Fix      - Per-user notification preferences (member Settings > Favorite Notifications) now load and save correctly - the settings module was previously never loaded.
 * Fix      - Migration-notice dismissal now persists (added the missing AJAX handler).

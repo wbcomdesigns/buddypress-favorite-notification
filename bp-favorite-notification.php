@@ -8,6 +8,7 @@
  * Requires PHP: 7.4
  * Requires Plugins: buddypress
  * Text Domain: buddypress-favorite-notification
+ * Domain Path: /languages
  * Author: Wbcom Designs<admin@wbcomdesigns.com>
  * Author URI: http://www.wbcomdesigns.com/
  * License: GPL2

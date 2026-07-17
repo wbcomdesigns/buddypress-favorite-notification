@@ -302,8 +302,8 @@
          */
         createNotificationElement: function(data) {
             var type = data.notification_type || 'favorite';
-            var timeAgo = data.time_ago || 'just now';
             var strings = window.BPFNRealtime && window.BPFNRealtime.strings || {};
+            var timeAgo = data.time_ago || strings.just_now || 'just now';
             
             var html = 
                 '<div class="bpfn-realtime-notification type-' + type + '" data-id="' + (data.notification_id || '') + '">' +
@@ -323,7 +323,7 @@
             }
             
             html += '<div class="bpfn-realtime-message">' +
-                        (data.text || 'Someone favorited your activity') +
+                        (data.text || strings.default_message || 'Someone favorited your activity') +
                         '<div class="bpfn-realtime-time">' + timeAgo + '</div>' +
                     '</div>' +
                 '</div>' +

@@ -202,7 +202,7 @@
             var self = this;
 
             // Show loading state.
-            this.showModal('<div class="bpfn-loading">' + this.str('loading', 'Loading...') + '</div>');
+            this.showModal('<div class="bpfn-loading">' + this.str('loading', 'Loading…') + '</div>');
 
             $.ajax({
                 url: bpfnFavorites.ajax_url,
