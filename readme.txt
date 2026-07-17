@@ -50,7 +50,8 @@ It also adds a Facebook-style "who liked this" line under each activity, and giv
 * Object caching on the favorite counts and the who-liked queries.
 
 **Member preferences**
-* Members get a **Settings > Favorite Notifications** screen in their BuddyPress profile where they can review their notification preferences per activity type.
+* Members get a **Settings > Favorite Notifications** screen in their BuddyPress profile where they can turn favorite notifications on or off per activity type (posts, comments) and per channel (web, email, realtime).
+* Turning a channel off stops that notification. Notifications are on by default, so members only visit this screen if they want less.
 
 **Developer friendly**
 * Action and filter hooks throughout, including `bpfn_notification_string`, `bpfn_who_favorited_limit`, `bpfn_email_from_name`, and `bpfn_email_from_email`.
@@ -96,7 +97,9 @@ Our support team is ready to help with setup, configuration, and troubleshooting
 
 = What's New in 2.0.1 =
 
-The admin is rebuilt on the unified Wbcom card-panel interface under the shared "WB Plugins" menu. Frontend colours now follow your theme palette instead of fixed literals, every surface mirrors correctly under RTL, and the member notification preferences screen loads and saves properly. The dead "Enhanced Notifications" toggle has been removed: BuddyPress strips notification markup down to a plain link, so the option could never change what members saw.
+Member notification preferences now actually work. Until this release a member who turned favorite notifications off still received them on every channel: the check that was meant to read their choice returned "enabled" for any request made through admin-ajax, which is exactly how BuddyPress favoriting works. Two further paths ignored the preference as well. If your members have complained that switching notifications off does nothing, this is the release that fixes it.
+
+The admin is also rebuilt on the unified Wbcom card-panel interface under the shared "WB Plugins" menu, frontend colours follow your theme palette instead of fixed literals, and every surface mirrors correctly under RTL. The dead "Enhanced Notifications" toggle has been removed: BuddyPress strips notification markup down to a plain link, so the option could never change what members saw. German, Spanish, French, Italian and Portuguese (Brazil) translations are included, and the text domain is now registered so they load at all.
 
 == More Free Tools from Wbcom Designs ==
 
@@ -175,7 +178,7 @@ Yes, when several members favorite the same activity. Those favorites collapse i
 
 = Can members control their notifications? =
 
-Members have a **Settings > Favorite Notifications** screen in their BuddyPress profile listing their preferences for each activity type and channel. Notifications for favorited content are delivered to authors by default.
+Yes. Members have a **Settings > Favorite Notifications** screen in their BuddyPress profile with a switch for each activity type (posts, comments) and each channel (web, email, realtime). Notifications are on by default; turning one off stops it.
 
 = Can I customize email templates? =
 
@@ -252,7 +255,11 @@ No. The plugin does not collect, store, or share personal data outside your Word
 * Fix      - Replaced native browser confirm() dialogs in the admin with an accessible confirm modal.
 * Fix      - Removed a duplicate registration of the bpfn_options setting and corrected the text domain to match the plugin slug.
 * Fix      - Added a sanitize callback for register_setting and removed the deprecated load_plugin_textdomain call.
+* Fix      - Per-user notification preferences now take effect. A member who turned favorite notifications off still received them on every channel: the enabled-check returned true for any request made through admin-ajax, which is how BuddyPress favoriting works, so the saved preference was never read.
+* Fix      - A safety-net handler re-added notifications without checking the member's preference, undoing the choice even once the check above was honoured.
+* Fix      - Email notifications ignored the preference for ordinary activity posts, because the type was mapped to a preference key the settings screen never writes.
 * Dev      - WordPress Coding Standards compliance across all PHP files.
+* Dev      - Removed two debug log entries that were written on every request.
 * Compat   - Tested up to WordPress 7.0.
 
 = 2.0.0 - 2025-11-24 =
