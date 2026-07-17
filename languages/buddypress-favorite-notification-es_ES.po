@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: BuddyPress Favorite Notification 2.0.1\n"
 "Report-Msgid-Bugs-To: "
 "https://wordpress.org/support/plugin/buddypress-favorite-notification\n"
-"POT-Creation-Date: 2026-07-16T13:55:50+00:00\n"
+"POT-Creation-Date: 2026-07-17T10:19:02+00:00\n"
 "PO-Revision-Date: 2026-07-16T11:32:19+00:00\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -17,8 +17,7 @@ msgstr ""
 "X-Domain: buddypress-favorite-notification\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: bp-favorite-notification.php bp-favorite-notification.php:251
-#: includes/admin/class-bpfn-admin.php:108 includes/admin/views/shell.php:27
+#: bp-favorite-notification.php
 #. Plugin Name of the plugin
 msgid "BuddyPress Favorite Notification"
 msgstr "Notificación de Favoritos de BuddyPress"
@@ -39,15 +38,11 @@ msgstr "Añade notificaciones cuando tu actividad recibe un favorito."
 msgid "Wbcom Designs<admin@wbcomdesigns.com>"
 msgstr "Wbcom Designs<admin@wbcomdesigns.com>"
 
-#: bp-favorite-notification.php:250
+#: bp-favorite-notification.php:251
 #. translators: 1: Plugin name, 2: BuddyPress.
 #, php-format
 msgid "%1$s is ineffective now as it requires %2$s to be installed and active."
 msgstr "%1$s no es efectivo ahora ya que requiere que %2$s esté instalado y activo."
-
-#: bp-favorite-notification.php:252
-msgid "BuddyPress"
-msgstr "BuddyPress"
 
 #: includes/admin/class-bpfn-admin.php:47
 msgid "Overview"
@@ -67,7 +62,7 @@ msgid "WB Plugins"
 msgstr "WB Plugins"
 
 #: includes/admin/class-bpfn-admin.php:109 includes/admin/views/shell.php:56
-#: includes/modules/class-settings.php:66
+#: includes/modules/class-settings.php:72
 msgid "Favorite Notifications"
 msgstr "Notificaciones de Favoritos"
 
@@ -184,11 +179,15 @@ msgstr ""
 msgid "Insufficient permissions"
 msgstr "Permisos insuficientes"
 
-#: includes/admin/views/discover.php:24
-msgid "BuddyNext"
-msgstr "BuddyNext"
+#: includes/admin/views/discover.php:27
+msgid ""
+"A free, fast community theme for BuddyPress, BuddyBoss and PeepSo with a "
+"modern layout and dark mode."
+msgstr ""
+"Un tema comunitario gratuito y rápido para BuddyPress, BuddyBoss y PeepSo "
+"con un diseño moderno y modo oscuro."
 
-#: includes/admin/views/discover.php:26
+#: includes/admin/views/discover.php:33
 msgid ""
 "A full WordPress social network with feeds, profiles, groups, and private "
 "messaging."
@@ -196,60 +195,75 @@ msgstr ""
 "Una red social WordPress completa con feeds, perfiles, grupos y mensajería "
 "privada."
 
-#: includes/admin/views/discover.php:30
-msgid "Jetonomy"
-msgstr "Jetonomy"
-
-#: includes/admin/views/discover.php:32
+#: includes/admin/views/discover.php:39
 msgid "Self-moderating forums and Q&A that stay fast into six-figure topic counts."
 msgstr ""
 "Foros autogestionados y preguntas y respuestas que se mantienen rápidos "
 "incluso con cientos de miles de temas."
 
-#: includes/admin/views/discover.php:36
-msgid "Mediaverse"
-msgstr "Mediaverse"
-
-#: includes/admin/views/discover.php:38
+#: includes/admin/views/discover.php:45
 msgid "A photo and video community with AI moderation built in."
 msgstr "Una comunidad de fotos y videos con modulación IA integrada."
 
-#: includes/admin/views/discover.php:42
-msgid "Listora"
-msgstr "Listora"
-
-#: includes/admin/views/discover.php:44
-msgid "Searchable directories with ten ready-made listing types."
-msgstr "Directorios buscables con diez tipos de listados prehechos."
-
-#: includes/admin/views/discover.php:48
-msgid "Learnomy"
-msgstr "Learnomy"
-
-#: includes/admin/views/discover.php:50
-msgid "A free LMS with courses, quizzes, and certificates."
-msgstr "Un LMS gratuito con cursos, pruebas y certificados."
-
-#: includes/admin/views/discover.php:58
-msgid "More Free Tools from Wbcom Designs"
-msgstr "Más Herramientas Gratuitas de Wbcom Designs"
+#: includes/admin/views/discover.php:52
+msgid "Run community events with RSVPs, calendars, and front-end submissions."
+msgstr ""
+"Organiza eventos comunitarios con confirmaciones de asistencia, calendarios "
+"y envíos desde la interfaz pública."
 
 #: includes/admin/views/discover.php:59
 msgid ""
+"Reward members with points, badges, and leaderboards to keep engagement "
+"high."
+msgstr ""
+"Recompensa a los miembros con puntos, insignias y tablas de clasificación "
+"para mantener la participación activa."
+
+#: includes/admin/views/discover.php:65
+msgid "Searchable directories with ten ready-made listing types."
+msgstr "Directorios buscables con diez tipos de listados prehechos."
+
+#: includes/admin/views/discover.php:72
+msgid ""
+"Add a job board with front-end listings, applications, and employer "
+"profiles."
+msgstr ""
+"Añade un tablero de empleos con listados en la interfaz pública, "
+"solicitudes y perfiles de empleadores."
+
+#: includes/admin/views/discover.php:78
+msgid "A free LMS with courses, quizzes, and certificates."
+msgstr "Un LMS gratuito con cursos, pruebas y certificados."
+
+#: includes/admin/views/discover.php:85
+msgid ""
+"A free service marketplace with vendor dashboards, an 11-status order flow, "
+"and Stripe or PayPal built in."
+msgstr ""
+"Un mercado de servicios gratuito con paneles de vendedores, un flujo de "
+"pedidos de 11 estados e integración nativa con Stripe o PayPal."
+
+#: includes/admin/views/discover.php:93
+msgid "More Free Tools from Wbcom Designs"
+msgstr "Más Herramientas Gratuitas de Wbcom Designs"
+
+#: includes/admin/views/discover.php:94
+msgid ""
 "Favorite Notification keeps members coming back when their activity gets "
 "liked. These free Wbcom Designs plugins give them more worth coming back "
-"to, from the network itself to forums, media, directories, and courses."
+"to: the theme and network itself, forums, media, events, gamification, "
+"directories, jobs, courses, and services."
 msgstr ""
-"Notificación de Favoritos mantiene a los miembros regresando cuando sus "
-"actividades reciben favoritos. Estos complementos gratuitos de Wbcom "
-"Designs les dan más razones para volver, desde la red misma hasta foros, "
-"medios, directorios y cursos."
+"Favorite Notification mantiene a los miembros volviendo cuando su actividad "
+"recibe likes. Estos plugins gratuitos de Wbcom Designs les dan más razones "
+"para volver: el tema y la red en sí, foros, medios, eventos, gamificación, "
+"directorios, empleos, cursos y servicios."
 
-#: includes/admin/views/discover.php:71
+#: includes/admin/views/discover.php:106
 msgid "Get it free"
 msgstr "Obtenerlo gratis"
 
-#: includes/admin/views/discover.php:76
+#: includes/admin/views/discover.php:111
 #. translators: %s: product name.
 #, php-format
 msgid "%s (opens in a new tab)"
@@ -377,7 +391,7 @@ msgid "Rank"
 msgstr "Clasificación"
 
 #: includes/admin/views/overview.php:305
-#: includes/modules/class-settings.php:183
+#: includes/modules/class-settings.php:241
 msgid "Favorites"
 msgstr "Favoritos"
 
@@ -841,51 +855,51 @@ msgstr "Notificación descartada"
 msgid "Failed to dismiss notification"
 msgstr "Error al descartar notificación"
 
-#: includes/modules/class-settings.php:98
+#: includes/modules/class-settings.php:104
 msgid "Favorite Notification Settings"
 msgstr "Configuración de Notificación de Favoritos"
 
-#: includes/modules/class-settings.php:158
+#: includes/modules/class-settings.php:164
 msgid "Settings saved successfully."
 msgstr "Configuración guardada exitosamente."
 
-#: includes/modules/class-settings.php:160
+#: includes/modules/class-settings.php:166
 msgid "There was a problem saving your settings."
 msgstr "Hubo un problema al guardar tu configuración."
 
-#: includes/modules/class-settings.php:184
+#: includes/modules/class-settings.php:242
 msgid "Yes"
 msgstr "Sí"
 
-#: includes/modules/class-settings.php:185
+#: includes/modules/class-settings.php:243
 msgid "No"
 msgstr "No"
 
-#: includes/modules/class-settings.php:192
+#: includes/modules/class-settings.php:250
 msgid "A member favorites your activity"
 msgstr "Un miembro da favorito a tu actividad"
 
-#: includes/modules/class-settings.php:196
+#: includes/modules/class-settings.php:254
 msgid "Yes, send email"
 msgstr "Sí, enviar correo"
 
-#: includes/modules/class-settings.php:202
+#: includes/modules/class-settings.php:260
 msgid "No, do not send email"
 msgstr "No, no enviar correo"
 
-#: includes/modules/class-settings.php:223
+#: includes/modules/class-settings.php:281
 msgid "Activity post favorites"
 msgstr "Favoritos de publicaciones de actividad"
 
-#: includes/modules/class-settings.php:224
+#: includes/modules/class-settings.php:282
 msgid "Notify me when someone favorites my activity posts"
 msgstr "Notifícame cuando alguien de favorito a mis publicaciones de actividad"
 
-#: includes/modules/class-settings.php:227
+#: includes/modules/class-settings.php:285
 msgid "Comment favorites"
 msgstr "Favoritos de comentarios"
 
-#: includes/modules/class-settings.php:228
+#: includes/modules/class-settings.php:286
 msgid "Notify me when someone favorites my comments"
 msgstr "Notifícame cuando alguien de favorito a mis comentarios"
 
@@ -994,6 +1008,49 @@ msgstr "Habilitar notificaciones por correo para %s"
 #, php-format
 msgid "Enable real-time notifications for %s"
 msgstr "Habilitar notificaciones en tiempo real para %s"
+
+#~ msgid "BuddyPress"
+#~ msgstr "BuddyPress"
+
+#~ msgid "BuddyX"
+#~ msgstr "BuddyX"
+
+#~ msgid "BuddyNext"
+#~ msgstr "BuddyNext"
+
+#~ msgid "Jetonomy"
+#~ msgstr "Jetonomy"
+
+#~ msgid "Mediaverse"
+#~ msgstr "Mediaverse"
+
+#~ msgid "Eventonomy"
+#~ msgstr "Eventonomy"
+
+#~ msgid "WB Gamification"
+#~ msgstr "WB Gamification"
+
+#~ msgid "Listora"
+#~ msgstr "Listora"
+
+#~ msgid "WP Career Board"
+#~ msgstr "WP Career Board"
+
+#~ msgid "Learnomy"
+#~ msgstr "Learnomy"
+
+#~ msgid "WP Sell Services"
+#~ msgstr "WP Sell Services"
+
+#~ msgid ""
+#~ "Favorite Notification keeps members coming back when their activity gets "
+#~ "liked. These free Wbcom Designs plugins give them more worth coming back "
+#~ "to, from the network itself to forums, media, directories, and courses."
+#~ msgstr ""
+#~ "Notificación de Favoritos mantiene a los miembros regresando cuando sus "
+#~ "actividades reciben favoritos. Estos complementos gratuitos de Wbcom "
+#~ "Designs les dan más razones para volver, desde la red misma hasta foros, "
+#~ "medios, directorios y cursos."
 
 #~ msgid "other"
 #~ msgid_plural "others"

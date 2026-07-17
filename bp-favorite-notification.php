@@ -4,8 +4,8 @@
  * Plugin URI: http://www.wbcomdesigns.com/
  * Description: Adds notification for the activity Favorite for the activity user.
  * Version: 2.0.1
- * Requires at least: 6.1
- * Requires PHP: 7.4
+ * Requires at least: 6.5
+ * Requires PHP: 8.0
  * Requires Plugins: buddypress
  * Text Domain: buddypress-favorite-notification
  * Domain Path: /languages
@@ -249,8 +249,8 @@ class BP_Favorite_Notification {
 			printf(
 				/* translators: 1: Plugin name, 2: BuddyPress. */
 				esc_html__( '%1$s is ineffective now as it requires %2$s to be installed and active.', 'buddypress-favorite-notification' ),
-				'<strong>' . esc_html__( 'BuddyPress Favorite Notification', 'buddypress-favorite-notification' ) . '</strong>',
-				'<strong>' . esc_html__( 'BuddyPress', 'buddypress-favorite-notification' ) . '</strong>'
+				'<strong>' . 'BuddyPress Favorite Notification' . '</strong>',
+				'<strong>' . 'BuddyPress' . '</strong>'
 			);
 			?>
 			</p>

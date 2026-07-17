@@ -2,9 +2,9 @@
 Contributors: wbcomdesigns, vapvarun
 Donate link: https://wbcomdesigns.com/donate/
 Tags: buddypress, notifications, favorites, activity, realtime
-Requires at least: 6.1
+Requires at least: 6.5
 Tested up to: 7.0
-Requires PHP: 7.4
+Requires PHP: 8.0
 Requires Plugins: buddypress
 Stable tag: 2.0.1
 License: GPLv2 or later
@@ -89,8 +89,8 @@ Our support team is ready to help with setup, configuration, and troubleshooting
 
 = Compatibility =
 
-* WordPress 6.1 and higher
-* PHP 7.4 and higher (8.0+ recommended)
+* WordPress 6.5 and higher
+* PHP 8.0 and higher
 * BuddyPress required - the plugin deactivates itself and explains why if BuddyPress is not active
 * Compatible with BuddyPress Nouveau and Legacy templates
 * Works with modern WordPress themes, including BuddyX and Reign
@@ -146,8 +146,8 @@ To review what is happening on your site:
 
 = Requirements =
 
-* WordPress 6.1 or higher
-* PHP 7.4 or higher
+* WordPress 6.5 or higher
+* PHP 8.0 or higher
 * BuddyPress installed and active
 
 == Frequently Asked Questions ==

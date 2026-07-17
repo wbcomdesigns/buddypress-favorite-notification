@@ -24,7 +24,7 @@ $version = defined( 'BPFN_VERSION' ) ? BPFN_VERSION : '';
 		<div class="bpfn-page-header__title">
 			<span class="dashicons dashicons-heart" aria-hidden="true"></span>
 			<div>
-				<h1><?php esc_html_e( 'BuddyPress Favorite Notification', 'buddypress-favorite-notification' ); ?></h1>
+				<h1><?php echo 'BuddyPress Favorite Notification'; ?></h1>
 				<p class="bpfn-page-header__subtitle"><?php esc_html_e( 'Notify members when their activity is favorited, with email, real-time, and a "X and N others liked this" display.', 'buddypress-favorite-notification' ); ?></p>
 			</div>
 		</div>

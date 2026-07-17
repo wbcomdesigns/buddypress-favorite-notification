@@ -9,16 +9,13 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-16T13:55:50+00:00\n"
+"POT-Creation-Date: 2026-07-17T10:19:02+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: buddypress-favorite-notification\n"
 
 #. Plugin Name of the plugin
 #: bp-favorite-notification.php
-#: bp-favorite-notification.php:251
-#: includes/admin/class-bpfn-admin.php:108
-#: includes/admin/views/shell.php:27
 msgid "BuddyPress Favorite Notification"
 msgstr ""
 
@@ -39,13 +36,9 @@ msgid "Wbcom Designs<admin@wbcomdesigns.com>"
 msgstr ""
 
 #. translators: 1: Plugin name, 2: BuddyPress.
-#: bp-favorite-notification.php:250
+#: bp-favorite-notification.php:251
 #, php-format
 msgid "%1$s is ineffective now as it requires %2$s to be installed and active."
-msgstr ""
-
-#: bp-favorite-notification.php:252
-msgid "BuddyPress"
 msgstr ""
 
 #: includes/admin/class-bpfn-admin.php:47
@@ -68,7 +61,7 @@ msgstr ""
 
 #: includes/admin/class-bpfn-admin.php:109
 #: includes/admin/views/shell.php:56
-#: includes/modules/class-settings.php:66
+#: includes/modules/class-settings.php:72
 msgid "Favorite Notifications"
 msgstr ""
 
@@ -173,60 +166,60 @@ msgstr ""
 msgid "Insufficient permissions"
 msgstr ""
 
-#: includes/admin/views/discover.php:24
-msgid "BuddyNext"
+#: includes/admin/views/discover.php:27
+msgid "A free, fast community theme for BuddyPress, BuddyBoss and PeepSo with a modern layout and dark mode."
 msgstr ""
 
-#: includes/admin/views/discover.php:26
+#: includes/admin/views/discover.php:33
 msgid "A full WordPress social network with feeds, profiles, groups, and private messaging."
 msgstr ""
 
-#: includes/admin/views/discover.php:30
-msgid "Jetonomy"
-msgstr ""
-
-#: includes/admin/views/discover.php:32
+#: includes/admin/views/discover.php:39
 msgid "Self-moderating forums and Q&A that stay fast into six-figure topic counts."
 msgstr ""
 
-#: includes/admin/views/discover.php:36
-msgid "Mediaverse"
-msgstr ""
-
-#: includes/admin/views/discover.php:38
+#: includes/admin/views/discover.php:45
 msgid "A photo and video community with AI moderation built in."
 msgstr ""
 
-#: includes/admin/views/discover.php:42
-msgid "Listora"
-msgstr ""
-
-#: includes/admin/views/discover.php:44
-msgid "Searchable directories with ten ready-made listing types."
-msgstr ""
-
-#: includes/admin/views/discover.php:48
-msgid "Learnomy"
-msgstr ""
-
-#: includes/admin/views/discover.php:50
-msgid "A free LMS with courses, quizzes, and certificates."
-msgstr ""
-
-#: includes/admin/views/discover.php:58
-msgid "More Free Tools from Wbcom Designs"
+#: includes/admin/views/discover.php:52
+msgid "Run community events with RSVPs, calendars, and front-end submissions."
 msgstr ""
 
 #: includes/admin/views/discover.php:59
-msgid "Favorite Notification keeps members coming back when their activity gets liked. These free Wbcom Designs plugins give them more worth coming back to, from the network itself to forums, media, directories, and courses."
+msgid "Reward members with points, badges, and leaderboards to keep engagement high."
 msgstr ""
 
-#: includes/admin/views/discover.php:71
+#: includes/admin/views/discover.php:65
+msgid "Searchable directories with ten ready-made listing types."
+msgstr ""
+
+#: includes/admin/views/discover.php:72
+msgid "Add a job board with front-end listings, applications, and employer profiles."
+msgstr ""
+
+#: includes/admin/views/discover.php:78
+msgid "A free LMS with courses, quizzes, and certificates."
+msgstr ""
+
+#: includes/admin/views/discover.php:85
+msgid "A free service marketplace with vendor dashboards, an 11-status order flow, and Stripe or PayPal built in."
+msgstr ""
+
+#: includes/admin/views/discover.php:93
+msgid "More Free Tools from Wbcom Designs"
+msgstr ""
+
+#: includes/admin/views/discover.php:94
+msgid "Favorite Notification keeps members coming back when their activity gets liked. These free Wbcom Designs plugins give them more worth coming back to: the theme and network itself, forums, media, events, gamification, directories, jobs, courses, and services."
+msgstr ""
+
+#: includes/admin/views/discover.php:106
 msgid "Get it free"
 msgstr ""
 
 #. translators: %s: product name.
-#: includes/admin/views/discover.php:76
+#: includes/admin/views/discover.php:111
 #, php-format
 msgid "%s (opens in a new tab)"
 msgstr ""
@@ -351,7 +344,7 @@ msgid "Rank"
 msgstr ""
 
 #: includes/admin/views/overview.php:305
-#: includes/modules/class-settings.php:183
+#: includes/modules/class-settings.php:241
 msgid "Favorites"
 msgstr ""
 
@@ -794,51 +787,51 @@ msgstr ""
 msgid "Failed to dismiss notification"
 msgstr ""
 
-#: includes/modules/class-settings.php:98
+#: includes/modules/class-settings.php:104
 msgid "Favorite Notification Settings"
 msgstr ""
 
-#: includes/modules/class-settings.php:158
+#: includes/modules/class-settings.php:164
 msgid "Settings saved successfully."
 msgstr ""
 
-#: includes/modules/class-settings.php:160
+#: includes/modules/class-settings.php:166
 msgid "There was a problem saving your settings."
 msgstr ""
 
-#: includes/modules/class-settings.php:184
+#: includes/modules/class-settings.php:242
 msgid "Yes"
 msgstr ""
 
-#: includes/modules/class-settings.php:185
+#: includes/modules/class-settings.php:243
 msgid "No"
 msgstr ""
 
-#: includes/modules/class-settings.php:192
+#: includes/modules/class-settings.php:250
 msgid "A member favorites your activity"
 msgstr ""
 
-#: includes/modules/class-settings.php:196
+#: includes/modules/class-settings.php:254
 msgid "Yes, send email"
 msgstr ""
 
-#: includes/modules/class-settings.php:202
+#: includes/modules/class-settings.php:260
 msgid "No, do not send email"
 msgstr ""
 
-#: includes/modules/class-settings.php:223
+#: includes/modules/class-settings.php:281
 msgid "Activity post favorites"
 msgstr ""
 
-#: includes/modules/class-settings.php:224
+#: includes/modules/class-settings.php:282
 msgid "Notify me when someone favorites my activity posts"
 msgstr ""
 
-#: includes/modules/class-settings.php:227
+#: includes/modules/class-settings.php:285
 msgid "Comment favorites"
 msgstr ""
 
-#: includes/modules/class-settings.php:228
+#: includes/modules/class-settings.php:286
 msgid "Notify me when someone favorites my comments"
 msgstr ""
 

@@ -190,7 +190,7 @@ class BPFN_Module_Settings {
 	 * bp_settings_action_notifications() runs check_admin_referer( 'bp_settings_notifications' )
 	 * and the screen itself is gated by bp_core_can_edit_settings().
 	 *
-	 * @since 2.0.2
+	 * @since 2.0.1
 	 */
 	public function save_bp_notification_settings() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified by BuddyPress core in bp_settings_action_notifications() before this hook fires.

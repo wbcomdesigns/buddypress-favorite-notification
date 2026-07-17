@@ -105,7 +105,7 @@ class BPFN_Admin {
 
 		add_submenu_page(
 			'wbcomplugins',
-			esc_html__( 'BuddyPress Favorite Notification', 'buddypress-favorite-notification' ),
+			'BuddyPress Favorite Notification',
 			esc_html__( 'Favorite Notifications', 'buddypress-favorite-notification' ),
 			$cap,
 			self::MENU_SLUG,
