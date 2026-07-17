@@ -1,28 +1,75 @@
 /**
  * BuddyPress Favorite Notification - Core Styles
- * Version: 1.2.3
- * 
+ *
  * ONLY styles for plugin-specific elements
  * Does NOT modify theme or BuddyPress elements
+ *
+ * This file is the shared style dependency of favorite-display.css and
+ * realtime.css, so it owns the plugin's --bpfn-* design tokens.
  */
+
+/* ========================================
+   Design tokens (--bpfn-*)
+
+   Theme-aware: BuddyX / BuddyX Pro publish --bx-color-* custom properties
+   on :root and flip them per color mode, so we consume those with literal
+   fallbacks. Reign 8.0.3 sets data-bx-mode on the root element but does
+   NOT define the --bx-color-* variables, which means the fallback literal
+   is what actually renders there. The dark-scoped blocks below therefore
+   use DARK-appropriate fallback literals - never the light values -
+   otherwise Reign dark mode renders light-gray-on-dark-navy text.
+   ======================================== */
+:root {
+    --bpfn-surface: var(--bx-color-bg-elevated, #ffffff);
+    --bpfn-surface-hover: var(--bx-color-bg-muted, #f5f5f5);
+    --bpfn-text: var(--bx-color-fg, #333333);
+    --bpfn-text-muted: var(--bx-color-fg-muted, #666666);
+    --bpfn-border: var(--bx-color-border, #e0e0e0);
+    --bpfn-link: var(--bx-color-link, var(--wp--preset--color--primary, #1d84b5));
+    /* Heart follows the theme brand accent (BuddyX, then Reign, then a
+       block-theme preset) and only lands on the pink literal when the theme
+       publishes nothing. */
+    --bpfn-heart: var(--bx-color-accent, var(--reign-colors-theme, var(--wp--preset--color--primary, #ff4458)));
+
+    /* Brand accent scale shared by the realtime toasts + notification count
+       badge. Each chains through the active theme's palette and only falls
+       back to the plugin's own literal when the theme defines nothing - so
+       favorite / comment / mention keep three distinct hues on every theme. */
+    --bpfn-primary-color: var(--bx-color-accent, var(--wp--preset--color--primary, #ff7b00));
+    --bpfn-secondary-color: var(--bx-color-link, var(--wp--preset--color--secondary, #1d84b5));
+    --bpfn-tertiary-color: var(--bx-color-accent-secondary, #8b5cf6);
+
+    /* Overlay stacking for the fixed realtime toast container. */
+    --bpfn-z-index-notification: 9999;
+}
+
+/* Manual dark toggle (BuddyX/Reign set data-bx-mode="dark" on <html>). */
+:root[data-bx-mode="dark"] {
+    --bpfn-surface: var(--bx-color-bg-elevated, #1f2430);
+    --bpfn-surface-hover: var(--bx-color-bg-muted, #2a3040);
+    --bpfn-text: var(--bx-color-fg, #e4e6eb);
+    --bpfn-text-muted: var(--bx-color-fg-muted, #a0a0a0);
+    --bpfn-border: var(--bx-color-border, #3b4254);
+    --bpfn-link: var(--bx-color-link, #7cb8e0);
+}
 
 /* ========================================
    Notification Count Badge
    Used in BuddyPress notification areas only
    ======================================== */
-   .bpfn-count {
+.bpfn-count {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     min-width: 20px;
     height: 20px;
     padding: 0 6px;
-    background-color: #ff7b00;
-    color: white;
+    background-color: var(--bpfn-primary-color, #ff7b00);
+    color: var(--bx-color-fg-inverse, #ffffff);
     font-size: 11px;
     font-weight: bold;
     border-radius: 10px;
-    margin-left: 5px;
+    margin-inline-start: 5px;
 }
 
 /* ========================================
@@ -33,396 +80,3 @@
     pointer-events: none;
     position: relative;
 }
-
-/* ========================================
-   Enhanced Notification Template Styles
-   ======================================== */
-
-/* Enhanced Notification Container */
-.bpfn-enhanced-notification {
-    display: flex;
-    align-items: flex-start;
-    gap: 15px;
-    padding: 15px;
-    background: #fff;
-    border: 1px solid #e5e5e5;
-    border-radius: 4px;
-    margin-bottom: 10px;
-    position: relative;
-    transition: all 0.2s ease;
-}
-
-.bpfn-enhanced-notification:hover {
-    border-color: #ff7b00;
-    box-shadow: 0 2px 8px rgba(255, 123, 0, 0.1);
-}
-
-.bpfn-enhanced-notification.unread {
-    background: #fffbf5;
-    border-left: 3px solid #ff7b00;
-}
-
-/* Enhanced Avatar Section */
-.bpfn-enhanced-avatar {
-    position: relative;
-    flex-shrink: 0;
-}
-
-.bpfn-enhanced-avatar img {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-.bpfn-type-indicator {
-    position: absolute;
-    bottom: -2px;
-    right: -2px;
-    width: 24px;
-    height: 24px;
-    background: #ff7b00;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid #fff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.bpfn-type-indicator .dashicons {
-    color: #fff;
-    font-size: 14px;
-    width: 14px;
-    height: 14px;
-}
-
-/* Enhanced Content Section */
-.bpfn-enhanced-content {
-    flex: 1;
-    min-width: 0; /* Allows text truncation */
-}
-
-.bpfn-enhanced-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 10px;
-    margin-bottom: 8px;
-}
-
-.bpfn-enhanced-title {
-    margin: 0;
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 1.4;
-    flex: 1;
-}
-
-.bpfn-enhanced-title a {
-    color: #333;
-    text-decoration: none;
-}
-
-.bpfn-enhanced-title a:hover {
-    color: #ff7b00;
-}
-
-.bpfn-enhanced-time {
-    color: #999;
-    font-size: 12px;
-    white-space: nowrap;
-    flex-shrink: 0;
-}
-
-/* Activity Preview */
-.bpfn-activity-preview {
-    margin: 10px 0;
-    padding: 10px;
-    background: #f9f9f9;
-    border-left: 3px solid #ddd;
-    border-radius: 3px;
-}
-
-.bpfn-activity-preview-content {
-    font-size: 13px;
-    line-height: 1.5;
-    color: #666;
-    max-height: 60px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* Enhanced Actions */
-.bpfn-enhanced-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-}
-
-.bpfn-enhanced-action {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 6px 12px;
-    font-size: 12px;
-    text-decoration: none;
-    border-radius: 3px;
-    transition: all 0.2s ease;
-}
-
-.bpfn-enhanced-action.primary {
-    background: #ff7b00;
-    color: #fff;
-}
-
-.bpfn-enhanced-action.primary:hover {
-    background: #ff9a33;
-}
-
-.bpfn-enhanced-action.secondary {
-    background: #f5f5f5;
-    color: #333;
-}
-
-.bpfn-enhanced-action.secondary:hover {
-    background: #e5e5e5;
-}
-
-.bpfn-enhanced-action .dashicons {
-    font-size: 14px;
-    width: 14px;
-    height: 14px;
-}
-
-/* Quick Actions */
-.bpfn-quick-actions {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    display: flex;
-    gap: 5px;
-}
-
-.bpfn-quick-action {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    background: #f5f5f5;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.bpfn-quick-action:hover {
-    background: #ff7b00;
-    color: #fff;
-}
-
-.bpfn-quick-action .dashicons {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-}
-
-/* ========================================
-   Standard Notification Template Styles
-   ======================================== */
-
-/* Standard Notification Container */
-.bpfn-notification-item {
-    padding: 12px;
-    background: #fff;
-    border-bottom: 1px solid #e5e5e5;
-    transition: background 0.2s ease;
-}
-
-.bpfn-notification-item:hover {
-    background: #f9f9f9;
-}
-
-.bpfn-notification-item.unread {
-    background: #fffbf5;
-    border-left: 3px solid #ff7b00;
-}
-
-/* Standard Notification Content */
-.bpfn-notification-content {
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-}
-
-.bpfn-notification-avatar img {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-.bpfn-notification-body {
-    flex: 1;
-    min-width: 0;
-}
-
-.bpfn-notification-text {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-    font-size: 14px;
-    line-height: 1.4;
-}
-
-.bpfn-notification-text .dashicons {
-    color: #ff7b00;
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-    flex-shrink: 0;
-}
-
-.bpfn-notification-text a {
-    color: #333;
-    text-decoration: none;
-}
-
-.bpfn-notification-text a:hover {
-    color: #ff7b00;
-}
-
-/* Activity Excerpt */
-.bpfn-activity-excerpt {
-    margin: 8px 0;
-}
-
-.bpfn-activity-excerpt blockquote {
-    margin: 0;
-    padding: 8px 12px;
-    background: #f5f5f5;
-    border-left: 3px solid #ddd;
-    font-size: 13px;
-    color: #666;
-    font-style: italic;
-}
-
-/* Notification Meta */
-.bpfn-notification-meta {
-    margin: 8px 0;
-    font-size: 12px;
-    color: #999;
-}
-
-.bpfn-notification-meta time {
-    font-style: italic;
-}
-
-/* Notification Actions */
-.bpfn-notification-actions {
-    margin-top: 8px;
-}
-
-.bpfn-view-activity {
-    display: inline-block;
-    font-size: 12px;
-    color: #ff7b00;
-    text-decoration: none;
-    padding: 4px 8px;
-    border: 1px solid #ff7b00;
-    border-radius: 3px;
-    transition: all 0.2s ease;
-}
-
-.bpfn-view-activity:hover {
-    background: #ff7b00;
-    color: #fff;
-}
-
-/* ========================================
-   Responsive Design
-   ======================================== */
-
-@media (max-width: 782px) {
-    /* Enhanced Notifications */
-    .bpfn-enhanced-notification {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .bpfn-enhanced-header {
-        flex-direction: column;
-        gap: 5px;
-    }
-
-    .bpfn-enhanced-time {
-        font-size: 11px;
-    }
-
-    .bpfn-enhanced-actions {
-        flex-direction: column;
-    }
-
-    .bpfn-enhanced-action {
-        width: 100%;
-        justify-content: center;
-    }
-
-    /* Standard Notifications */
-    .bpfn-notification-content {
-        flex-direction: column;
-    }
-
-    .bpfn-notification-avatar {
-        align-self: flex-start;
-    }
-}
-
-/* ========================================
-   Dark Mode Support (Optional)
-   ======================================== */
-
-@media (prefers-color-scheme: dark) {
-    .bpfn-enhanced-notification,
-    .bpfn-notification-item {
-        background: #1e1e1e;
-        border-color: #333;
-    }
-
-    .bpfn-enhanced-notification.unread,
-    .bpfn-notification-item.unread {
-        background: #2a2416;
-    }
-
-    .bpfn-enhanced-title a,
-    .bpfn-notification-text a {
-        color: #e0e0e0;
-    }
-
-    .bpfn-activity-preview,
-    .bpfn-activity-excerpt blockquote {
-        background: #2a2a2a;
-        color: #b0b0b0;
-    }
-
-    .bpfn-enhanced-action.secondary {
-        background: #333;
-        color: #e0e0e0;
-    }
-
-    .bpfn-enhanced-action.secondary:hover {
-        background: #444;
-    }
-
-    .bpfn-quick-action {
-        background: #333;
-    }
-}
-
-/* ========================================
-   That's ALL!
-   No activity stream styles
-   No button modifications
-   No theme overrides
-   ======================================== */

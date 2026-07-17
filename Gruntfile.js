@@ -8,7 +8,7 @@ module.exports = function(grunt) {
         // Check text domain
         checktextdomain: {
             options: {
-                text_domain: 'bp-fav-notification',
+                text_domain: 'buddypress-favorite-notification',
                 keywords: [
                     '__:1,2d',
                     '_e:1,2d',
@@ -43,7 +43,7 @@ module.exports = function(grunt) {
             target: {
                 options: {
                     domainPath: '/languages',
-                    potFilename: 'bp-fav-notification.pot',
+                    potFilename: 'buddypress-favorite-notification.pot',
                     mainFile: 'bp-favorite-notification.php',
                     type: 'wp-plugin',
                     exclude: [
@@ -62,7 +62,7 @@ module.exports = function(grunt) {
                     updateTimestamp: true,
                     processPot: function(pot) {
                         // Add plugin header comment
-                        pot.headers['project-id-version'] = 'BuddyPress Favorite Notification 2.0.0';
+                        pot.headers['project-id-version'] = 'BuddyPress Favorite Notification 2.0.1';
                         return pot;
                     }
                 }
@@ -80,7 +80,19 @@ module.exports = function(grunt) {
             build: {
                 src: [
                     '**',
+                    // Dev-only tooling (PHPStan + stubs). Never ship these.
+                    '!vendor/**',
+                    '!composer.json',
+                    '!composer.lock',
+                    '!phpstan.neon',
+                    '!phpstan-baseline.neon',
                     '!node_modules/**',
+                    '!audit/**',
+                    '!docs/**',
+                    '!marketing/**',
+                    '!**/*.md',
+                    '!*.md',
+                    '!.wbcom-i18n.json',
                     '!vendor/**',
                     '!dist/**',
                     '!tests/**',

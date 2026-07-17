@@ -1,0 +1,123 @@
+/**
+ * BuddyPress Favorite Notification - Member Settings Screen Styles
+ *
+ * Styles the front-end "Settings > Favorite Notifications" per-user
+ * preferences screen (templates/settings/notifications.php).
+ *
+ * Consumes the shared --bpfn-* design tokens defined in notifications.css
+ * (this stylesheet's registered dependency), so the screen follows the
+ * active color mode on BuddyX and Reign automatically.
+ */
+
+/* Toggle switch. */
+.bpfn-toggle {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.bpfn-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.bpfn-toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: var(--bpfn-border, #cccccc);
+    transition: 0.3s;
+    border-radius: 24px;
+}
+
+.bpfn-toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: #ffffff;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+.bpfn-toggle input:checked + .bpfn-toggle-slider {
+    background-color: var(--bpfn-primary-color, #ff7b00);
+}
+
+.bpfn-toggle input:checked + .bpfn-toggle-slider:before {
+    transform: translateX(20px);
+}
+
+.bpfn-toggle input:focus-visible + .bpfn-toggle-slider {
+    outline: 2px solid var(--bpfn-link, #1d84b5);
+    outline-offset: 2px;
+}
+
+/* Settings table. */
+.bpfn-notification-settings {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.bpfn-notification-settings th,
+.bpfn-notification-settings td {
+    padding: 15px;
+    text-align: start;
+    border-bottom: 1px solid var(--bpfn-border, #eeeeee);
+    color: var(--bpfn-text, #333333);
+}
+
+.bpfn-notification-settings th {
+    background-color: var(--bpfn-surface-hover, #f5f5f5);
+    font-weight: 600;
+}
+
+.bpfn-notification-settings .icon {
+    width: 40px;
+    text-align: center;
+}
+
+.bpfn-notification-settings .channel {
+    width: 100px;
+    text-align: center;
+}
+
+.bpfn-notification-settings .description {
+    margin: 5px 0 0;
+    font-size: 0.9em;
+    color: var(--bpfn-text-muted, #666666);
+}
+
+.bpfn-settings-intro {
+    margin-bottom: 20px;
+}
+
+.bpfn-settings-actions {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--bpfn-border, #eeeeee);
+}
+
+/* Responsive: the 5-column matrix scrolls inside itself on small screens. */
+@media (max-width: 640px) {
+    .bpfn-notification-settings {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .bpfn-notification-settings th,
+    .bpfn-notification-settings td {
+        padding: 10px;
+        font-size: 13px;
+    }
+
+    .bpfn-notification-settings .channel {
+        width: 72px;
+    }
+}
