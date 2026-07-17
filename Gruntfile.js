@@ -172,7 +172,6 @@ module.exports = function(grunt) {
 
     grunt.registerTask('build', [
         'checktextdomain',
-        'makepot',
         'clean:dist',
         'copy:build',
         'compress:build',
