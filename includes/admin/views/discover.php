@@ -21,6 +21,13 @@ $bpfn_ecosystem_img = BPFN_ASSETS_URL . 'images/ecosystem/';
  */
 $bpfn_ecosystem = array(
 	array(
+		'name' => __( 'BuddyX', 'buddypress-favorite-notification' ),
+		'logo' => 'buddyx.png',
+		'icon' => 'admin-appearance',
+		'desc' => __( 'A free, fast community theme for BuddyPress, BuddyBoss and PeepSo with a modern layout and dark mode.', 'buddypress-favorite-notification' ),
+		'url'  => 'https://wbcomdesigns.com/downloads/buddyx-theme/',
+	),
+	array(
 		'name' => __( 'BuddyNext', 'buddypress-favorite-notification' ),
 		'logo' => 'buddynext.svg',
 		'desc' => __( 'A full WordPress social network with feeds, profiles, groups, and private messaging.', 'buddypress-favorite-notification' ),
@@ -39,10 +46,31 @@ $bpfn_ecosystem = array(
 		'url'  => 'https://wbcomdesigns.com/downloads/mediaverse/',
 	),
 	array(
+		'name' => __( 'Eventonomy', 'buddypress-favorite-notification' ),
+		'logo' => 'eventonomy.svg',
+		'icon' => 'calendar-alt',
+		'desc' => __( 'Run community events with RSVPs, calendars, and front-end submissions.', 'buddypress-favorite-notification' ),
+		'url'  => 'https://wbcomdesigns.com/downloads/eventonomy/',
+	),
+	array(
+		'name' => __( 'WB Gamification', 'buddypress-favorite-notification' ),
+		'logo' => 'wb-gamification.svg',
+		'icon' => 'awards',
+		'desc' => __( 'Reward members with points, badges, and leaderboards to keep engagement high.', 'buddypress-favorite-notification' ),
+		'url'  => 'https://wbcomdesigns.com/downloads/wordpress-gamification-plugin/',
+	),
+	array(
 		'name' => __( 'Listora', 'buddypress-favorite-notification' ),
 		'logo' => 'listora.svg',
 		'desc' => __( 'Searchable directories with ten ready-made listing types.', 'buddypress-favorite-notification' ),
 		'url'  => 'https://wbcomdesigns.com/downloads/listora/',
+	),
+	array(
+		'name' => __( 'WP Career Board', 'buddypress-favorite-notification' ),
+		'logo' => 'wp-career-board.svg',
+		'icon' => 'businessman',
+		'desc' => __( 'Add a job board with front-end listings, applications, and employer profiles.', 'buddypress-favorite-notification' ),
+		'url'  => 'https://wbcomdesigns.com/downloads/wp-career-board/',
 	),
 	array(
 		'name' => __( 'Learnomy', 'buddypress-favorite-notification' ),
@@ -50,13 +78,20 @@ $bpfn_ecosystem = array(
 		'desc' => __( 'A free LMS with courses, quizzes, and certificates.', 'buddypress-favorite-notification' ),
 		'url'  => 'https://wbcomdesigns.com/downloads/learnomy/',
 	),
+	array(
+		'name' => __( 'WP Sell Services', 'buddypress-favorite-notification' ),
+		'logo' => 'wp-sell-services.svg',
+		'icon' => 'cart',
+		'desc' => __( 'A free service marketplace with vendor dashboards, an 11-status order flow, and Stripe or PayPal built in.', 'buddypress-favorite-notification' ),
+		'url'  => 'https://wbcomdesigns.com/downloads/wp-sell-services/',
+	),
 );
 ?>
 
 <div class="bpfn-card">
 	<div class="bpfn-card__head">
 		<p class="bpfn-card__title"><?php esc_html_e( 'More Free Tools from Wbcom Designs', 'buddypress-favorite-notification' ); ?></p>
-		<p class="bpfn-card__desc"><?php esc_html_e( 'Favorite Notification keeps members coming back when their activity gets liked. These free Wbcom Designs plugins give them more worth coming back to, from the network itself to forums, media, directories, and courses.', 'buddypress-favorite-notification' ); ?></p>
+		<p class="bpfn-card__desc"><?php esc_html_e( 'Favorite Notification keeps members coming back when their activity gets liked. These free Wbcom Designs plugins give them more worth coming back to: the theme and network itself, forums, media, events, gamification, directories, jobs, courses, and services.', 'buddypress-favorite-notification' ); ?></p>
 	</div>
 	<div class="bpfn-card__body">
 		<div class="bpfn-discover-grid">

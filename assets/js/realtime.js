@@ -345,24 +345,6 @@
         },
 
         /**
-         * Show test notification (for admin testing)
-         */
-        showTestNotification: function() {
-            var self = this;
-            
-            var testData = {
-                notification_id: 'test-' + Date.now(),
-                notification_type: 'favorite',
-                text: '<strong>Test User</strong> favorited your activity',
-                link: '#',
-                time_ago: 'just now',
-                user_avatar: '<img src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&s=60" width="60" height="60" />'
-            };
-            
-            self.showNotification(testData);
-        },
-
-        /**
          * Dismiss notification
          */
         dismissNotification: function($notification) {

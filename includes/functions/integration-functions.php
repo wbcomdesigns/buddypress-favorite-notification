@@ -567,7 +567,6 @@ function bpfn_get_diagnostics() {
 			'activity'      => bp_is_active( 'activity' ),
 			'settings'      => bp_is_active( 'settings' ),
 		),
-		'options'     => get_option( 'bpfn_options', array() ),
 	);
 
 	// Check if favorite_notifier is set up.

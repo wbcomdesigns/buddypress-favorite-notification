@@ -1203,6 +1203,7 @@
 .bpfn-discover-card__logo img {
 	width: 52px;
 	height: 52px;
+	object-fit: contain;
 	display: block;
 	border-radius: var(--bpfn-admin-radius-sm);
 }
