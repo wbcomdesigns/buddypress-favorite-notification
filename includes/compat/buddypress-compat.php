@@ -210,24 +210,30 @@ function bpfn_compat_add_notification( $activity_id, $user_id ) {
 add_action( 'bp_init', 'bpfn_compat_verify_registration', 999 );
 
 /**
- * Debug helper to verify component registration.
+ * Verify the component registered, and re-register it if it did not.
+ *
+ * Runs on every request (bp_init, priority 999). It used to log "Component
+ * successfully registered" on the happy path whenever WP_DEBUG was on, which
+ * meant a line in debug.log for every single page load on any site running with
+ * debug enabled - pure noise burying real entries. Normal operation now stays
+ * silent; only an actual failure is logged, and only then is the recovery
+ * attempted.
  */
 function bpfn_compat_verify_registration() {
 	global $bp;
 
-	if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-		// Log component status.
-		if ( isset( $bp->favorite_notifier ) && isset( $bp->active_components['favorite_notifier'] ) ) {
-			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging.
-			error_log( 'BPFN Compat: Component successfully registered' );
-		} else {
-			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging.
-			error_log( 'BPFN Compat: Component registration failed!' );
+	if ( isset( $bp->favorite_notifier ) && isset( $bp->active_components['favorite_notifier'] ) ) {
+		return;
+	}
 
-			// Try to fix it.
-			if ( ! isset( $bp->favorite_notifier ) ) {
-				bpfn_compat_setup_globals();
-			}
-		}
+	if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Logs a genuine registration failure, not every request.
+		error_log( 'BPFN Compat: Component registration failed!' );
+	}
+
+	// Recover regardless of WP_DEBUG - the component missing is a real problem
+	// on production too, not only something to note on debug sites.
+	if ( ! isset( $bp->favorite_notifier ) ) {
+		bpfn_compat_setup_globals();
 	}
 }
