@@ -22,43 +22,6 @@
         return i18n[key] || fallback;
     }
 
-    /* ─── Toast (no native alert) ─────────────────────────────── */
-
-    function getToastHost() {
-        var host = document.querySelector('.bpfn-toast-host');
-        if (!host) {
-            host = document.createElement('div');
-            host.className = 'bpfn-toast-host';
-            document.body.appendChild(host);
-        }
-        return host;
-    }
-
-    function bpfnToast(message, tone) {
-        tone = tone || 'info';
-        var host = getToastHost();
-        var el = document.createElement('div');
-        el.className = 'bpfn-toast bpfn-toast--' + tone;
-        el.setAttribute('role', 'status');
-        el.textContent = String(message);
-        host.appendChild(el);
-
-        window.requestAnimationFrame(function() {
-            el.classList.add('bpfn-toast--visible');
-        });
-
-        window.setTimeout(function() {
-            el.classList.remove('bpfn-toast--visible');
-            window.setTimeout(function() {
-                if (el.parentNode) {
-                    el.parentNode.removeChild(el);
-                }
-            }, 250);
-        }, 3600);
-    }
-
-    window.bpfnToast = bpfnToast;
-
     /* ─── Confirm modal (returns a Promise, no native confirm) ── */
 
     function bpfnConfirm(opts) {
@@ -138,7 +101,6 @@
         });
     }
 
-    window.bpfnConfirm = bpfnConfirm;
 
     /**
      * Admin handler
@@ -318,11 +280,12 @@
          * Run clear old notifications (after confirm).
          */
         runClearOldNotifications: function($button) {
-            var self = this;
             var originalText = $button.text();
+            var $result = $('#bpfn-clear-result');
 
             $button.prop('disabled', true);
             $button.html('<span class="bpfn-spinner"></span> ' + str('clearing', 'Clearing...'));
+            $result.html('');
 
             $.ajax({
                 url: bpfnAdmin.ajax_url,
@@ -337,42 +300,19 @@
                         if (response.data.remaining !== undefined) {
                             message += ' (' + str('remaining', '%s notifications remaining').replace('%s', response.data.remaining) + ')';
                         }
-                        self.showNotice(message, 'success');
+                        $result.html('<div class="notice notice-success inline"><p>' + message + '</p></div>');
                     } else {
-                        self.showNotice(response.data.message || str('clear_failed', 'Failed to clear notifications.'), 'error');
+                        $result.html('<div class="notice notice-error inline"><p>' + (response.data.message || str('clear_failed', 'Failed to clear notifications.')) + '</p></div>');
                     }
                 },
                 error: function(xhr, status, error) {
-                    self.showNotice(str('error_generic', 'An error occurred:') + ' ' + error, 'error');
+                    $result.html('<div class="notice notice-error inline"><p>' + str('error_generic', 'An error occurred:') + ' ' + error + '</p></div>');
                 },
                 complete: function() {
                     $button.prop('disabled', false);
                     $button.text(originalText);
                 }
             });
-        },
-
-        /**
-         * Show admin notice
-         */
-        showNotice: function(message, type) {
-            var $notice = $('<div class="notice notice-' + type + ' is-dismissible"><p>' + message + '</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">' + str('dismiss_notice', 'Dismiss this notice.') + '</span></button></div>');
-
-            $('.wrap h1').first().after($notice);
-
-            // Trigger WordPress notice dismiss handler
-            $notice.find('.notice-dismiss').on('click', function() {
-                $notice.fadeOut(function() {
-                    $(this).remove();
-                });
-            });
-
-            // Auto dismiss success after 5 seconds
-            if (type === 'success') {
-                setTimeout(function() {
-                    $notice.find('.notice-dismiss').trigger('click');
-                }, 5000);
-            }
         }
     };
 
@@ -380,8 +320,5 @@
     $(document).ready(function() {
         BPFNAdmin.init();
     });
-
-    // Expose to global scope for external access
-    window.BPFNAdmin = BPFNAdmin;
 
 })(jQuery, window, document);

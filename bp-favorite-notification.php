@@ -76,20 +76,6 @@ class BP_Favorite_Notification {
 	private $modules = array();
 
 	/**
-	 * Component ID.
-	 *
-	 * @var string
-	 */
-	public $component_id = 'favorite_notifier';
-
-	/**
-	 * Component slug.
-	 *
-	 * @var string
-	 */
-	public $component_slug = 'favorite_notification';
-
-	/**
 	 * Get instance of the class
 	 */
 	public static function get_instance() {

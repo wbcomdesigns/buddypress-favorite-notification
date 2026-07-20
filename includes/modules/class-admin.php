@@ -151,18 +151,22 @@ class BPFN_Module_Admin {
 
 		$result = bpfn_clear_old_notifications( $days );
 
-		if ( isset( $result['count'] ) ) {
-			wp_send_json_success(
-				array(
-					/* translators: %d: Number of cleared notifications. */
-					'message'   => sprintf( esc_html__( 'Cleared %d old notifications', 'buddypress-favorite-notification' ), $result['count'] ),
-					'count'     => isset( $result['count'] ) ? (int) $result['count'] : 0,
-					'remaining' => isset( $result['remaining'] ) ? (int) $result['remaining'] : 0,
-				)
-			);
-		} else {
+		// bpfn_clear_old_notifications() always returns a 'count' key (0 on
+		// failure), so testing isset( $result['count'] ) for success could never
+		// fail and silently reported DB/component errors as "0 cleared". Treat the
+		// presence of an 'error' key as the failure signal instead.
+		if ( ! empty( $result['error'] ) ) {
 			wp_send_json_error( array( 'message' => esc_html__( 'Failed to clear notifications', 'buddypress-favorite-notification' ) ) );
 		}
+
+		wp_send_json_success(
+			array(
+				/* translators: %d: Number of cleared notifications. */
+				'message'   => sprintf( esc_html__( 'Cleared %d old notifications', 'buddypress-favorite-notification' ), (int) $result['count'] ),
+				'count'     => (int) $result['count'],
+				'remaining' => isset( $result['remaining'] ) ? (int) $result['remaining'] : 0,
+			)
+		);
 	}
 
 	/**
@@ -283,7 +287,7 @@ class BPFN_Module_Admin {
 				'bpfn_last_auto_cleanup',
 				array(
 					'date'      => current_time( 'mysql' ),
-					'deleted'   => isset( $result['count'] ) ? $result['count'] : 0,
+					'deleted'   => (int) $result['count'],
 					'remaining' => isset( $result['remaining'] ) ? $result['remaining'] : 0,
 				)
 			);

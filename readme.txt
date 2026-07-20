@@ -258,8 +258,11 @@ No. The plugin does not collect, store, or share personal data outside your Word
 * Fix      - Per-user notification preferences now take effect. A member who turned favorite notifications off still received them on every channel: the enabled-check returned true for any request made through admin-ajax, which is how BuddyPress favoriting works, so the saved preference was never read.
 * Fix      - A safety-net handler re-added notifications without checking the member's preference, undoing the choice even once the check above was honoured.
 * Fix      - Email notifications ignored the preference for ordinary activity posts, because the type was mapped to a preference key the settings screen never writes.
+* Fix      - The Tools tab "Clear Old Notifications Now" button appeared to do nothing; its result notice now renders in the visible Manual Cleanup card instead of a hidden header node, the loading spinner is styled, and a real database error is reported instead of silently shown as "0 cleared".
 * Dev      - WordPress Coding Standards compliance across all PHP files.
 * Dev      - Removed two debug log entries that were written on every request.
+* Dev      - Resolved 12 PHPStan level 5 findings (undefined template variables, always-true checks) with defensive guards.
+* Dev      - Removed dead admin CSS (unused role-grid, license, and legacy button-spinner blocks), dead admin JS (unused toast helper and globals), and two unused component properties; added the missing spinner, badge, preview, and migration-progress styles.
 * Compat   - Tested up to WordPress 7.0.
 
 = 2.0.0 - 2025-11-24 =

@@ -413,137 +413,8 @@
 }
 
 /* ═══════════════════════════════════════════════════════════
-   Role chip grid (Permissions tab)
-   ═══════════════════════════════════════════════════════════ */
-
-.bpfn-role-grid-wrap {
-	margin: 0;
-	padding: 0;
-	border: 0;
-}
-
-.bpfn-role-grid-toolbar {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 12px;
-	padding: 0 0 12px;
-	margin-bottom: 12px;
-	border-bottom: 1px solid var(--bpfn-admin-surface-2);
-}
-
-.bpfn-role-grid-count {
-	font-size: 12px;
-	font-weight: 600;
-	color: var(--bpfn-admin-text-3);
-	letter-spacing: 0.02em;
-}
-
-.bpfn-role-grid-actions {
-	display: inline-flex;
-	align-items: center;
-	gap: 8px;
-}
-
-.bpfn-role-grid-sep {
-	color: var(--bpfn-admin-border-strong);
-}
-
-.bpfn-link {
-	background: transparent;
-	border: 0;
-	padding: 0;
-	font-size: 12px;
-	font-weight: 600;
-	color: var(--bpfn-admin-accent);
-	cursor: pointer;
-	text-decoration: none;
-}
-
-.bpfn-link:hover,
-.bpfn-link:focus {
-	color: var(--bpfn-admin-accent-hover);
-	text-decoration: underline;
-}
-
-/* Mouse-focus only — keyboard users get a visible outline via the
-   .bpfn-link:focus-visible rule below. */
-.bpfn-link:focus:not(:focus-visible) {
-	outline: none;
-}
-
-.bpfn-link:focus-visible {
-	outline: 2px solid var(--bpfn-admin-accent);
-	outline-offset: 2px;
-	border-radius: 2px;
-}
-
-.bpfn-role-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-	gap: 8px;
-	margin-bottom: 12px;
-}
-
-.bpfn-role-chip {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-	padding: 10px 12px;
-	background: var(--bpfn-admin-surface-1);
-	border: 1px solid var(--bpfn-admin-border);
-	border-radius: var(--bpfn-admin-radius-sm);
-	cursor: pointer;
-	transition: background 0.12s, border-color 0.12s;
-	min-height: 40px;
-}
-
-.bpfn-role-chip:hover {
-	background: var(--bpfn-admin-white);
-	border-color: var(--bpfn-admin-border-strong);
-}
-
-/* The chip is a <label> wrapping the checkbox, so keyboard focus lands on the
-   inner checkbox - surface a visible ring on the whole chip via :focus-within. */
-.bpfn-role-chip:focus-within {
-	outline: 2px solid var(--bpfn-admin-accent);
-	outline-offset: 2px;
-}
-
-.bpfn-role-chip input[type="checkbox"] {
-	margin: 0;
-	flex-shrink: 0;
-	accent-color: var(--bpfn-admin-accent);
-}
-
-.bpfn-role-chip__label {
-	font-size: 13px;
-	font-weight: 500;
-	color: var(--bpfn-admin-text-4);
-	line-height: 1.3;
-}
-
-.bpfn-role-chip:has(input:checked) {
-	background: var(--bpfn-admin-accent-light);
-	border-color: rgba(37, 99, 235, 0.35);
-}
-
-.bpfn-role-chip:has(input:checked) .bpfn-role-chip__label {
-	color: var(--bpfn-admin-accent);
-	font-weight: 600;
-}
-
-/* ═══════════════════════════════════════════════════════════
    Form helpers
    ═══════════════════════════════════════════════════════════ */
-
-.bpfn-inline-hint {
-	display: inline-block;
-	margin-inline-start: 8px;
-	color: var(--bpfn-admin-text-3);
-	font-size: 12px;
-	font-weight: 400;
-}
 
 .bpfn-save-bar {
 	display: flex;
@@ -584,41 +455,15 @@
 	box-shadow: none;
 }
 
-/* Disabled + loading affordance. admin.js flips `disabled` on the migration
-   and clear-notifications buttons while their AJAX request is in flight, so
-   the button needs a visible processing state (prevents double-clicks). */
+/* Disabled affordance. admin.js flips `disabled` on the migration and
+   clear-notifications buttons while their AJAX request is in flight to
+   prevent double-clicks. */
 .bpfn-btn:disabled,
-.bpfn-btn[disabled],
-.bpfn-btn.is-loading {
+.bpfn-btn[disabled] {
 	opacity: 0.6;
 	cursor: not-allowed;
 	pointer-events: none;
 }
-
-.bpfn-btn.is-loading {
-	position: relative;
-	color: transparent !important;
-}
-
-.bpfn-btn.is-loading::after {
-	content: "";
-	position: absolute;
-	top: 50%;
-	inset-inline-start: 50%;
-	width: 14px;
-	height: 14px;
-	margin: -7px 0 0 -7px;
-	border: 2px solid currentColor;
-	border-top-color: transparent;
-	border-radius: 50%;
-	color: #fff;
-	animation: bpfn-btn-spin 0.7s linear infinite;
-}
-
-@keyframes bpfn-btn-spin {
-	to { transform: rotate(360deg); }
-}
-
 .bpfn-btn-primary {
 	background: var(--bpfn-admin-accent);
 	color: #fff;
@@ -1087,80 +932,6 @@
 }
 
 /* ════════════════════════════════════════════════
-   License status (1.5.0+ - card-panel license tab)
-   Mirrors the BFFS pattern: status pill + inline
-   metadata (Expires, Activations) on a single row.
-   ════════════════════════════════════════════════ */
-.bpfn-license-status {
-	display: inline-flex;
-	align-items: center;
-	gap: 6px;
-	padding: 4px 10px;
-	border-radius: var(--bpfn-admin-radius-sm);
-	font-size: 12px;
-	font-weight: 700;
-	letter-spacing: 0.02em;
-	line-height: 1.4;
-	vertical-align: middle;
-}
-
-.bpfn-license-status::before {
-	content: "";
-	width: 6px;
-	height: 6px;
-	border-radius: 50%;
-	background: currentColor;
-	flex-shrink: 0;
-}
-
-.bpfn-license-status.is-active {
-	background: var(--bpfn-admin-success-light, rgba(16, 185, 129, 0.10));
-	color: var(--bpfn-admin-success, #047857);
-}
-
-.bpfn-license-status.is-inactive,
-.bpfn-license-status.is-pending {
-	background: var(--bpfn-admin-warn-light, rgba(217, 119, 6, 0.10));
-	color: var(--bpfn-admin-warn, #d97706);
-}
-
-.bpfn-license-status.is-expired,
-.bpfn-license-status.is-invalid {
-	background: var(--bpfn-admin-danger-light, rgba(220, 38, 38, 0.10));
-	color: var(--bpfn-admin-danger, #b91c1c);
-}
-
-.bpfn-license-meta {
-	display: inline-flex;
-	align-items: center;
-	color: var(--bpfn-admin-text-2);
-	font-size: 13px;
-	font-weight: 400;
-	vertical-align: middle;
-}
-
-.bpfn-license-meta strong {
-	color: var(--bpfn-admin-text);
-	font-weight: 600;
-	margin-inline-end: 4px;
-}
-
-.bpfn-license-meta-sep {
-	display: inline-block;
-	color: var(--bpfn-admin-text-3);
-	margin: 0 8px;
-	vertical-align: middle;
-	font-size: 14px;
-	line-height: 1;
-}
-
-.bpfn-license-renew-warn {
-	margin: 8px 0 0;
-	color: var(--bpfn-admin-warn, #d97706);
-	font-size: 13px;
-}
-
-/* ════════════════════════════════════════════════
    Discover — ecosystem cross-promotion cards
    Token-driven, matches the hub/overview card language.
    auto-fill collapses to 1 column on narrow viewports
@@ -1232,4 +1003,75 @@
 	width: 14px;
 	height: 14px;
 	font-size: 14px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Async action affordances (spinner, migration progress, badges)
+   Classes emitted by admin.js and the overview/shell views that
+   previously had no styles.
+   ═══════════════════════════════════════════════════════════ */
+
+.bpfn-spinner {
+	display: inline-block;
+	width: 14px;
+	height: 14px;
+	vertical-align: -2px;
+	border: 2px solid currentColor;
+	border-top-color: transparent;
+	border-radius: 50%;
+	animation: bpfn-spin 0.7s linear infinite;
+}
+
+@keyframes bpfn-spin {
+	to { transform: rotate(360deg); }
+}
+
+.bpfn-badge {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: 10px;
+	background: var(--bpfn-admin-accent, #2271b1);
+	color: var(--bpfn-admin-white, #fff);
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 1.6;
+}
+
+.bpfn-preview {
+	color: var(--bpfn-admin-text-muted, #646970);
+	font-size: 13px;
+}
+
+.bpfn-progress-wrapper {
+	display: flex;
+	align-items: center;
+	gap: var(--bpfn-admin-gap-sm, 8px);
+	margin-top: 8px;
+}
+
+.bpfn-progress-bar {
+	flex: 1;
+	height: 8px;
+	background: var(--bpfn-admin-border, #dcdcde);
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+.bpfn-progress-fill {
+	height: 100%;
+	background: var(--bpfn-admin-accent, #2271b1);
+	transition: width 0.3s ease;
+}
+
+.bpfn-progress-text {
+	min-width: 40px;
+	font-size: 12px;
+	color: var(--bpfn-admin-text-muted, #646970);
+	text-align: end;
+}
+
+.bpfn-snav-link__ext {
+	margin-inline-start: 4px;
+	font-size: 12px;
+	opacity: 0.7;
 }

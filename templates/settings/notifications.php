@@ -9,6 +9,11 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+// Provided by BPFN_Module_Settings::notification_settings() before this template
+// is included. Declared here so a missing value (and static analysis) fall back
+// to an empty list instead of a foreach over an undefined variable.
+$notification_types = isset( $notification_types ) ? $notification_types : array();
 ?>
 
 <form method="post" action="" class="bpfn-settings-form">

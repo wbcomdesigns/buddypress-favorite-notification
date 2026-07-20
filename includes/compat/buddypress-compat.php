@@ -58,11 +58,11 @@ function bpfn_compat_setup_globals() {
  * @return string|array|false The formatted notification.
  */
 function bpfn_compat_format_notifications( $action, $item_id, $secondary_item_id, $total_items, $format = 'string', $id = 0 ) {
-	// Get the main plugin instance.
+	// Get the main plugin instance. bpfn() always returns the singleton.
 	$plugin = bpfn();
 
 	// If we have the notifications module, use it.
-	$notifications_module = $plugin ? $plugin->get_module( 'notifications' ) : null;
+	$notifications_module = $plugin->get_module( 'notifications' );
 	if ( $notifications_module ) {
 		return $notifications_module->format_notification( $action, $item_id, $secondary_item_id, $total_items, $format, $id );
 	}

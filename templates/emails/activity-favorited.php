@@ -19,6 +19,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// These come from extract( $tokens ) in BPFN_Module_Email. Declared here so a
+// missing token (and static analysis) both fall back to a safe empty string.
+$user_name     = isset( $user_name ) ? $user_name : '';
+$favorited_by  = isset( $favorited_by ) ? $favorited_by : '';
+$activity_link = isset( $activity_link ) ? $activity_link : '';
+
 // Get user who favorited.
 $favoriter        = get_userdata( $secondary_item_id ?? 0 );
 $favoriter_avatar = bp_core_fetch_avatar(

@@ -13,12 +13,6 @@ parameters:
 			path: includes/admin/class-bpfn-admin.php
 
 		-
-			message: '#^Ternary operator condition is always true\.$#'
-			identifier: ternary.alwaysTrue
-			count: 1
-			path: includes/compat/buddypress-compat.php
-
-		-
 			message: '#^Constant BPFN_PLUGIN_PATH not found\.$#'
 			identifier: constant.notFound
 			count: 1
@@ -31,18 +25,6 @@ parameters:
 			path: includes/functions/api-functions.php
 
 		-
-			message: '#^Call to function method_exists\(\) with BP_Favorite_Notification and ''activate'' will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: includes/functions/integration-functions.php
-
-		-
-			message: '#^Offset ''count'' on non\-empty\-array in isset\(\) always exists and is not nullable\.$#'
-			identifier: isset.offset
-			count: 1
-			path: includes/modules/class-admin.php
-
-		-
 			message: '#^Parameter \#1 \$text of function esc_attr expects string, int\<min, \-1\>\|int\<1, max\> given\.$#'
 			identifier: argument.type
 			count: 2
@@ -53,45 +35,3 @@ parameters:
 			identifier: deadCode.unreachable
 			count: 1
 			path: includes/modules/class-favorite-display.php
-
-		-
-			message: '#^Variable \$activity_link might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: templates/emails/activity-favorited.php
-
-		-
-			message: '#^Variable \$favorited_by might not be defined\.$#'
-			identifier: variable.undefined
-			count: 2
-			path: templates/emails/activity-favorited.php
-
-		-
-			message: '#^Variable \$user_name might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: templates/emails/activity-favorited.php
-
-		-
-			message: '#^Variable \$activity_link might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: templates/emails/comment-favorited.php
-
-		-
-			message: '#^Variable \$favorited_by might not be defined\.$#'
-			identifier: variable.undefined
-			count: 2
-			path: templates/emails/comment-favorited.php
-
-		-
-			message: '#^Variable \$user_name might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: templates/emails/comment-favorited.php
-
-		-
-			message: '#^Variable \$notification_types might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: templates/settings/notifications.php

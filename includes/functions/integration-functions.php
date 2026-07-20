@@ -26,6 +26,13 @@ function bpfn_clear_old_notifications( $days = 30 ) {
 		);
 	}
 
+	if ( empty( $bp->notifications->table_name ) ) {
+		return array(
+			'count' => 0,
+			'error' => 'Notifications table is unavailable',
+		);
+	}
+
 	$table     = $bp->notifications->table_name;
 	$component = isset( $bp->favorite_notifier ) ? $bp->favorite_notifier->id : 'favorite_notifier';
 
@@ -39,6 +46,15 @@ function bpfn_clear_old_notifications( $days = 30 ) {
 			$days
 		)
 	);
+
+	// $wpdb->query() returns false on a database error; surface it instead of
+	// reporting a successful "0 cleared".
+	if ( false === $deleted ) {
+		return array(
+			'count' => 0,
+			'error' => 'Database error while clearing notifications',
+		);
+	}
 
 	// Get remaining count.
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Stats query.
