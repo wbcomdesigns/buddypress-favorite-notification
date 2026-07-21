@@ -159,12 +159,30 @@ class BPFN_Module_Admin {
 			wp_send_json_error( array( 'message' => esc_html__( 'Failed to clear notifications', 'buddypress-favorite-notification' ) ) );
 		}
 
+		$count     = (int) $result['count'];
+		$remaining = isset( $result['remaining'] ) ? (int) $result['remaining'] : 0;
+
+		// State the rule alongside the number: only read notifications past the
+		// retention window are removed, so 0 is a normal result. A bare "cleared 0"
+		// is indistinguishable from a dead button, and was filed as exactly that.
+		$message = sprintf(
+			/* translators: 1: number cleared, 2: retention period in days, 3: number remaining. */
+			_n(
+				'Cleared %1$d notification. Only read notifications older than %2$d days are removed; %3$d remain.',
+				'Cleared %1$d notifications. Only read notifications older than %2$d days are removed; %3$d remain.',
+				$count,
+				'buddypress-favorite-notification'
+			),
+			$count,
+			(int) $result['days'],
+			$remaining
+		);
+
 		wp_send_json_success(
 			array(
-				/* translators: %d: Number of cleared notifications. */
-				'message'   => sprintf( esc_html__( 'Cleared %d old notifications', 'buddypress-favorite-notification' ), (int) $result['count'] ),
-				'count'     => (int) $result['count'],
-				'remaining' => isset( $result['remaining'] ) ? (int) $result['remaining'] : 0,
+				'message'   => $message,
+				'count'     => $count,
+				'remaining' => $remaining,
 			)
 		);
 	}

@@ -296,11 +296,7 @@
                 },
                 success: function(response) {
                     if (response.success) {
-                        var message = str('cleared', 'Successfully cleared %s old notifications.').replace('%s', response.data.count);
-                        if (response.data.remaining !== undefined) {
-                            message += ' (' + str('remaining', '%s notifications remaining').replace('%s', response.data.remaining) + ')';
-                        }
-                        $result.html('<div class="notice notice-success inline"><p>' + message + '</p></div>');
+                        $result.html('<div class="notice notice-success inline"><p>' + response.data.message + '</p></div>');
                     } else {
                         $result.html('<div class="notice notice-error inline"><p>' + (response.data.message || str('clear_failed', 'Failed to clear notifications.')) + '</p></div>');
                     }

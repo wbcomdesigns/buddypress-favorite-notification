@@ -36,7 +36,10 @@ function bpfn_clear_old_notifications( $days = 30 ) {
 	$table     = $bp->notifications->table_name;
 	$component = isset( $bp->favorite_notifier ) ? $bp->favorite_notifier->id : 'favorite_notifier';
 
-	// Delete notifications older than X days that are read.
+	// Read notifications only - `is_new = 0` is deliberate. Deleting unread ones
+	// destroys notifications the member has never seen. It also makes "0 cleared"
+	// a normal result on a quiet site, which is why the caller reports the rule
+	// alongside the number.
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Cleanup query.
 	$deleted = $wpdb->query(
 		$wpdb->prepare(
@@ -67,8 +70,9 @@ function bpfn_clear_old_notifications( $days = 30 ) {
 	);
 
 	return array(
-		'count'     => $deleted,
-		'remaining' => $remaining,
+		'count'     => (int) $deleted,
+		'remaining' => (int) $remaining,
+		'days'      => (int) $days,
 	);
 }
 
