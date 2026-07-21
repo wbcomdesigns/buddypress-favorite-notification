@@ -170,12 +170,59 @@ module.exports = function(grunt) {
         'makepot'
     ]);
 
+    // Release preflight.
+    //
+    // copy:build globs '**' from the WORKING DIRECTORY, so the zip is whatever is
+    // on disk - committed or not. On 2.0.1 that shipped ten source files that were
+    // never committed: the published zip contained fixes master did not have, and
+    // the next build from master would have silently regressed all of them.
+    //
+    // The zip is generated FROM the repo, so the repo has to BE the source of
+    // truth. Refuse to build from a dirty tree. If you genuinely need a scratch
+    // build, run the copy/compress tasks directly - but never ship that zip.
+    grunt.registerTask('preflight', 'Refuse to build unless the tree is clean', function () {
+        var done = this.async();
+        var exec = require('child_process').exec;
+
+        exec('git status --porcelain', { cwd: __dirname }, function (err, stdout) {
+            if (err) {
+                grunt.log.warn('Not a git checkout - skipping the cleanliness check.');
+                return done();
+            }
+
+            var dirty = stdout.trim();
+            if (dirty) {
+                grunt.log.error('Uncommitted changes in the working tree:');
+                grunt.log.error(dirty);
+                grunt.fail.fatal(
+                    'Refusing to build. The zip must be reproducible from the repo - ' +
+                    'commit (or stash) these first, or the release will ship code that ' +
+                    'exists nowhere but the zip.'
+                );
+                return done(false);
+            }
+
+            // Not fatal: a clean tree that has not been pushed still builds, but the
+            // tag would point at a commit nobody else can fetch.
+            exec('git log --oneline @{upstream}..HEAD', { cwd: __dirname }, function (upErr, ahead) {
+                if (!upErr && ahead.trim()) {
+                    grunt.log.warn('HEAD is ahead of its upstream - push before tagging:');
+                    grunt.log.warn(ahead.trim());
+                }
+                grunt.log.ok('Working tree clean - safe to build.');
+                done();
+            });
+        });
+    });
+
     grunt.registerTask('build', [
+        'preflight',
         'checktextdomain',
         'clean:dist',
         'copy:build',
         'compress:build',
-        'clean:build'
+        'clean:build',
+        'build-info'
     ]);
 
     // Custom task to display build info
@@ -191,6 +238,9 @@ module.exports = function(grunt) {
         grunt.log.writeln('');
     });
 
-    // Add build info to build task
-    grunt.task.run('build-info');
+    // build-info is the LAST step of `build` (see the task list above), not a
+    // module-scope call. It used to be queued here at load time, so it ran on every
+    // grunt invocation and printed "Build Complete!" before the real task had run -
+    // including when the build then failed, and even for `grunt check`. Announcing a
+    // successful build that did not happen is exactly how a bad zip gets shipped.
 };
