@@ -1075,3 +1075,51 @@
 	font-size: 12px;
 	opacity: 0.7;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   Display tab: appearance preview swatch
+   ═══════════════════════════════════════════════════════════ */
+
+.bpfn-card__preview {
+	margin-top: var(--bpfn-admin-gap-lg);
+	padding-top: var(--bpfn-admin-gap-md);
+	border-top: 1px solid var(--bpfn-admin-border);
+}
+
+.bpfn-card__preview-label {
+	margin: 0 0 var(--bpfn-admin-gap-sm);
+	font-size: 12px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--bpfn-admin-text-3);
+}
+
+.bpfn-preview-swatch {
+	display: flex;
+	align-items: center;
+	gap: var(--bpfn-admin-gap-sm);
+	padding: 12px 16px;
+	border: 1px solid var(--bpfn-admin-border);
+	border-radius: var(--bpfn-admin-radius-sm);
+	background: var(--bpfn-admin-surface-1);
+	font-size: 14px;
+	color: var(--bpfn-admin-text-2);
+}
+
+.bpfn-preview-icon {
+	font-size: 16px;
+	line-height: 1;
+	color: var(--bpfn-admin-danger);
+}
+
+.bpfn-preview-text {
+	font-weight: 500;
+}
+
+@media screen and (max-width: 640px) {
+	.bpfn-preview-swatch {
+		padding: 10px 12px;
+		font-size: 13px;
+	}
+}

@@ -40,13 +40,20 @@ follows **`/ux-foundation`**; audit drift with **`/ux-audit`**. Onboarding artef
 - ONE admin page: submenu **`bpfn-dashboard`** under the shared **WB Plugins hub**
   (`wbcomplugins`), cap `manage_options`, rendered by `BPFN_Admin::render_page()`
   (`includes/admin/class-bpfn-admin.php`) with the modern card-panel shell
-  (`includes/admin/views/shell.php` + `overview.php` / `tools.php` / `discover.php`).
-  Three tabs (`BPFN_Admin::get_tabs()`, filter `bpfn_admin_tabs`): **Overview** (stats,
-  trending, quick actions), **Tools** (migration, cleanup), **Discover** (ecosystem cards).
-- There is NO Settings API options page. The former Settings tab's only field
-  ("Enhanced Notifications", option `bpfn_options`) was removed on branch 2.0.0: its
-  enhanced template could never render — BuddyPress kses-strips notification
-  descriptions to `<a href class>` on every surface.
+  (`includes/admin/views/shell.php` + `overview.php` / `display.php` / `tools.php` /
+  `discover.php`). Four tabs (`BPFN_Admin::get_tabs()`, filter `bpfn_admin_tabs`):
+  **Overview** (stats, trending, quick actions), **Display** (favorite display mode +
+  icon), **Tools** (migration, cleanup), **Discover** (ecosystem cards).
+- There is still NO Settings API options page — `register_setting()` is used nowhere.
+  The Display tab persists via a hand-rolled POST handler like Tools does:
+  `BPFN_Module_Admin::handle_display_settings_save()`, nonce `bpfn_display_settings`,
+  cap `manage_options`. Both values are validated against
+  `BPFN_Module_Favorite_Display::get_display_modes()` / `::get_icon_choices()` rather
+  than merely sanitized, so a crafted POST cannot persist a mode the renderer has no
+  branch for.
+- The former Settings tab's only field ("Enhanced Notifications", option `bpfn_options`)
+  was removed on branch 2.0.0: its enhanced template could never render — BuddyPress
+  kses-strips notification descriptions to `<a href class>` on every surface.
 - `BPFN_Module_Settings` (`includes/modules/class-settings.php`) is **front-end only**
   and IS loaded: BP member **Settings → Favorite Notifications** subnav + per-user
   save handler (template `templates/settings/notifications.php`, styles
@@ -55,7 +62,8 @@ follows **`/ux-foundation`**; audit drift with **`/ux-audit`**. Onboarding artef
 ## Settings / options
 - Standalone options: `bpfn_auto_cleanup_enabled`, `bpfn_auto_cleanup_days`,
   `bpfn_last_auto_cleanup`, `bpfn_version`, `bpfn_show_migration_notice`,
-  `bpfn_favorites_migrated`, `bpfn_migration_status`, `bpfn_migration_log`.
+  `bpfn_favorites_migrated`, `bpfn_migration_status`, `bpfn_migration_log`,
+  `bpfn_display_mode` (default `inline`), `bpfn_favorite_icon` (default `heart`).
 - `bpfn_options` (group `bpfn_settings`) is RETIRED — never registered or written. One stale
   reader survives: `includes/functions/integration-functions.php:562` dumps it into
   `bpfn_get_diagnostics()`. Harmless (defaults to `array()`), but it is a read-never-written key.
@@ -111,6 +119,33 @@ notification; OFF -> web/email false, 0 notifications; compat-only ON -> 1, OFF 
 
 `audit/manifest.json` was fully rescanned and is current as of 2026-07-16.
 `AUDIT-VERDICT.md` still predates the 2.0.x removals — treat it as stale.
+
+## Favorite display (`includes/modules/class-favorite-display.php`)
+- **One renderer, two callers.** `render_display()` is the ONLY place the activity-stream
+  markup is built. Both `display_favorite_count()` (server render) and
+  `ajax_refresh_favorite_display()` (post-favorite refresh) call it. Before 2.1.0 these
+  were two verbatim copies, so the icon lived in two places and any format change
+  reverted the instant a member clicked like. **Do not re-inline markup into either
+  caller** — a change that lands in one and not the other is invisible until someone
+  favorites something.
+- Three modes (`bpfn_display_mode`): `inline` (names), `counter` (static `<span
+  role="img">`), `modal` (a `<button>` opening the paginated list). `counter` must stay
+  non-interactive — rendering a button there puts a dead control in the tab order.
+- Public display filters: `bpfn_favorite_icon_html`, `bpfn_favorite_display_format`,
+  `bpfn_favorite_display_html` (full override), `bpfn_display_modes`,
+  `bpfn_favorite_icons`, `bpfn_favorites_modal_per_page`. Everything the renderer emits
+  — including a third-party `bpfn_favorite_display_html` return — goes through
+  `wp_kses( …, get_allowed_display_html() )`. New attributes (e.g. `role`) must be added
+  to that allow list or they are silently stripped.
+- **Cache is versioned, not enumerated.** Every count/user-list key carries
+  `get_cache_incrementor( $activity_id )`; `clear_cache()` bumps that one value.
+  Do NOT go back to deleting a hand-maintained list of key shapes — the modal paginates
+  with arbitrary offsets, so any such list is incomplete by construction and serves a
+  stale list for the full 5-minute TTL.
+- **The counter is a `<button>`, so BuddyPress styles it.**
+  `.buddypress .buddypress-wrap button` (0,2,1) sets a white box + grey border and
+  buddypress.min.css loads after ours. Counter CSS selectors must EXCEED that
+  specificity, not tie — BP wins ties on load order.
 
 ## Conventions
 - Prefix everything `bpfn_` / `BPFN_`. Text domain `buddypress-favorite-notification`.

@@ -3,7 +3,7 @@
  * Plugin Name: BuddyPress Favorite Notification
  * Plugin URI: http://www.wbcomdesigns.com/
  * Description: Adds notification for the activity Favorite for the activity user.
- * Version: 2.0.1
+ * Version: 2.1.0
  * Requires at least: 6.5
  * Requires PHP: 8.0
  * Requires Plugins: buddypress
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants.
-define( 'BPFN_VERSION', '2.0.1' );
+define( 'BPFN_VERSION', '2.1.0' );
 define( 'BPFN_PLUGIN_FILE', __FILE__ );
 define( 'BPFN_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'BPFN_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
