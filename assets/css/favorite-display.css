@@ -401,6 +401,11 @@ body.bpfn-modal-open {
 	padding: 12px 0;
 }
 
+.site-wrapper .activity .bpfn-favorite-display {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
 /* Animation for new favorites */
 @keyframes bpfn-pulse {
 	0%, 100% {
