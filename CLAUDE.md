@@ -147,6 +147,39 @@ notification; OFF -> web/email false, 0 notifications; compat-only ON -> 1, OFF 
   buddypress.min.css loads after ours. Counter CSS selectors must EXCEED that
   specificity, not tie — BP wins ties on load order.
 
+## Handoff sequence — do these IN THIS ORDER, every card
+
+**Verify fixes → commit → push → move card → comment → Slack reply.**
+
+Verification comes FIRST and is not optional. Nothing downstream is allowed to start
+until the change is verified in a browser against the state QA will actually pull.
+
+1. **Verify fixes.** Browser-verify every mode/state/viewport the change touches, plus
+   the surfaces adjacent to it. Re-run PHPStan + WPCS. Verify against the committed
+   tree, not a half-saved working copy — confirm `git status` is clean and
+   `git diff HEAD origin/<branch>` is empty, so what you tested is what QA pulls.
+   Synthetic checks lie: a programmatic `.click()` does not move focus, so it will pass
+   a focus-restore test that a real user fails. Drive the real interaction.
+2. **Commit** on a feature branch (never straight to master/main).
+3. **Push** to origin. A card at Ready for Testing pointing at an unpushed branch means
+   QA tests the OLD code and bounces it — see [[release-zip-must-equal-repo]].
+4. **Move the card** to Ready for Testing, then re-fetch it to confirm the move landed.
+5. **Comment on the card**: what shipped, what to test (numbered, with the specific
+   regression case called out), any correction to the reporter's diagnosis, and every
+   known/pre-existing gap. Never let a comment read as a cleaner bill of health than
+   the work earned.
+6. **Slack reply** in the plugin's thread, tagging the reporter.
+
+Steps 4-6 are team-visible and step 3 is a push: confirm with the owner before the
+first one unless already told to run the whole sequence.
+
+**QA cards are entry points, not specs.** The reporter is a tester, not an architect —
+their proposed implementation plan can be wrong, including confident claims that
+something "already works". Audit every surface the card points at before coding, and
+correct the record on the card. (On the 2.1.0 counter+modal card, all three of the
+plan's technical claims were wrong and following it verbatim would have shipped a
+display that reverted on the first click.)
+
 ## Conventions
 - Prefix everything `bpfn_` / `BPFN_`. Text domain `buddypress-favorite-notification`.
 - Custom-table queries are deliberately direct (`$wpdb`) with object caching + inline

@@ -324,11 +324,21 @@
         },
 
         showModal: function(html) {
-            // Remove existing modal.
-            $('.bpfn-modal-overlay').remove();
+            var $existing = $('.bpfn-modal-overlay');
 
             // Remember what opened the dialog so focus can be restored on close.
-            this.lastFocused = document.activeElement;
+            // Only capture it when no dialog is open yet: showAllFavorites()
+            // calls this twice (loading state, then content), and by the second
+            // call focus is on the close button of the dialog we are about to
+            // remove — capturing then would record that instead of the counter,
+            // and removing it leaves document.activeElement as <body>, so focus
+            // would be dumped at the top of the page on close.
+            if (!$existing.length) {
+                this.lastFocused = document.activeElement;
+            }
+
+            // Remove existing modal.
+            $existing.remove();
 
             var $modal = $('<div class="bpfn-modal-overlay">' +
                 '<div class="bpfn-modal" role="dialog" aria-modal="true">' +
