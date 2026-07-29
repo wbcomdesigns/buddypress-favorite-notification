@@ -57,7 +57,9 @@ a.bpfn-others-count:hover {
 /* Counter modes ------------------------------------------------------- */
 
 /* Shared shape for the counter in both 'counter' (static) and 'modal'
-   (interactive) display modes, so switching modes never shifts the layout. */
+   (interactive) display modes, so switching modes never shifts the layout.
+   Base rule for themes that leave buttons alone; the scoped block below
+   re-declares the layout for themes that do not. */
 .bpfn-favorite-counter,
 .bpfn-view-all-favorites {
 	display: inline-flex;
@@ -67,6 +69,24 @@ a.bpfn-others-count:hover {
 	font-weight: 500;
 	line-height: 1;
 	color: var(--bpfn-text-muted);
+}
+
+/*
+ * LAYOUT must carry the same specificity as the visual reset below, not
+ * just colour and border. Reign 8 restyles Nouveau buttons and wins
+ * `display` against a single class, which flips the counter to a block
+ * box — and because `gap` only applies to flex/grid containers, the
+ * 6px gap silently stops working and the icon jams against the number.
+ * A theme overriding `display` must not be able to disable the spacing.
+ */
+.buddypress .buddypress-wrap .bpfn-favorite-display .bpfn-view-all-favorites,
+.buddypress .buddypress-wrap .bpfn-favorite-display .bpfn-favorite-counter,
+.bpfn-favorite-display > .bpfn-view-all-favorites,
+.bpfn-favorite-display > .bpfn-favorite-counter {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	line-height: 1;
 }
 
 .bpfn-favorite-counter .bpfn-favorite-icon,
