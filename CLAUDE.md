@@ -17,7 +17,7 @@
 ## What this is
 Free Wbcom Designs BuddyPress addon. Sends BP + email + realtime notifications when a
 member's activity/comment is favorited, and renders a Facebook-style "X and N others liked
-this" display. Hard dependency on BuddyPress. Current version 2.0.1, dev branch `2.0.0`.
+this" display. Hard dependency on BuddyPress. Current version 2.1.0, released from `master`.
 
 ## Development skill — follow this
 All plugin work MUST follow **`/wp-plugin-development`** (canonical Wbcom plugin skill):
@@ -64,9 +64,10 @@ follows **`/ux-foundation`**; audit drift with **`/ux-audit`**. Onboarding artef
   `bpfn_last_auto_cleanup`, `bpfn_version`, `bpfn_show_migration_notice`,
   `bpfn_favorites_migrated`, `bpfn_migration_status`, `bpfn_migration_log`,
   `bpfn_display_mode` (default `inline`), `bpfn_favorite_icon` (default `heart`).
-- `bpfn_options` (group `bpfn_settings`) is RETIRED — never registered or written. One stale
-  reader survives: `includes/functions/integration-functions.php:562` dumps it into
-  `bpfn_get_diagnostics()`. Harmless (defaults to `array()`), but it is a read-never-written key.
+- `bpfn_options` (group `bpfn_settings`) is RETIRED — never registered, written, or read.
+  The last stale reader (the `bpfn_get_diagnostics()` dump) went with the diagnostic
+  helpers; `integration-functions.php` is now 84 lines. Verified 0 `get_option('bpfn_options')`
+  calls across all non-vendor PHP (2026-07-30). Only explanatory comments remain.
 - There is NO `register_setting()` anywhere. The Tools tab persists its two options via a
   hand-rolled POST handler (`class-admin.php:80-128`, nonce `bpfn_cleanup_settings`).
 - Per-user prefs: `{prefix}bp_favorite_notification_prefs` via `bpfn_get/save_user_settings`.
@@ -111,14 +112,23 @@ notification; OFF -> web/email false, 0 notifications; compat-only ON -> 1, OFF 
   at `class-notifications.php:104` remains: it only fires when the component failed to
   initialise. `bpfn_compat_verify_registration()` is already `WP_DEBUG`-guarded.
 
-**OPEN — needs a card, not yet fixed:**
-- **Major — dead UI.** `BPFN_Module_Settings::notification_settings()` (`class-settings.php:44`)
-  renders radios named `notifications[favorite_activity]` (`:194`, `:200`); BP core saves
-  that to user meta `favorite_activity`, a key the plugin never reads. This is a second,
-  separate settings surface from the working **Settings → Favorite Notifications** screen.
+**FIXED 2026-07-30 (verified at the 2.1.0 release gate) — the dead-UI finding.** The
+BP notification-settings row is no longer decorative. `BPFN_Module_Settings::notification_settings()`
+still renders radios named `notifications[favorite_activity]`, but
+`save_bp_notification_settings()` (`class-settings.php:195`) now hooks
+`bp_core_notification_settings_after_save` (fired by BP core in
+`bp-settings/actions/notifications.php:52` since BP 1.5, after the core save and before the
+redirect) and mirrors the posted value into the plugin's own prefs table. Verified on a live
+BP 14.5.2 install: posting `no` sets `email_enabled` to 0, posting `yes` restores it to 1, and
+the web channel's `is_enabled` survives both saves. **Keep the read and the write on the same
+storage** — the row reads its checked state from the prefs table, so if a future change writes
+only user meta the surface goes decorative again.
 
-`audit/manifest.json` was fully rescanned and is current as of 2026-07-16.
-`AUDIT-VERDICT.md` still predates the 2.0.x removals — treat it as stale.
+`audit/manifest.json`: structural sections are current as of the 2026-07-29 rescan; the
+`static_analysis` block was re-verified finding by finding on 2026-07-30 (it had still listed
+BPFN-PREF-01/02 and BPFN-DEADUI-01 as open blockers after 2.0.1 shipped their fixes).
+`CAPABILITIES.md` is the human roll-up. `AUDIT-VERDICT.md` still predates the 2.0.x removals —
+treat it as stale.
 
 ## Favorite display (`includes/modules/class-favorite-display.php`)
 - **One renderer, two callers.** `render_display()` is the ONLY place the activity-stream
