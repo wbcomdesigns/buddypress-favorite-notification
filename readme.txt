@@ -328,6 +328,9 @@ Major release with a favorite count display, an analytics dashboard, an indexed 
 
 == Upgrade Notice ==
 
+= 2.1.0 =
+Adds a Display tab to choose how the favorite line renders (inline usernames, icon and count, or a count that opens the full list) and which icon it uses. The member list now pages instead of stopping at 50. Existing sites keep inline usernames until you change the setting.
+
 = 2.0.1 =
 Rebuilt admin under the shared WB Plugins menu, theme-aware colours, RTL fixes, and working member notification preferences. The Enhanced Notifications toggle is removed; BuddyPress stripped its markup, so it never had an effect.
 

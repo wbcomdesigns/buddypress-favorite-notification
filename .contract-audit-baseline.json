@@ -1,0 +1,25 @@
+{
+    "generated": "2026-07-30T00:00:00+00:00",
+    "suppressions": [
+        {
+            "id": "ajax-action-no-handler:bpfn_clear_old_notifications",
+            "reason": "False positive. Handler IS registered, but the hook name is built dynamically: includes/modules/class-admin.php:65 loops $ajax_actions and calls add_action( 'wp_ajax_bpfn_' . $action, array( $this, 'ajax_' . $action ) ). Callback ajax_clear_old_notifications() is at class-admin.php:185. Verified 2026-07-30."
+        },
+        {
+            "id": "ajax-action-no-handler:bpfn_migrate_favorites",
+            "reason": "False positive. Same dynamic wp_ajax_ registration loop (class-admin.php:65). Callback ajax_migrate_favorites() is at class-admin.php:245. Verified 2026-07-30."
+        },
+        {
+            "id": "ajax-action-no-handler:bpfn_migration_progress",
+            "reason": "False positive. Same dynamic wp_ajax_ registration loop (class-admin.php:65). Callback ajax_migration_progress() is at class-admin.php:287. Verified 2026-07-30."
+        },
+        {
+            "id": "ajax-handler-unreferenced:bpfn_dismiss_migration_notice",
+            "reason": "False positive. The caller is inline JS printed from PHP (includes/admin/class-bpfn-admin.php:321), which the scanner does not index because it lives in a .php file rather than assets/js. Handler at class-bpfn-admin.php:337. Verified 2026-07-30."
+        },
+        {
+            "id": "option-written-never-read:bpfn_version",
+            "reason": "Intentional. bpfn_version is a schema stamp written on activation/upgrade (bp-favorite-notification.php:253) so a future release can detect the installed version and run a data migration. Nothing reads it yet by design. Verified 2026-07-30."
+        }
+    ]
+}

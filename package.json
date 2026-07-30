@@ -1,6 +1,6 @@
 {
   "name": "buddypress-favorite-notification",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "BuddyPress Favorite Notification - Send notifications when activities are favorited",
   "main": "bp-favorite-notification.php",
   "scripts": {

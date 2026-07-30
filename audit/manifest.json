@@ -19,43 +19,273 @@
       "header_source": "bp-favorite-notification.php:6-9 — Version 2.1.0, Requires at least 6.1, Requires PHP 7.4, Requires Plugins: buddypress. BPFN_VERSION = '2.1.0' at :26."
     }
   },
-  "rest": { "namespace": null, "endpoints": [] },
+  "rest": {
+    "namespace": null,
+    "endpoints": []
+  },
   "ajax": [
-    { "action": "bpfn_clear_old_notifications", "handler": "includes/modules/class-admin.php::ajax_clear_old_notifications", "nonce": "bpfn-admin-nonce", "capability": "manage_options", "purpose": "Manually delete read notifications older than bpfn_auto_cleanup_days.", "registered_at": "includes/modules/class-admin.php:59-67 (loop over $ajax_actions)", "gate_at": "class-admin.php:134-138" },
-    { "action": "bpfn_migrate_favorites", "handler": "includes/modules/class-admin.php::ajax_migrate_favorites", "nonce": "bpfn-admin-nonce", "capability": "manage_options", "purpose": "Run / start usermeta->table favorites migration (background when >100 users).", "registered_at": "includes/modules/class-admin.php:59-67", "gate_at": "class-admin.php:172-176" },
-    { "action": "bpfn_migration_progress", "handler": "includes/modules/class-admin.php::ajax_migration_progress", "nonce": "bpfn-admin-nonce", "capability": "manage_options", "purpose": "Poll background migration progress.", "registered_at": "includes/modules/class-admin.php:59-67", "gate_at": "class-admin.php:214-218" },
-    { "action": "bpfn_dismiss_migration_notice", "handler": "includes/admin/class-bpfn-admin.php::ajax_dismiss_migration_notice", "nonce": "bpfn-dismiss-notice", "capability": "manage_options", "purpose": "Persist migration-notice dismissal (deletes bpfn_show_migration_notice).", "registered_at": "includes/admin/class-bpfn-admin.php:78", "gate_at": "class-bpfn-admin.php:332-336 (cap first, then nonce)" },
-    { "action": "bpfn_check_notifications", "handler": "includes/modules/class-realtime.php::ajax_check_notifications", "nonce": "bpfn-nonce | bpfn_realtime_nonce", "capability": "logged-in (is_user_logged_in)", "purpose": "AJAX fallback poll for new realtime notifications (Heartbeat is the primary path).", "registered_at": "includes/modules/class-realtime.php:35", "gate_at": "class-realtime.php:98" },
-    { "action": "bpfn_dismiss_notification", "handler": "includes/modules/class-realtime.php::ajax_dismiss_notification", "nonce": "bpfn-nonce | bpfn_realtime_nonce", "capability": "logged-in + ownership check", "purpose": "Mark a realtime notification read; verifies ownership.", "registered_at": "includes/modules/class-realtime.php:36", "gate_at": "class-realtime.php:125" },
-    { "action": "bpfn_get_all_favorites", "handler": "includes/modules/class-favorite-display.php::ajax_get_all_favorites", "nonce": "bpfn-favorite-nonce", "capability": "registered priv + nopriv; nopriv unreachable in practice", "purpose": "Return full list of users who favorited an activity (modal).", "registered_at": "includes/modules/class-favorite-display.php:69-70", "gate_at": "class-favorite-display.php:372" },
-    { "action": "bpfn_refresh_favorite_display", "handler": "includes/modules/class-favorite-display.php::ajax_refresh_favorite_display", "nonce": "bpfn-favorite-nonce", "capability": "registered priv + nopriv; nopriv unreachable in practice", "purpose": "Return refreshed favorite-count HTML for an activity.", "registered_at": "includes/modules/class-favorite-display.php:71-72", "gate_at": "class-favorite-display.php:473" }
+    {
+      "action": "bpfn_clear_old_notifications",
+      "handler": "includes/modules/class-admin.php::ajax_clear_old_notifications",
+      "nonce": "bpfn-admin-nonce",
+      "capability": "manage_options",
+      "purpose": "Manually delete read notifications older than bpfn_auto_cleanup_days.",
+      "registered_at": "includes/modules/class-admin.php:59-67 (loop over $ajax_actions)",
+      "gate_at": "class-admin.php:134-138"
+    },
+    {
+      "action": "bpfn_migrate_favorites",
+      "handler": "includes/modules/class-admin.php::ajax_migrate_favorites",
+      "nonce": "bpfn-admin-nonce",
+      "capability": "manage_options",
+      "purpose": "Run / start usermeta->table favorites migration (background when >100 users).",
+      "registered_at": "includes/modules/class-admin.php:59-67",
+      "gate_at": "class-admin.php:172-176"
+    },
+    {
+      "action": "bpfn_migration_progress",
+      "handler": "includes/modules/class-admin.php::ajax_migration_progress",
+      "nonce": "bpfn-admin-nonce",
+      "capability": "manage_options",
+      "purpose": "Poll background migration progress.",
+      "registered_at": "includes/modules/class-admin.php:59-67",
+      "gate_at": "class-admin.php:214-218"
+    },
+    {
+      "action": "bpfn_dismiss_migration_notice",
+      "handler": "includes/admin/class-bpfn-admin.php::ajax_dismiss_migration_notice",
+      "nonce": "bpfn-dismiss-notice",
+      "capability": "manage_options",
+      "purpose": "Persist migration-notice dismissal (deletes bpfn_show_migration_notice).",
+      "registered_at": "includes/admin/class-bpfn-admin.php:78",
+      "gate_at": "class-bpfn-admin.php:332-336 (cap first, then nonce)"
+    },
+    {
+      "action": "bpfn_check_notifications",
+      "handler": "includes/modules/class-realtime.php::ajax_check_notifications",
+      "nonce": "bpfn-nonce | bpfn_realtime_nonce",
+      "capability": "logged-in (is_user_logged_in)",
+      "purpose": "AJAX fallback poll for new realtime notifications (Heartbeat is the primary path).",
+      "registered_at": "includes/modules/class-realtime.php:35",
+      "gate_at": "class-realtime.php:98"
+    },
+    {
+      "action": "bpfn_dismiss_notification",
+      "handler": "includes/modules/class-realtime.php::ajax_dismiss_notification",
+      "nonce": "bpfn-nonce | bpfn_realtime_nonce",
+      "capability": "logged-in + ownership check",
+      "purpose": "Mark a realtime notification read; verifies ownership.",
+      "registered_at": "includes/modules/class-realtime.php:36",
+      "gate_at": "class-realtime.php:125"
+    },
+    {
+      "action": "bpfn_get_all_favorites",
+      "handler": "includes/modules/class-favorite-display.php::ajax_get_all_favorites",
+      "nonce": "bpfn-favorite-nonce",
+      "capability": "registered priv + nopriv; nopriv unreachable in practice",
+      "purpose": "Return full list of users who favorited an activity (modal).",
+      "registered_at": "includes/modules/class-favorite-display.php:69-70",
+      "gate_at": "class-favorite-display.php:372"
+    },
+    {
+      "action": "bpfn_refresh_favorite_display",
+      "handler": "includes/modules/class-favorite-display.php::ajax_refresh_favorite_display",
+      "nonce": "bpfn-favorite-nonce",
+      "capability": "registered priv + nopriv; nopriv unreachable in practice",
+      "purpose": "Return refreshed favorite-count HTML for an activity.",
+      "registered_at": "includes/modules/class-favorite-display.php:71-72",
+      "gate_at": "class-favorite-display.php:473"
+    }
   ],
   "ajax_dead_listeners": [],
   "ajax_notes": "8 distinct AJAX actions over 10 add_action registrations (the 2 favorite-display actions each register priv + nopriv). The nopriv registrations are effectively unreachable: BPFN_Module_Favorite_Display::display_favorite_count() returns early for logged-out visitors (class-favorite-display.php:315), so the markup that carries the nonce and triggers these endpoints is never printed for anonymous users. bpfn_get_stats (listed in the 2026-06-05 manifest) does NOT exist — class-admin.php:59-63 registers exactly three actions.",
   "admin_pages": [
-    { "title": "BuddyPress Favorite Notification", "menu_title": "Favorite Notifications", "slug": "bpfn-dashboard", "parent": "wbcomplugins (shared WB Plugins hub)", "capability": "manage_options", "registered_at": "includes/admin/class-bpfn-admin.php:106-113 (add_submenu_page)", "hook_suffix": "*_page_bpfn-dashboard", "renderer": "BPFN_Admin::render_page (class-bpfn-admin.php:233)", "shell": "includes/admin/views/shell.php", "tabs": ["overview", "display", "tools", "discover"], "tab_source": "BPFN_Admin::get_tabs() class-bpfn-admin.php:44-68, filterable via bpfn_admin_tabs", "views": ["includes/admin/views/overview.php", "includes/admin/views/display.php", "includes/admin/views/tools.php", "includes/admin/views/discover.php"], "status": "ACTIVE" },
-    { "title": "WB Plugins (shared hub landing)", "slug": "wbcomplugins", "parent": "(top-level)", "capability": "manage_options", "icon": "dashicons-lightbulb", "position": 59, "registered_at": "includes/admin/class-bpfn-admin.php:94-104 (add_menu_page, only if no other Wbcom plugin created it)", "renderer": "BPFN_Admin::render_hub -> includes/admin/views/hub.php", "note": "BPFN_Admin::takeover_hub_landing() (class-bpfn-admin.php:121-128, admin_menu prio 999) removes all toplevel_page_wbcomplugins actions and re-binds render_hub, so this plugin owns the hub landing even when a legacy wbcom-wrapper plugin registered it first.", "status": "ACTIVE (shared, cooperative)" }
+    {
+      "title": "BuddyPress Favorite Notification",
+      "menu_title": "Favorite Notifications",
+      "slug": "bpfn-dashboard",
+      "parent": "wbcomplugins (shared WB Plugins hub)",
+      "capability": "manage_options",
+      "registered_at": "includes/admin/class-bpfn-admin.php:106-113 (add_submenu_page)",
+      "hook_suffix": "*_page_bpfn-dashboard",
+      "renderer": "BPFN_Admin::render_page (class-bpfn-admin.php:233)",
+      "shell": "includes/admin/views/shell.php",
+      "tabs": [
+        "overview",
+        "display",
+        "tools",
+        "discover"
+      ],
+      "tab_source": "BPFN_Admin::get_tabs() class-bpfn-admin.php:44-68, filterable via bpfn_admin_tabs",
+      "views": [
+        "includes/admin/views/overview.php",
+        "includes/admin/views/display.php",
+        "includes/admin/views/tools.php",
+        "includes/admin/views/discover.php"
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "title": "WB Plugins (shared hub landing)",
+      "slug": "wbcomplugins",
+      "parent": "(top-level)",
+      "capability": "manage_options",
+      "icon": "dashicons-lightbulb",
+      "position": 59,
+      "registered_at": "includes/admin/class-bpfn-admin.php:94-104 (add_menu_page, only if no other Wbcom plugin created it)",
+      "renderer": "BPFN_Admin::render_hub -> includes/admin/views/hub.php",
+      "note": "BPFN_Admin::takeover_hub_landing() (class-bpfn-admin.php:121-128, admin_menu prio 999) removes all toplevel_page_wbcomplugins actions and re-binds render_hub, so this plugin owns the hub landing even when a legacy wbcom-wrapper plugin registered it first.",
+      "status": "ACTIVE (shared, cooperative)"
+    }
   ],
   "admin_pages_notes": "The 2026-06-05 manifest is superseded: there is no top-level `bpfn-dashboard` add_menu_page, no Settings tab, and no `bpfn-settings` options page. The former Settings tab's only field ('Enhanced Notifications', option `bpfn_options`) was removed on 2.0.x — rationale documented at includes/admin/class-bpfn-admin.php:10-14: BuddyPress runs notification descriptions through wp_kses() allowing only `<a href class>`, so the enhanced template could never render on any surface.",
   "settings": [
-    { "key": "bpfn_display_mode", "group": "(standalone option, custom POST handler)", "type": "string inline|counter|modal", "default": "inline", "controls": "Display tab: how the who-favorited line renders in the activity stream", "written_at": "includes/modules/class-admin.php::handle_display_settings_save (nonce bpfn_display_settings)", "read_at": ["includes/modules/class-favorite-display.php::get_display_mode", "includes/admin/views/display.php"], "validated_against": "BPFN_Module_Favorite_Display::get_display_modes()" },
-    { "key": "bpfn_favorite_icon", "group": "(standalone option, custom POST handler)", "type": "string heart|star|bookmark|thumb|none", "default": "heart", "controls": "Display tab: which glyph precedes the favorite count", "written_at": "includes/modules/class-admin.php::handle_display_settings_save (nonce bpfn_display_settings)", "read_at": ["includes/modules/class-favorite-display.php::get_icon_html", "includes/admin/views/display.php"], "validated_against": "BPFN_Module_Favorite_Display::get_icon_choices()" },
-    { "key": "bpfn_auto_cleanup_enabled", "group": "(standalone option, custom POST handler)", "type": "string yes|no", "default": "yes", "controls": "Tools tab: enable monthly cron cleanup", "written_at": "includes/modules/class-admin.php:98", "read_at": ["includes/modules/class-admin.php:255 (setup_automatic_cleanup)", "includes/modules/class-admin.php:266 (run_automatic_cleanup)", "includes/admin/views/tools.php:23"] },
-    { "key": "bpfn_auto_cleanup_days", "group": "(standalone option)", "type": "int (min 7, default 30)", "default": "30", "controls": "Tools tab: retention period", "written_at": "includes/modules/class-admin.php:105", "read_at": ["includes/modules/class-admin.php:147 (ajax_clear_old_notifications)", "includes/modules/class-admin.php:272 (run_automatic_cleanup)", "includes/admin/views/tools.php:24"] },
-    { "key": "bpfn_last_auto_cleanup", "group": "(state)", "type": "array", "default": "array()", "controls": "Last cleanup log (read-only display)", "written_at": "includes/modules/class-admin.php:277", "read_at": ["includes/admin/views/tools.php:25"] },
-    { "key": "bpfn_version", "group": "(state)", "type": "string", "default": "BPFN_VERSION", "controls": "Installed version marker", "written_at": "bp-favorite-notification.php:242", "read_at": [] },
-    { "key": "bpfn_show_migration_notice", "group": "(state)", "type": "bool", "default": "false", "controls": "Show admin migration nag", "written_at": "bp-favorite-notification.php:251", "read_at": ["includes/admin/class-bpfn-admin.php:279"], "deleted_at": ["includes/admin/class-bpfn-admin.php:289 (auto-clear when migration complete)", "includes/admin/class-bpfn-admin.php:338 (AJAX dismiss)"] },
-    { "key": "bpfn_favorites_migrated", "group": "(state)", "type": "bool", "controls": "Migration completed flag", "written_at": "includes/migrations/class-favorites-migration.php:177,275", "read_at": ["includes/migrations/class-favorites-migration.php:286"], "deleted_at": ["includes/migrations/class-favorites-migration.php:302"] },
-    { "key": "bpfn_migration_status", "group": "(state)", "type": "array", "controls": "Background migration offset/progress", "written_at": "includes/migrations/class-favorites-migration.php:151,174,398", "read_at": ["includes/migrations/class-favorites-migration.php:69,356,395"] },
-    { "key": "bpfn_migration_log", "group": "(state)", "type": "array", "controls": "Migration result log", "written_at": "includes/migrations/class-favorites-migration.php:173,272", "read_at": ["includes/migrations/class-favorites-migration.php:295"], "deleted_at": ["includes/migrations/class-favorites-migration.php:303"] },
-    { "key": "bpfn_options", "group": "(RETIRED — no group)", "type": "array", "status": "ORPHAN_READ", "controls": "(none — the 'Enhanced Notifications' toggle it backed was removed on 2.0.x)", "written_at": "NONE — no register_setting, no update_option anywhere.", "read_at": ["includes/functions/integration-functions.php:562 (bpfn_get_diagnostics dumps it into the diagnostics array)"], "note": "Read-but-never-written. Harmless (diagnostics dump only, defaults to array()), but it is a stale key: the option can only be non-empty on sites upgraded from <=1.x. Root CLAUDE.md claims bpfn_options is 'no longer registered or read' — the 'or read' half is wrong; this line is the last reader." }
+    {
+      "key": "bpfn_display_mode",
+      "group": "(standalone option, custom POST handler)",
+      "type": "string inline|counter|modal",
+      "default": "inline",
+      "controls": "Display tab: how the who-favorited line renders in the activity stream",
+      "written_at": "includes/modules/class-admin.php::handle_display_settings_save (nonce bpfn_display_settings)",
+      "read_at": [
+        "includes/modules/class-favorite-display.php::get_display_mode",
+        "includes/admin/views/display.php"
+      ],
+      "validated_against": "BPFN_Module_Favorite_Display::get_display_modes()"
+    },
+    {
+      "key": "bpfn_favorite_icon",
+      "group": "(standalone option, custom POST handler)",
+      "type": "string heart|star|bookmark|thumb|none",
+      "default": "heart",
+      "controls": "Display tab: which glyph precedes the favorite count",
+      "written_at": "includes/modules/class-admin.php::handle_display_settings_save (nonce bpfn_display_settings)",
+      "read_at": [
+        "includes/modules/class-favorite-display.php::get_icon_html",
+        "includes/admin/views/display.php"
+      ],
+      "validated_against": "BPFN_Module_Favorite_Display::get_icon_choices()"
+    },
+    {
+      "key": "bpfn_auto_cleanup_enabled",
+      "group": "(standalone option, custom POST handler)",
+      "type": "string yes|no",
+      "default": "yes",
+      "controls": "Tools tab: enable monthly cron cleanup",
+      "written_at": "includes/modules/class-admin.php:98",
+      "read_at": [
+        "includes/modules/class-admin.php:255 (setup_automatic_cleanup)",
+        "includes/modules/class-admin.php:266 (run_automatic_cleanup)",
+        "includes/admin/views/tools.php:23"
+      ]
+    },
+    {
+      "key": "bpfn_auto_cleanup_days",
+      "group": "(standalone option)",
+      "type": "int (min 7, default 30)",
+      "default": "30",
+      "controls": "Tools tab: retention period",
+      "written_at": "includes/modules/class-admin.php:105",
+      "read_at": [
+        "includes/modules/class-admin.php:147 (ajax_clear_old_notifications)",
+        "includes/modules/class-admin.php:272 (run_automatic_cleanup)",
+        "includes/admin/views/tools.php:24"
+      ]
+    },
+    {
+      "key": "bpfn_last_auto_cleanup",
+      "group": "(state)",
+      "type": "array",
+      "default": "array()",
+      "controls": "Last cleanup log (read-only display)",
+      "written_at": "includes/modules/class-admin.php:277",
+      "read_at": [
+        "includes/admin/views/tools.php:25"
+      ]
+    },
+    {
+      "key": "bpfn_version",
+      "group": "(state)",
+      "type": "string",
+      "default": "BPFN_VERSION",
+      "controls": "Installed version marker",
+      "written_at": "bp-favorite-notification.php:242",
+      "read_at": []
+    },
+    {
+      "key": "bpfn_show_migration_notice",
+      "group": "(state)",
+      "type": "bool",
+      "default": "false",
+      "controls": "Show admin migration nag",
+      "written_at": "bp-favorite-notification.php:251",
+      "read_at": [
+        "includes/admin/class-bpfn-admin.php:279"
+      ],
+      "deleted_at": [
+        "includes/admin/class-bpfn-admin.php:289 (auto-clear when migration complete)",
+        "includes/admin/class-bpfn-admin.php:338 (AJAX dismiss)"
+      ]
+    },
+    {
+      "key": "bpfn_favorites_migrated",
+      "group": "(state)",
+      "type": "bool",
+      "controls": "Migration completed flag",
+      "written_at": "includes/migrations/class-favorites-migration.php:177,275",
+      "read_at": [
+        "includes/migrations/class-favorites-migration.php:286"
+      ],
+      "deleted_at": [
+        "includes/migrations/class-favorites-migration.php:302"
+      ]
+    },
+    {
+      "key": "bpfn_migration_status",
+      "group": "(state)",
+      "type": "array",
+      "controls": "Background migration offset/progress",
+      "written_at": "includes/migrations/class-favorites-migration.php:151,174,398",
+      "read_at": [
+        "includes/migrations/class-favorites-migration.php:69,356,395"
+      ]
+    },
+    {
+      "key": "bpfn_migration_log",
+      "group": "(state)",
+      "type": "array",
+      "controls": "Migration result log",
+      "written_at": "includes/migrations/class-favorites-migration.php:173,272",
+      "read_at": [
+        "includes/migrations/class-favorites-migration.php:295"
+      ],
+      "deleted_at": [
+        "includes/migrations/class-favorites-migration.php:303"
+      ]
+    },
+    {
+      "key": "bpfn_options",
+      "group": "(RETIRED — no group)",
+      "type": "array",
+      "status": "ORPHAN_READ",
+      "controls": "(none — the 'Enhanced Notifications' toggle it backed was removed on 2.0.x)",
+      "written_at": "NONE — no register_setting, no update_option anywhere.",
+      "read_at": [
+        "includes/functions/integration-functions.php:562 (bpfn_get_diagnostics dumps it into the diagnostics array)"
+      ],
+      "note": "Read-but-never-written. Harmless (diagnostics dump only, defaults to array()), but it is a stale key: the option can only be non-empty on sites upgraded from <=1.x. Root CLAUDE.md claims bpfn_options is 'no longer registered or read' — the 'or read' half is wrong; this line is the last reader."
+    }
   ],
   "settings_notes": "There is NO register_setting() call anywhere in the plugin (verified: 0 hits across all non-vendor PHP). No Settings API page, no settings group, no sanitize callback. The Tools tab persists its two options through a hand-rolled POST handler (BPFN_Module_Admin::handle_cleanup_settings_save, class-admin.php:80-128, nonce `bpfn_cleanup_settings`, cap manage_options, redirects to ?page=bpfn-dashboard&tab=tools&settings_updated=true).",
   "per_user_settings": {
     "storage": "{prefix}bp_favorite_notification_prefs table via bpfn_get_user_settings() / bpfn_save_user_settings() (includes/functions/core-functions.php)",
     "surface": "BuddyPress member Settings > Favorite Notifications subnav (slug 'notifications') + a row in the BP notification settings table",
     "owner": "BPFN_Module_Settings (includes/modules/class-settings.php) — IS loaded (bp-favorite-notification.php:179 module map). Front-end only as of 2.0.x; it no longer registers any admin page or Settings API option (documented class-settings.php:43-47).",
-    "hooks": ["bp_setup_nav prio 100 -> setup_nav (class-settings.php:37)", "bp_actions -> handle_settings_save (class-settings.php:40)", "bp_notification_settings -> notification_settings (class-settings.php:44)"],
+    "hooks": [
+      "bp_setup_nav prio 100 -> setup_nav (class-settings.php:37)",
+      "bp_actions -> handle_settings_save (class-settings.php:40)",
+      "bp_notification_settings -> notification_settings (class-settings.php:44)"
+    ],
     "template": "templates/settings/notifications.php",
     "styles": "assets/css/settings.css",
     "status": "NON_FUNCTIONAL — see static_analysis.preference_enforcement_broken and static_analysis.dead_ui. The UI renders and saves, but nothing reads the saved values on the notification path."
@@ -66,79 +296,471 @@
   "taxonomies": [],
   "surface_verification": "Verified 0 hits each for add_shortcode / register_block_type / register_rest_route / register_post_type / register_taxonomy / register_setting across all non-vendor PHP. Root CLAUDE.md's 'No REST, no blocks, no shortcodes, no CPTs' remains accurate; add 'no register_setting' to that list.",
   "tables": [
-    { "name": "{prefix}bp_favorite_notification_prefs", "purpose": "Per-user per-type notification preferences (is_enabled / email_enabled / realtime_enabled).", "columns": ["id bigint AUTO_INCREMENT", "user_id bigint", "notification_type varchar(50)", "is_enabled tinyint(1) DEFAULT 1", "email_enabled tinyint(1) DEFAULT 1", "realtime_enabled tinyint(1) DEFAULT 1", "created_at datetime", "updated_at datetime"], "keys": ["PRIMARY (id)", "UNIQUE KEY user_notification_type (user_id, notification_type)", "KEY user_id (user_id)"], "created_at": "bp-favorite-notification.php:275-291 (dbDelta)", "note": "Written by the member-settings save path; NOT consulted on the notification path — see static_analysis.preference_enforcement_broken." },
-    { "name": "{prefix}bp_activity_favorites", "purpose": "Tracks which user favorited which activity (counts, trending, who-liked lists).", "columns": ["id bigint AUTO_INCREMENT", "activity_id bigint", "user_id bigint", "favorited_at datetime"], "keys": ["PRIMARY (id)", "KEY activity_id (activity_id)", "KEY user_id (user_id)", "UNIQUE KEY activity_user (activity_id, user_id)"], "created_at": "bp-favorite-notification.php:294-307 (dbDelta)", "note": "Indexed on both lookup columns with a UNIQUE (activity_id, user_id) constraint preventing duplicate favorites. Populated live via bp_activity_add_user_favorite / bp_activity_remove_user_favorite sync (class-favorite-display.php:65-66) and backfilled from usermeta by BPFN_Favorites_Migration." }
+    {
+      "name": "{prefix}bp_favorite_notification_prefs",
+      "purpose": "Per-user per-type notification preferences (is_enabled / email_enabled / realtime_enabled).",
+      "columns": [
+        "id bigint AUTO_INCREMENT",
+        "user_id bigint",
+        "notification_type varchar(50)",
+        "is_enabled tinyint(1) DEFAULT 1",
+        "email_enabled tinyint(1) DEFAULT 1",
+        "realtime_enabled tinyint(1) DEFAULT 1",
+        "created_at datetime",
+        "updated_at datetime"
+      ],
+      "keys": [
+        "PRIMARY (id)",
+        "UNIQUE KEY user_notification_type (user_id, notification_type)",
+        "KEY user_id (user_id)"
+      ],
+      "created_at": "bp-favorite-notification.php:275-291 (dbDelta)",
+      "note": "Written by the member-settings save path; NOT consulted on the notification path — see static_analysis.preference_enforcement_broken."
+    },
+    {
+      "name": "{prefix}bp_activity_favorites",
+      "purpose": "Tracks which user favorited which activity (counts, trending, who-liked lists).",
+      "columns": [
+        "id bigint AUTO_INCREMENT",
+        "activity_id bigint",
+        "user_id bigint",
+        "favorited_at datetime"
+      ],
+      "keys": [
+        "PRIMARY (id)",
+        "KEY activity_id (activity_id)",
+        "KEY user_id (user_id)",
+        "UNIQUE KEY activity_user (activity_id, user_id)"
+      ],
+      "created_at": "bp-favorite-notification.php:294-307 (dbDelta)",
+      "note": "Indexed on both lookup columns with a UNIQUE (activity_id, user_id) constraint preventing duplicate favorites. Populated live via bp_activity_add_user_favorite / bp_activity_remove_user_favorite sync (class-favorite-display.php:65-66) and backfilled from usermeta by BPFN_Favorites_Migration."
+    }
   ],
   "capabilities": [
-    { "cap": "manage_options", "default_roles": ["administrator"], "enforced_at": ["includes/modules/class-admin.php:137,175,217 (3 admin AJAX handlers)", "includes/modules/class-admin.php:91 (handle_cleanup_settings_save)", "includes/admin/class-bpfn-admin.php:332 (ajax_dismiss_migration_notice)", "includes/admin/class-bpfn-admin.php:275 (migration_notice)", "includes/admin/class-bpfn-admin.php:91 (add_menu / add_submenu_page)"], "meta": false, "requires_context": "none" },
-    { "cap": "bp_is_my_profile() / displayed-user ownership", "default_roles": ["profile owner", "administrator"], "enforced_at": ["includes/modules/class-settings.php (settings_screen / handle_settings_save — BP subnav ownership)"], "meta": true, "requires_context": "displayed user" }
+    {
+      "cap": "manage_options",
+      "default_roles": [
+        "administrator"
+      ],
+      "enforced_at": [
+        "includes/modules/class-admin.php:137,175,217 (3 admin AJAX handlers)",
+        "includes/modules/class-admin.php:91 (handle_cleanup_settings_save)",
+        "includes/admin/class-bpfn-admin.php:332 (ajax_dismiss_migration_notice)",
+        "includes/admin/class-bpfn-admin.php:275 (migration_notice)",
+        "includes/admin/class-bpfn-admin.php:91 (add_menu / add_submenu_page)"
+      ],
+      "meta": false,
+      "requires_context": "none"
+    },
+    {
+      "cap": "bp_is_my_profile() / displayed-user ownership",
+      "default_roles": [
+        "profile owner",
+        "administrator"
+      ],
+      "enforced_at": [
+        "includes/modules/class-settings.php (settings_screen / handle_settings_save — BP subnav ownership)"
+      ],
+      "meta": true,
+      "requires_context": "displayed user"
+    }
   ],
   "services": [
-    { "key": "notifications", "class": "BPFN_Module_Notifications", "file": "includes/modules/class-notifications.php", "added": "2.0.0" },
-    { "key": "email", "class": "BPFN_Module_Email", "file": "includes/modules/class-email.php", "added": "2.0.0" },
-    { "key": "realtime", "class": "BPFN_Module_Realtime", "file": "includes/modules/class-realtime.php", "added": "2.0.0" },
-    { "key": "assets", "class": "BPFN_Module_Assets", "file": "includes/modules/class-assets.php", "added": "2.0.0" },
-    { "key": "admin", "class": "BPFN_Module_Admin", "file": "includes/modules/class-admin.php", "added": "2.0.0", "note": "Legacy service module. Post-2.0.0 it owns only the 3 admin AJAX handlers, the Tools-tab cleanup save handler, and the monthly cleanup cron. Menu/UI/assets/action-links/migration-notice moved to BPFN_Admin." },
-    { "key": "settings", "class": "BPFN_Module_Settings", "file": "includes/modules/class-settings.php", "added": "2.0.0", "note": "IS loaded (bp-favorite-notification.php:179). Front-end only: BP member settings subnav + per-user save handler." },
-    { "key": "favorite_display", "class": "BPFN_Module_Favorite_Display", "file": "includes/modules/class-favorite-display.php", "added": "2.0.0" }
+    {
+      "key": "notifications",
+      "class": "BPFN_Module_Notifications",
+      "file": "includes/modules/class-notifications.php",
+      "added": "2.0.0"
+    },
+    {
+      "key": "email",
+      "class": "BPFN_Module_Email",
+      "file": "includes/modules/class-email.php",
+      "added": "2.0.0"
+    },
+    {
+      "key": "realtime",
+      "class": "BPFN_Module_Realtime",
+      "file": "includes/modules/class-realtime.php",
+      "added": "2.0.0"
+    },
+    {
+      "key": "assets",
+      "class": "BPFN_Module_Assets",
+      "file": "includes/modules/class-assets.php",
+      "added": "2.0.0"
+    },
+    {
+      "key": "admin",
+      "class": "BPFN_Module_Admin",
+      "file": "includes/modules/class-admin.php",
+      "added": "2.0.0",
+      "note": "Legacy service module. Post-2.0.0 it owns only the 3 admin AJAX handlers, the Tools-tab cleanup save handler, and the monthly cleanup cron. Menu/UI/assets/action-links/migration-notice moved to BPFN_Admin."
+    },
+    {
+      "key": "settings",
+      "class": "BPFN_Module_Settings",
+      "file": "includes/modules/class-settings.php",
+      "added": "2.0.0",
+      "note": "IS loaded (bp-favorite-notification.php:179). Front-end only: BP member settings subnav + per-user save handler."
+    },
+    {
+      "key": "favorite_display",
+      "class": "BPFN_Module_Favorite_Display",
+      "file": "includes/modules/class-favorite-display.php",
+      "added": "2.0.0"
+    }
   ],
   "services_not_loaded": [],
   "services_notes": "7 modules loaded on bp_init prio 5 via BP_Favorite_Notification::load_modules() (bp-favorite-notification.php:172-197). The 2026-06-05 manifest's services_not_loaded entry for BPFN_Module_Settings is STALE — it was added to the module map on branch 2.0.0. Two classes live outside the module map: BPFN_Admin (includes/admin/class-bpfn-admin.php, instantiated at bp-favorite-notification.php:140 under is_admin()) and BPFN_Favorites_Migration (instantiated at bp-favorite-notification.php:165).",
   "hooks_fired": [
-    { "name": "bpfn_display_modes", "type": "filter", "args_count": 1, "where": "includes/modules/class-favorite-display.php::get_display_modes", "consumed_by": [] },
-    { "name": "bpfn_favorite_icons", "type": "filter", "args_count": 1, "where": "includes/modules/class-favorite-display.php::get_icon_choices", "consumed_by": [] },
-    { "name": "bpfn_favorite_display_format", "type": "filter", "args_count": 4, "where": "includes/modules/class-favorite-display.php::get_display_mode", "consumed_by": [] },
-    { "name": "bpfn_favorite_icon_html", "type": "filter", "args_count": 3, "where": "includes/modules/class-favorite-display.php::get_icon_html", "consumed_by": [] },
-    { "name": "bpfn_favorite_display_html", "type": "filter", "args_count": 4, "where": "includes/modules/class-favorite-display.php::render_display", "consumed_by": [] },
-    { "name": "bpfn_favorites_modal_per_page", "type": "filter", "args_count": 2, "where": "includes/modules/class-favorite-display.php::ajax_get_all_favorites", "consumed_by": [] },
-    { "name": "bpfn_init", "type": "action", "args_count": 1, "where": "bp-favorite-notification.php:157", "consumed_by": [] },
-    { "name": "bpfn_load_modules", "type": "action", "args_count": 1, "where": "bp-favorite-notification.php:196", "consumed_by": [] },
-    { "name": "bpfn_activate", "type": "action", "args_count": 0, "where": "bp-favorite-notification.php:254", "consumed_by": [] },
-    { "name": "bpfn_deactivate", "type": "action", "args_count": 0, "where": "bp-favorite-notification.php:261", "consumed_by": [] },
-    { "name": "bpfn_create_tables", "type": "action", "args_count": 2, "where": "bp-favorite-notification.php:309", "consumed_by": [] },
-    { "name": "bpfn_compat_setup_globals", "type": "action", "args_count": 0, "where": "includes/compat/buddypress-compat.php:44", "consumed_by": [] },
-    { "name": "bpfn_after_add_notification", "type": "action", "args_count": 4, "where": "includes/modules/class-notifications.php:137; also includes/functions/integration-functions.php:299 (test/diagnostic path)", "consumed_by": ["BPFN_Module_Email::send_email_notification (class-email.php:58, prio 20)"] },
-    { "name": "bpfn_after_send_email", "type": "action", "args_count": 2, "where": "includes/modules/class-email.php:256", "consumed_by": [] },
-    { "name": "bpfn_after_save_user_settings", "type": "action", "where": "includes/functions/core-functions.php:115", "consumed_by": [] },
-    { "name": "bpfn_log_event", "type": "action", "where": "includes/functions/core-functions.php:268", "consumed_by": [] },
-    { "name": "bpfn_registered_notification_type", "type": "action", "where": "includes/functions/api-functions.php:44", "consumed_by": [] },
-    { "name": "bpfn_notification_added", "type": "action", "where": "includes/functions/api-functions.php:84", "consumed_by": [] },
-    { "name": "bpfn_notifications_deleted", "type": "action", "where": "includes/functions/api-functions.php:114", "consumed_by": [] },
-    { "name": "bpfn_marked_notifications_read", "type": "action", "where": "includes/functions/api-functions.php:157", "consumed_by": [] },
-    { "name": "bpfn_module_registered", "type": "action", "where": "includes/functions/api-functions.php:232", "consumed_by": [] },
-    { "name": "bpfn_template_not_found", "type": "action", "where": "includes/functions/template-functions.php:182", "consumed_by": [] },
-    { "name": "bpfn_settings_setup_hooks", "type": "action", "args_count": 1, "where": "includes/modules/class-settings.php:52", "consumed_by": [] },
-    { "name": "bpfn_notification_settings", "type": "action", "args_count": 0, "where": "includes/modules/class-settings.php:207", "consumed_by": [] },
-    { "name": "bpfn_admin_tabs", "type": "filter", "args_count": 1, "where": "includes/admin/class-bpfn-admin.php:62", "consumed_by": [], "note": "Extension point for the Overview/Tools/Discover tab set." },
-    { "name": "bpfn_dashboard_stats_ttl", "type": "filter", "args_count": 1, "where": "includes/admin/views/overview.php:41", "consumed_by": [] },
-    { "name": "bpfn_default_user_settings", "type": "filter", "where": "includes/functions/core-functions.php:25", "consumed_by": [] },
-    { "name": "bpfn_get_user_settings", "type": "filter", "where": "includes/functions/core-functions.php:73", "consumed_by": [] },
-    { "name": "bpfn_before_save_user_settings", "type": "filter", "where": "includes/functions/core-functions.php:88", "consumed_by": [] },
-    { "name": "bpfn_activity_type_map", "type": "filter", "where": "includes/functions/core-functions.php:135", "consumed_by": [] },
-    { "name": "bpfn_format_notification_data", "type": "filter", "where": "includes/functions/core-functions.php:247", "consumed_by": [] },
-    { "name": "bpfn_enable_logging", "type": "filter", "where": "includes/functions/core-functions.php:257", "consumed_by": [] },
-    { "name": "bpfn_get_notifications", "type": "filter", "where": "includes/functions/api-functions.php:208", "consumed_by": [] },
-    { "name": "bpfn_notification_stats", "type": "filter", "where": "includes/functions/integration-functions.php:66", "consumed_by": [] },
-    { "name": "bpfn_diagnostics", "type": "filter", "where": "includes/functions/integration-functions.php:568", "consumed_by": [] },
-    { "name": "bpfn_notification_icons", "type": "filter", "where": "includes/functions/template-functions.php:20", "consumed_by": [] },
-    { "name": "bpfn_notification_icon_html", "type": "filter", "where": "includes/functions/template-functions.php:31", "consumed_by": [] },
-    { "name": "bpfn_should_show_notifications", "type": "filter", "where": "includes/functions/template-functions.php:202", "consumed_by": [] },
-    { "name": "bpfn_notification_string", "type": "filter", "args_count": 4, "where": "includes/modules/class-notifications.php:247", "consumed_by": [] },
-    { "name": "bpfn_notification_array", "type": "filter", "args_count": 3, "where": "includes/modules/class-notifications.php:256", "consumed_by": [] },
-    { "name": "bpfn_email_templates", "type": "filter", "where": "includes/modules/class-email.php:39", "consumed_by": [] },
-    { "name": "bpfn_email_template_key", "type": "filter", "where": "includes/modules/class-email.php:121", "consumed_by": [] },
-    { "name": "bpfn_email_data", "type": "filter", "where": "includes/modules/class-email.php:159", "consumed_by": [] },
-    { "name": "bpfn_email_subject", "type": "filter", "where": "includes/modules/class-email.php:221", "consumed_by": [] },
-    { "name": "bpfn_email_message", "type": "filter", "where": "includes/modules/class-email.php:225", "consumed_by": [] },
-    { "name": "bpfn_email_headers", "type": "filter", "where": "includes/modules/class-email.php:229", "consumed_by": [] },
-    { "name": "bpfn_email_from_name", "type": "filter", "where": "includes/modules/class-email.php:237; also :395 (direct-send fallback)", "consumed_by": [] },
-    { "name": "bpfn_email_from_email", "type": "filter", "where": "includes/modules/class-email.php:238; also :396 (direct-send fallback)", "consumed_by": [] },
-    { "name": "bpfn_email_template_path", "type": "filter", "where": "includes/modules/class-email.php:278", "consumed_by": [] },
-    { "name": "bpfn_email_social_links", "type": "filter", "where": "templates/emails/activity-favorited.php:105", "consumed_by": [] },
-    { "name": "bpfn_user_comment_favorites_count", "type": "filter", "where": "templates/emails/comment-favorited.php:132", "consumed_by": [] },
-    { "name": "bpfn_user_comments_count", "type": "filter", "where": "templates/emails/comment-favorited.php:144", "consumed_by": [] },
-    { "name": "bpfn_settings_notification_types", "type": "filter", "where": "includes/modules/class-settings.php:220", "consumed_by": [] },
-    { "name": "bpfn_who_favorited_limit", "type": "filter", "where": "includes/modules/class-favorite-display.php:390; also :455", "consumed_by": [] }
+    {
+      "name": "bpfn_display_modes",
+      "type": "filter",
+      "args_count": 1,
+      "where": "includes/modules/class-favorite-display.php::get_display_modes",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_favorite_icons",
+      "type": "filter",
+      "args_count": 1,
+      "where": "includes/modules/class-favorite-display.php::get_icon_choices",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_favorite_display_format",
+      "type": "filter",
+      "args_count": 4,
+      "where": "includes/modules/class-favorite-display.php::get_display_mode",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_favorite_icon_html",
+      "type": "filter",
+      "args_count": 3,
+      "where": "includes/modules/class-favorite-display.php::get_icon_html",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_favorite_display_html",
+      "type": "filter",
+      "args_count": 4,
+      "where": "includes/modules/class-favorite-display.php::render_display",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_favorites_modal_per_page",
+      "type": "filter",
+      "args_count": 2,
+      "where": "includes/modules/class-favorite-display.php::ajax_get_all_favorites",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_init",
+      "type": "action",
+      "args_count": 1,
+      "where": "bp-favorite-notification.php:157",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_load_modules",
+      "type": "action",
+      "args_count": 1,
+      "where": "bp-favorite-notification.php:196",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_activate",
+      "type": "action",
+      "args_count": 0,
+      "where": "bp-favorite-notification.php:254",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_deactivate",
+      "type": "action",
+      "args_count": 0,
+      "where": "bp-favorite-notification.php:261",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_create_tables",
+      "type": "action",
+      "args_count": 2,
+      "where": "bp-favorite-notification.php:309",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_compat_setup_globals",
+      "type": "action",
+      "args_count": 0,
+      "where": "includes/compat/buddypress-compat.php:44",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_after_add_notification",
+      "type": "action",
+      "args_count": 4,
+      "where": "includes/modules/class-notifications.php:137; also includes/functions/integration-functions.php:299 (test/diagnostic path)",
+      "consumed_by": [
+        "BPFN_Module_Email::send_email_notification (class-email.php:58, prio 20)"
+      ]
+    },
+    {
+      "name": "bpfn_after_send_email",
+      "type": "action",
+      "args_count": 2,
+      "where": "includes/modules/class-email.php:256",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_after_save_user_settings",
+      "type": "action",
+      "where": "includes/functions/core-functions.php:115",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_log_event",
+      "type": "action",
+      "where": "includes/functions/core-functions.php:268",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_registered_notification_type",
+      "type": "action",
+      "where": "includes/functions/api-functions.php:44",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_notification_added",
+      "type": "action",
+      "where": "includes/functions/api-functions.php:84",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_notifications_deleted",
+      "type": "action",
+      "where": "includes/functions/api-functions.php:114",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_marked_notifications_read",
+      "type": "action",
+      "where": "includes/functions/api-functions.php:157",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_module_registered",
+      "type": "action",
+      "where": "includes/functions/api-functions.php:232",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_template_not_found",
+      "type": "action",
+      "where": "includes/functions/template-functions.php:182",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_settings_setup_hooks",
+      "type": "action",
+      "args_count": 1,
+      "where": "includes/modules/class-settings.php:52",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_notification_settings",
+      "type": "action",
+      "args_count": 0,
+      "where": "includes/modules/class-settings.php:207",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_admin_tabs",
+      "type": "filter",
+      "args_count": 1,
+      "where": "includes/admin/class-bpfn-admin.php:62",
+      "consumed_by": [],
+      "note": "Extension point for the Overview/Tools/Discover tab set."
+    },
+    {
+      "name": "bpfn_dashboard_stats_ttl",
+      "type": "filter",
+      "args_count": 1,
+      "where": "includes/admin/views/overview.php:41",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_default_user_settings",
+      "type": "filter",
+      "where": "includes/functions/core-functions.php:25",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_get_user_settings",
+      "type": "filter",
+      "where": "includes/functions/core-functions.php:73",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_before_save_user_settings",
+      "type": "filter",
+      "where": "includes/functions/core-functions.php:88",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_activity_type_map",
+      "type": "filter",
+      "where": "includes/functions/core-functions.php:135",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_format_notification_data",
+      "type": "filter",
+      "where": "includes/functions/core-functions.php:247",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_enable_logging",
+      "type": "filter",
+      "where": "includes/functions/core-functions.php:257",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_get_notifications",
+      "type": "filter",
+      "where": "includes/functions/api-functions.php:208",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_notification_stats",
+      "type": "filter",
+      "where": "includes/functions/integration-functions.php:66",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_diagnostics",
+      "type": "filter",
+      "where": "includes/functions/integration-functions.php:568",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_notification_icons",
+      "type": "filter",
+      "where": "includes/functions/template-functions.php:20",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_notification_icon_html",
+      "type": "filter",
+      "where": "includes/functions/template-functions.php:31",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_should_show_notifications",
+      "type": "filter",
+      "where": "includes/functions/template-functions.php:202",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_notification_string",
+      "type": "filter",
+      "args_count": 4,
+      "where": "includes/modules/class-notifications.php:247",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_notification_array",
+      "type": "filter",
+      "args_count": 3,
+      "where": "includes/modules/class-notifications.php:256",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_email_templates",
+      "type": "filter",
+      "where": "includes/modules/class-email.php:39",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_email_template_key",
+      "type": "filter",
+      "where": "includes/modules/class-email.php:121",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_email_data",
+      "type": "filter",
+      "where": "includes/modules/class-email.php:159",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_email_subject",
+      "type": "filter",
+      "where": "includes/modules/class-email.php:221",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_email_message",
+      "type": "filter",
+      "where": "includes/modules/class-email.php:225",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_email_headers",
+      "type": "filter",
+      "where": "includes/modules/class-email.php:229",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_email_from_name",
+      "type": "filter",
+      "where": "includes/modules/class-email.php:237; also :395 (direct-send fallback)",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_email_from_email",
+      "type": "filter",
+      "where": "includes/modules/class-email.php:238; also :396 (direct-send fallback)",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_email_template_path",
+      "type": "filter",
+      "where": "includes/modules/class-email.php:278",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_email_social_links",
+      "type": "filter",
+      "where": "templates/emails/activity-favorited.php:105",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_user_comment_favorites_count",
+      "type": "filter",
+      "where": "templates/emails/comment-favorited.php:132",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_user_comments_count",
+      "type": "filter",
+      "where": "templates/emails/comment-favorited.php:144",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_settings_notification_types",
+      "type": "filter",
+      "where": "includes/modules/class-settings.php:220",
+      "consumed_by": []
+    },
+    {
+      "name": "bpfn_who_favorited_limit",
+      "type": "filter",
+      "where": "includes/modules/class-favorite-display.php:390; also :455",
+      "consumed_by": []
+    }
   ],
   "hooks_fired_count": {
     "distinct": 54,
@@ -149,24 +771,86 @@
     "note": "This supersedes both the 2026-06-05 manifest's list and any 'over 20 hooks' / '38 hooks' claim. Hooks REMOVED since the 2026-06-05 manifest (no longer fired anywhere): bpfn_admin_init_settings, bpfn_sanitize_options, bpfn_after_notification_item, bpfn_notification_template, bpfn_use_enhanced_template, bpfn_is_feature_enabled. Hooks ADDED since: bpfn_admin_tabs, bpfn_dashboard_stats_ttl, bpfn_default_user_settings, bpfn_activity_type_map, bpfn_notification_icons, bpfn_who_favorited_limit. Targeted delta 2026-07-29 (2.1.0 display-mode work) ADDED: bpfn_display_modes, bpfn_favorite_icons, bpfn_favorite_display_format, bpfn_favorite_icon_html, bpfn_favorite_display_html, bpfn_favorites_modal_per_page. bpfn_who_favorited_limit changed meaning: default 0 (no ceiling) instead of 50, now bounding a paginated list. Run /wp-plugin-onboard --refresh at release for a full rescan."
   },
   "hooks_consumed_external": {
-    "buddypress": ["bp_loaded", "bp_init", "bp_setup_nav", "bp_actions", "bp_notification_settings", "bp_activity_add_user_favorite", "bp_activity_remove_user_favorite", "bp_activity_before_post_footer_content", "bp_activity_entry_content"],
-    "wordpress": ["plugins_loaded", "admin_menu", "admin_init", "admin_enqueue_scripts", "admin_notices", "in_admin_header", "cron_schedules", "heartbeat_received", "heartbeat_settings", "plugin_action_links_{basename}"]
+    "buddypress": [
+      "bp_loaded",
+      "bp_init",
+      "bp_setup_nav",
+      "bp_actions",
+      "bp_notification_settings",
+      "bp_activity_add_user_favorite",
+      "bp_activity_remove_user_favorite",
+      "bp_activity_before_post_footer_content",
+      "bp_activity_entry_content"
+    ],
+    "wordpress": [
+      "plugins_loaded",
+      "admin_menu",
+      "admin_init",
+      "admin_enqueue_scripts",
+      "admin_notices",
+      "in_admin_header",
+      "cron_schedules",
+      "heartbeat_received",
+      "heartbeat_settings",
+      "plugin_action_links_{basename}"
+    ]
   },
   "interactivity": [],
   "ui_activation": [],
   "frontend_assets": {
-    "js": ["assets/js/favorite-display.js", "assets/js/realtime.js", "assets/js/admin.js (admin only)"],
-    "css": ["assets/css/notifications.css (token source)", "assets/css/favorite-display.css", "assets/css/realtime.css", "assets/css/settings.css", "assets/css/admin.css (admin only)"],
-    "images": ["assets/images/ecosystem/*.svg (5 files, Discover tab)"],
+    "js": [
+      "assets/js/favorite-display.js",
+      "assets/js/realtime.js",
+      "assets/js/admin.js (admin only)"
+    ],
+    "css": [
+      "assets/css/notifications.css (token source)",
+      "assets/css/favorite-display.css",
+      "assets/css/realtime.css",
+      "assets/css/settings.css",
+      "assets/css/admin.css (admin only)"
+    ],
+    "images": [
+      "assets/images/ecosystem/*.svg (5 files, Discover tab)"
+    ],
     "note": "assets/js/notifications.js was deleted on 2.0.0 (100% dead: wrong selectors + AJAX actions with no handlers). The 2026-06-05 manifest still lists it. Shared --bpfn-* design tokens live in assets/css/notifications.css, the style dependency of favorite-display.css / realtime.css / settings.css."
   },
   "cron": [
-    { "hook": "bpfn_auto_cleanup_notifications", "interval": "monthly (custom schedule)", "handler": "BPFN_Module_Admin::run_automatic_cleanup (class-admin.php:264-291)", "listener_at": "includes/modules/class-admin.php:250-253 (setup_automatic_cleanup)", "scheduled_at": "includes/modules/class-admin.php:257 (on load when enabled); includes/modules/class-admin.php:111 (on Tools-tab save)", "unscheduled_at": "includes/modules/class-admin.php:113 (Tools-tab save, when disabled)", "gated_by": "bpfn_auto_cleanup_enabled === 'yes'", "purpose": "Delete read notifications older than bpfn_auto_cleanup_days (min 7, default 30); writes bpfn_last_auto_cleanup." },
-    { "hook": "bpfn_process_migration_batch", "interval": "single event (re-chains itself +5s per batch)", "handler": "BPFN_Favorites_Migration::process_migration_batch", "scheduled_at": "includes/migrations/class-favorites-migration.php:54 (start), :154 (re-chain)", "unscheduled_at": "includes/migrations/class-favorites-migration.php:401", "purpose": "Background batch migration of usermeta favorites -> {prefix}bp_activity_favorites (batch size 50; used when >100 users have favorites)." },
-    { "hook": "bpfn_cleanup_test_activity", "interval": "single event (+60s)", "handler": "closure at includes/functions/integration-functions.php:572-583", "scheduled_at": "includes/functions/integration-functions.php:304", "purpose": "Delete the throwaway activity created by the diagnostic test-notification helper.", "note": "Diagnostic path only; not reachable from the shipped admin UI." }
+    {
+      "hook": "bpfn_auto_cleanup_notifications",
+      "interval": "monthly (custom schedule)",
+      "handler": "BPFN_Module_Admin::run_automatic_cleanup (class-admin.php:264-291)",
+      "listener_at": "includes/modules/class-admin.php:250-253 (setup_automatic_cleanup)",
+      "scheduled_at": "includes/modules/class-admin.php:257 (on load when enabled); includes/modules/class-admin.php:111 (on Tools-tab save)",
+      "unscheduled_at": "includes/modules/class-admin.php:113 (Tools-tab save, when disabled)",
+      "gated_by": "bpfn_auto_cleanup_enabled === 'yes'",
+      "purpose": "Delete read notifications older than bpfn_auto_cleanup_days (min 7, default 30); writes bpfn_last_auto_cleanup."
+    },
+    {
+      "hook": "bpfn_process_migration_batch",
+      "interval": "single event (re-chains itself +5s per batch)",
+      "handler": "BPFN_Favorites_Migration::process_migration_batch",
+      "scheduled_at": "includes/migrations/class-favorites-migration.php:54 (start), :154 (re-chain)",
+      "unscheduled_at": "includes/migrations/class-favorites-migration.php:401",
+      "purpose": "Background batch migration of usermeta favorites -> {prefix}bp_activity_favorites (batch size 50; used when >100 users have favorites)."
+    },
+    {
+      "hook": "bpfn_cleanup_test_activity",
+      "interval": "single event (+60s)",
+      "handler": "closure at includes/functions/integration-functions.php:572-583",
+      "scheduled_at": "includes/functions/integration-functions.php:304",
+      "purpose": "Delete the throwaway activity created by the diagnostic test-notification helper.",
+      "note": "Diagnostic path only; not reachable from the shipped admin UI."
+    }
   ],
   "cron_schedules_registered": [
-    { "name": "monthly", "interval": "MONTH_IN_SECONDS", "display": "Once Monthly", "registered_at": "includes/modules/class-admin.php:237-245 (register_cron_schedule), hooked at :46", "note": "WordPress ships only hourly/twicedaily/daily/weekly. The filter is registered BEFORE setup_automatic_cleanup() runs (class-admin.php:46 then :49) because wp_schedule_event() silently no-ops on an unknown recurrence — that ordering bug previously left the cleanup cron uncreated." }
+    {
+      "name": "monthly",
+      "interval": "MONTH_IN_SECONDS",
+      "display": "Once Monthly",
+      "registered_at": "includes/modules/class-admin.php:237-245 (register_cron_schedule), hooked at :46",
+      "note": "WordPress ships only hourly/twicedaily/daily/weekly. The filter is registered BEFORE setup_automatic_cleanup() runs (class-admin.php:46 then :49) because wp_schedule_event() silently no-ops on an unknown recurrence — that ordering bug previously left the cleanup cron uncreated."
+    }
   ],
   "wp_cli": [],
   "buddypress_integration": {
@@ -175,14 +859,38 @@
     "component_id": "favorite_notifier",
     "component_slug": "favorite_notification",
     "component_registered_at": "includes/compat/buddypress-compat.php:32-33 (id/slug), :36 (notification_callback = bpfn_compat_format_notifications), :39 (active_components), :42-44 (loaded_components)",
-    "sub_classes": ["BP_Activity_Activity", "BP_Notifications_Notification", "bp_notifications_add_notification"],
-    "key_actions_consumed": ["bp_activity_add_user_favorite", "bp_activity_remove_user_favorite", "bp_setup_nav", "bp_actions", "bp_notification_settings", "heartbeat_received", "heartbeat_settings", "bp_activity_before_post_footer_content", "bp_activity_entry_content"],
+    "sub_classes": [
+      "BP_Activity_Activity",
+      "BP_Notifications_Notification",
+      "bp_notifications_add_notification"
+    ],
+    "key_actions_consumed": [
+      "bp_activity_add_user_favorite",
+      "bp_activity_remove_user_favorite",
+      "bp_setup_nav",
+      "bp_actions",
+      "bp_notification_settings",
+      "heartbeat_received",
+      "heartbeat_settings",
+      "bp_activity_before_post_footer_content",
+      "bp_activity_entry_content"
+    ],
     "dependency_declaration": "Requires Plugins: buddypress header added to bp-favorite-notification.php:9 (2.0.1); a runtime admin notice at :219-234 covers WP < 6.5 where the header is ignored."
   },
   "email": {
     "templates": [
-      { "key": "activity_favorited", "subject": "[{site_name}] {user_name} favorited your activity", "template": "templates/emails/activity-favorited.php", "registered_at": "includes/modules/class-email.php:39-48" },
-      { "key": "comment_favorited", "subject": "[{site_name}] {user_name} favorited your comment", "template": "templates/emails/comment-favorited.php", "registered_at": "includes/modules/class-email.php:39-48" }
+      {
+        "key": "activity_favorited",
+        "subject": "[{site_name}] {user_name} favorited your activity",
+        "template": "templates/emails/activity-favorited.php",
+        "registered_at": "includes/modules/class-email.php:39-48"
+      },
+      {
+        "key": "comment_favorited",
+        "subject": "[{site_name}] {user_name} favorited your comment",
+        "template": "templates/emails/comment-favorited.php",
+        "registered_at": "includes/modules/class-email.php:39-48"
+      }
     ],
     "base_template": "templates/emails/base.php",
     "trigger": "bpfn_after_add_notification prio 20 -> BPFN_Module_Email::send_email_notification (class-email.php:58)",
@@ -192,22 +900,55 @@
   "realtime": {
     "primary": "WordPress Heartbeat API — heartbeat_received / heartbeat_settings filters (class-realtime.php:31-32)",
     "fallback": "admin-ajax polling — bpfn_check_notifications / bpfn_dismiss_notification (class-realtime.php:35-36)",
-    "nonces": ["bpfn_realtime_nonce (class-assets.php:144)", "bpfn-nonce (legacy, still accepted at class-realtime.php:98,125)"]
+    "nonces": [
+      "bpfn_realtime_nonce (class-assets.php:144)",
+      "bpfn-nonce (legacy, still accepted at class-realtime.php:98,125)"
+    ]
   },
   "public_api": {
     "count": 10,
     "file": "includes/functions/api-functions.php",
     "functions": [
-      { "name": "bpfn_register_notification_type", "line": 20 },
-      { "name": "bpfn_add_notification", "line": 55 },
-      { "name": "bpfn_delete_notifications", "line": 96 },
-      { "name": "bpfn_mark_notifications_read", "line": 126 },
-      { "name": "bpfn_get_notifications", "line": 169 },
-      { "name": "bpfn_get_module", "line": 217 },
-      { "name": "bpfn_register_module", "line": 228 },
-      { "name": "bpfn_get_version", "line": 242 },
-      { "name": "bpfn_get_plugin_url", "line": 252 },
-      { "name": "bpfn_get_plugin_path", "line": 268 }
+      {
+        "name": "bpfn_register_notification_type",
+        "line": 20
+      },
+      {
+        "name": "bpfn_add_notification",
+        "line": 55
+      },
+      {
+        "name": "bpfn_delete_notifications",
+        "line": 96
+      },
+      {
+        "name": "bpfn_mark_notifications_read",
+        "line": 126
+      },
+      {
+        "name": "bpfn_get_notifications",
+        "line": 169
+      },
+      {
+        "name": "bpfn_get_module",
+        "line": 217
+      },
+      {
+        "name": "bpfn_register_module",
+        "line": 228
+      },
+      {
+        "name": "bpfn_get_version",
+        "line": 242
+      },
+      {
+        "name": "bpfn_get_plugin_url",
+        "line": 252
+      },
+      {
+        "name": "bpfn_get_plugin_path",
+        "line": 268
+      }
     ],
     "note": "40 bpfn_* global functions exist across includes/ in total; these 10 in api-functions.php are the documented public surface."
   },
@@ -225,78 +966,161 @@
     "realtime_ajax_gate": "wp_verify_nonce('bpfn-nonce' | 'bpfn_realtime_nonce') + ownership check on dismiss.",
     "notes": "wppqa nonce-no-cap flags on the favorite-display AJAX handlers are FALSE POSITIVES — both endpoints are read-only and registered with wp_ajax_nopriv_, so no capability is appropriate. In practice the nopriv registrations are unreachable anyway (display_favorite_count() returns early for logged-out users, class-favorite-display.php:315), meaning anonymous callers never receive the nonce these handlers require."
   },
-  "ci_guards": { "script": null, "phpstan_level": "5 (phpstan.neon present, phpstan-baseline.neon present)" },
+  "ci_guards": {
+    "script": null,
+    "phpstan_level": "5 (phpstan.neon present, phpstan-baseline.neon present)"
+  },
   "coding_rules": [],
-  "build_commands": { "release": "grunt (Gruntfile.js present)", "ci_local": null },
+  "build_commands": {
+    "release": "grunt (Gruntfile.js present)",
+    "ci_local": null
+  },
   "category_sources": {
-    "ajax": ["includes/modules/*.php", "includes/admin/class-bpfn-admin.php"],
-    "admin_pages": ["includes/admin/class-bpfn-admin.php", "includes/admin/views/*.php"],
-    "settings": ["includes/modules/class-admin.php", "includes/admin/views/tools.php", "includes/migrations/class-favorites-migration.php"],
-    "tables": ["bp-favorite-notification.php"],
-    "capabilities": ["includes/**/*.php"],
-    "services": ["bp-favorite-notification.php", "includes/modules/*.php"],
-    "hooks_fired": ["includes/**/*.php", "templates/**/*.php", "bp-favorite-notification.php"],
-    "cron": ["includes/modules/class-admin.php", "includes/migrations/class-favorites-migration.php", "includes/functions/integration-functions.php"],
-    "public_api": ["includes/functions/api-functions.php"],
-    "email": ["includes/modules/class-email.php", "templates/emails/*.php"]
+    "ajax": [
+      "includes/modules/*.php",
+      "includes/admin/class-bpfn-admin.php"
+    ],
+    "admin_pages": [
+      "includes/admin/class-bpfn-admin.php",
+      "includes/admin/views/*.php"
+    ],
+    "settings": [
+      "includes/modules/class-admin.php",
+      "includes/admin/views/tools.php",
+      "includes/migrations/class-favorites-migration.php"
+    ],
+    "tables": [
+      "bp-favorite-notification.php"
+    ],
+    "capabilities": [
+      "includes/**/*.php"
+    ],
+    "services": [
+      "bp-favorite-notification.php",
+      "includes/modules/*.php"
+    ],
+    "hooks_fired": [
+      "includes/**/*.php",
+      "templates/**/*.php",
+      "bp-favorite-notification.php"
+    ],
+    "cron": [
+      "includes/modules/class-admin.php",
+      "includes/migrations/class-favorites-migration.php",
+      "includes/functions/integration-functions.php"
+    ],
+    "public_api": [
+      "includes/functions/api-functions.php"
+    ],
+    "email": [
+      "includes/modules/class-email.php",
+      "templates/emails/*.php"
+    ]
   },
   "static_analysis": {
     "preference_enforcement_broken": [
       {
         "id": "BPFN-PREF-01",
-        "verdict": "real_bug",
-        "severity": "blocker",
-        "title": "Per-user notification preferences are non-functional — bpfn_is_notification_enabled() returns true unconditionally in practice.",
-        "detail": "includes/functions/core-functions.php:154-157 short-circuits: `if ( defined( 'DOING_AJAX' ) || defined( 'WP_SETUP_CONFIG' ) ) { return true; }`. BuddyPress favoriting always posts through admin-ajax.php (DOING_AJAX is defined), so every real favorite action hits this early return before the prefs table is ever read. All three channels (web / email / realtime) therefore report enabled regardless of what the member saved.",
-        "evidence": ["includes/functions/core-functions.php:154-157 (short-circuit)", "includes/functions/core-functions.php:158-184 (the settings lookup that is skipped)"],
-        "impact": "A member who turns favorite notifications OFF still receives BP notifications, emails, and realtime pings. The prefs table + member settings screen are write-only.",
-        "action": "Needs a Basecamp card. Do NOT fix inside a manifest refresh."
+        "verdict": "resolved",
+        "resolved_in": "2.0.1",
+        "severity": "blocker (historic)",
+        "title": "Per-user notification preferences were non-functional - bpfn_is_notification_enabled() returned true unconditionally.",
+        "detail": "The `if ( defined( 'DOING_AJAX' ) || defined( 'WP_SETUP_CONFIG' ) ) { return true; }` short-circuit was removed from includes/functions/core-functions.php. The removal is documented in place at core-functions.php:163-167 so it is not reintroduced; the prefs-table lookup now runs for every caller including admin-ajax, which is how BuddyPress favoriting arrives.",
+        "evidence": [
+          "includes/functions/core-functions.php:163-167 (removal note; no DOING_AJAX return remains)"
+        ],
+        "verified_at": "2026-07-30 (2.1.0 release gate)"
       },
       {
         "id": "BPFN-PREF-02",
-        "verdict": "real_bug",
-        "severity": "blocker",
-        "title": "Compat safety-net re-adds the notification at prio 15 with no preference check.",
-        "detail": "includes/compat/buddypress-compat.php:131 registers `add_action( 'bp_activity_add_user_favorite', 'bpfn_compat_add_notification', 15, 2 )`. The handler (:141-189) checks only for an existing duplicate notification, then calls bp_notifications_add_notification() directly — it never calls bpfn_is_notification_enabled() or reads the prefs table.",
-        "evidence": ["includes/compat/buddypress-compat.php:131 (registration)", "includes/compat/buddypress-compat.php:141-189 (handler; no preference gate)", "includes/compat/buddypress-compat.php:163-176 (duplicate check is the only guard)"],
-        "impact": "Even if BPFN-PREF-01 were fixed, this second writer would still bypass the member's choice. Both must be fixed together.",
-        "action": "Needs a Basecamp card, paired with BPFN-PREF-01."
+        "verdict": "resolved",
+        "resolved_in": "2.0.1",
+        "severity": "blocker (historic)",
+        "title": "Compat safety-net re-added the notification at prio 15 with no preference check.",
+        "detail": "bpfn_compat_add_notification() now gates on bpfn_is_notification_enabled( $activity->user_id, $activity_type, 'web' ) before calling bp_notifications_add_notification(), so the second writer honours the member's saved choice.",
+        "evidence": [
+          "includes/compat/buddypress-compat.php:131 (registration, unchanged)",
+          "includes/compat/buddypress-compat.php:172 (preference gate added)"
+        ],
+        "verified_at": "2026-07-30 (2.1.0 release gate)"
       }
     ],
     "dead_ui": [
       {
         "id": "BPFN-DEADUI-01",
-        "verdict": "real_bug",
-        "severity": "major",
-        "title": "BP notification-settings row writes to a user_meta key the plugin never reads.",
-        "detail": "BPFN_Module_Settings::notification_settings() (hooked at includes/modules/class-settings.php:44 on bp_notification_settings) renders yes/no radios named `notifications[favorite_activity]` (class-settings.php:194 and :200). BuddyPress core's own settings-save handler persists that field to user meta key `favorite_activity`. Grep confirms the plugin NEVER reads `favorite_activity` from user meta anywhere — its own reads go to the {prefix}bp_favorite_notification_prefs table via bpfn_get_user_settings().",
-        "evidence": ["includes/modules/class-settings.php:44 (hook)", "includes/modules/class-settings.php:194,200 (radio name=\"notifications[favorite_activity]\")", "includes/functions/core-functions.php (bpfn_get_user_settings reads the prefs table only)"],
-        "impact": "The row on Settings > Email appears to work (it saves, and re-renders checked state from the prefs table) but the value BP writes is orphaned. Combined with BPFN-PREF-01/02 this surface is entirely decorative.",
-        "action": "Needs a Basecamp card. Decide: read the meta key, or drop the row."
+        "verdict": "resolved",
+        "resolved_in": "2.0.1",
+        "severity": "major (historic)",
+        "title": "BP notification-settings row wrote to a user_meta key the plugin never read.",
+        "detail": "BPFN_Module_Settings::save_bp_notification_settings() (class-settings.php:195) now hooks BuddyPress core's notification-settings save, reads `notifications[favorite_activity]` from the POST, and writes it into the {prefix}bp_favorite_notification_prefs row via bpfn_save_user_settings(), preserving the web/real-time channels. The row on Settings > Email is no longer decorative.",
+        "evidence": [
+          "includes/modules/class-settings.php:195-225 (save handler; nonce verified upstream by bp_settings_action_notifications)",
+          "includes/modules/class-settings.php:252,258 (radios, unchanged)"
+        ],
+        "verified_at": "2026-07-30 (2.1.0 release gate)"
       }
     ],
     "debug_output_in_production": [
       {
         "id": "BPFN-LOG-01",
-        "verdict": "real_bug",
-        "severity": "major",
-        "title": "3 unconditional error_log() calls on the live notification path.",
-        "detail": "These fire on production installs regardless of WP_DEBUG — they carry only a phpcs:ignore, not a debug guard. core-functions.php:182 in particular runs on EVERY notification-enabled check.",
-        "evidence": ["includes/functions/core-functions.php:164 ('BPFN: No settings found for user ...')", "includes/functions/core-functions.php:182 ('BPFN: Notification enabled check - ...' — fires on every check)", "includes/modules/class-notifications.php:104 ('BPFN: Component not initialized, cannot add notification')"],
-        "impact": "Unbounded debug.log growth on busy communities; leaks user IDs into the log.",
-        "action": "Needs a Basecamp card: wrap in `if ( defined('WP_DEBUG') && WP_DEBUG )` or route through bpfn_log_event().",
-        "not_flagged": "buddypress-compat.php:204,207 ARE correctly guarded by WP_DEBUG (:200). The ~20 error_log() calls in integration-functions.php sit inside the diagnostic/test helpers (bpfn_create_test_activity, bpfn_send_test_email, etc.), which are unreachable from the shipped admin UI — lower priority, but they are unguarded too."
+        "verdict": "partially_resolved",
+        "resolved_in": "2.0.1 (hot path), open for 2 residual calls",
+        "severity": "low",
+        "title": "Unconditional error_log() calls on the notification path - hot-path calls removed, 2 cold-path calls remain.",
+        "detail": "The two calls in core-functions.php (including the one that fired on EVERY enabled-check) are gone, as are the ~20 in integration-functions.php - that file is now 84 lines after the diagnostic helpers were removed. Two unguarded calls remain, both on failure-only paths that fire at most once per request: a component-registration failure and an uninitialised-component guard. Unbounded log growth is no longer a risk; wrapping these in a WP_DEBUG check is cleanup, not a release blocker.",
+        "evidence": [
+          "includes/compat/buddypress-compat.php:231 ('BPFN Compat: Component registration failed!')",
+          "includes/modules/class-notifications.php:104 ('BPFN: Component not initialized, cannot add notification')"
+        ],
+        "action": "Low-priority cleanup: route both through a WP_DEBUG guard.",
+        "verified_at": "2026-07-30 (2.1.0 release gate)"
       }
     ],
     "orphan_keys": [
-      { "key": "bpfn_options", "kind": "option", "read_at": "includes/functions/integration-functions.php:562", "written_at": "NONE", "verdict": "stale_read", "severity": "low", "detail": "Retired with the Enhanced Notifications toggle on 2.0.x. Only surviving reader is the diagnostics dump; defaults to array() so it is harmless, but it is a read-never-written key and root CLAUDE.md wrongly claims it is 'no longer registered or read'." },
-      { "key": "favorite_activity", "kind": "user_meta", "read_at": "NONE (plugin)", "written_at": "BuddyPress core, from the radios at includes/modules/class-settings.php:194,200", "verdict": "real_bug", "severity": "major", "detail": "See BPFN-DEADUI-01." }
+      {
+        "key": "bpfn_options",
+        "kind": "option",
+        "read_at": "NONE",
+        "written_at": "NONE",
+        "verdict": "resolved",
+        "resolved_in": "2.0.1",
+        "severity": "low (historic)",
+        "detail": "The last reader (the diagnostics dump in integration-functions.php) was removed with the diagnostic helpers. Verified 0 get_option('bpfn_options') calls across all non-vendor PHP; only explanatory comments remain. Root CLAUDE.md's claim that the key is no longer registered or read is now accurate.",
+        "verified_at": "2026-07-30 (2.1.0 release gate)"
+      },
+      {
+        "key": "favorite_activity",
+        "kind": "user_meta",
+        "read_at": "n/a - the POST field is consumed directly, not the meta key",
+        "written_at": "BuddyPress core, from the radios at includes/modules/class-settings.php:252,258",
+        "verdict": "resolved",
+        "resolved_in": "2.0.1",
+        "severity": "major (historic)",
+        "detail": "See BPFN-DEADUI-01. The plugin now mirrors the posted value into its own prefs table on the same save, so the value BP writes to user meta is no longer the only copy.",
+        "verified_at": "2026-07-30 (2.1.0 release gate)"
+      },
+      {
+        "key": "bpfn_version",
+        "kind": "option",
+        "read_at": "NONE (by design)",
+        "written_at": "bp-favorite-notification.php:253 (activation / upgrade)",
+        "verdict": "intentional",
+        "severity": "info",
+        "detail": "Schema stamp written so a future release can detect the installed version and run a data migration. Nothing reads it yet by design. Baselined in .contract-audit-baseline.json.",
+        "verified_at": "2026-07-30 (2.1.0 release gate)"
+      }
     ],
     "dead_listeners": [],
     "dead_modules": [],
     "n_plus_one_risks": [],
     "unreachable_registrations": [
-      { "what": "wp_ajax_nopriv_bpfn_get_all_favorites / wp_ajax_nopriv_bpfn_refresh_favorite_display", "where": "includes/modules/class-favorite-display.php:70,72", "verdict": "harmless_dead_code", "severity": "low", "detail": "Registered for logged-out callers, but BPFN_Module_Favorite_Display::display_favorite_count() returns early at class-favorite-display.php:315 when ! is_user_logged_in(), so the favorite-display markup (and the bpfn-favorite-nonce it carries) is never emitted anonymously. The nopriv path is therefore unreachable in practice. Not a security issue (read-only, nonce-gated); it just means the manifest's old 'public (priv + nopriv)' capability label overstated the real surface." }
+      {
+        "what": "wp_ajax_nopriv_bpfn_get_all_favorites / wp_ajax_nopriv_bpfn_refresh_favorite_display",
+        "where": "includes/modules/class-favorite-display.php:70,72",
+        "verdict": "harmless_dead_code",
+        "severity": "low",
+        "detail": "Registered for logged-out callers, but BPFN_Module_Favorite_Display::display_favorite_count() returns early at class-favorite-display.php:315 when ! is_user_logged_in(), so the favorite-display markup (and the bpfn-favorite-nonce it carries) is never emitted anonymously. The nopriv path is therefore unreachable in practice. Not a security issue (read-only, nonce-gated); it just means the manifest's old 'public (priv + nopriv)' capability label overstated the real surface."
+      }
     ],
     "cap_context_mismatches": [],
     "extensibility_gaps": [],
@@ -306,8 +1130,19 @@
     "grid_track_overflow_risks": [],
     "hook_signature_drift": [],
     "suppressed_baseline_inventory": {
-      "phpcs_excludes": { "count": "many inline phpcs:ignore for direct DB queries on custom tables; ~25 inline phpcs:ignore for error_log()", "action": "custom-table queries acceptable (object-cached); the error_log ignores are masking BPFN-LOG-01 — a phpcs:ignore is not a debug guard." },
-      "phpstan": { "level": "5", "baseline": "phpstan-baseline.neon present" }
+      "phpcs_excludes": {
+        "count": "many inline phpcs:ignore for direct DB queries on custom tables; 2 remaining inline phpcs:ignore for error_log()",
+        "action": "custom-table queries acceptable (object-cached); the 2 remaining error_log ignores are cold-path only - see BPFN-LOG-01."
+      },
+      "phpstan": {
+        "level": "5",
+        "baseline": "phpstan-baseline.neon present",
+        "status": "clean at 2.1.0 - `phpstan analyse` reports [OK] No errors; 6 baseline entries were dropped on this branch."
+      },
+      "contract_audit": {
+        "baseline": ".contract-audit-baseline.json",
+        "status": "0 errors, 0 warnings, 5 baselined - all 5 verified false positives (3 dynamically-registered wp_ajax_ hooks, 1 inline-JS caller printed from PHP, 1 intentional version stamp)."
+      }
     }
   },
   "coverage_notes": {
@@ -320,15 +1155,15 @@
     "verification_scope": "STRUCTURAL ONLY. This refresh re-derived every section from a grep/glob rescan of shipped code at the file:line level. No browser run, no wppqa, no functional test. The bugs recorded under static_analysis are static findings backed by file:line evidence and need Basecamp cards — they were NOT fixed."
   },
   "generated": {
-    "at": "2026-07-16T10:31:51+00:00",
-    "from": "manual structural rescan (grep/glob against shipped code)",
-    "branch": "2.0.0",
+    "at": "2026-07-30T00:00:00+00:00",
+    "from": "2.1.0 release gate - targeted static_analysis delta, verified against shipped code",
+    "branch": "master (merged feature/favorite-display-modes)",
     "schema_version": "v2.2",
-    "scan_scope": "full_rescan",
+    "scan_scope": "structural sections carried from the 2026-07-29 full rescan (accurate for 2.1.0); static_analysis re-verified finding by finding",
     "scan_path": ".",
     "php_file_count": 25,
     "size_class": "small",
-    "supersedes": "2026-06-05T00:00:00Z wp-plugin-onboard fallback_defaults scan",
-    "note": "Rescanned because the 2026-06-05 manifest predated the 2.0.x admin migration (Settings tab + bpfn_options removed, card-panel shell, BPFN_Module_Settings loaded) and had drifted on ajax, admin_pages, settings, services, hooks, and assets."
+    "supersedes": "2026-07-16T10:31:51+00:00 manual structural rescan",
+    "note": "The 2026-07-16 static_analysis block predated the 2.0.1 fixes and still listed BPFN-PREF-01, BPFN-PREF-02 and BPFN-DEADUI-01 as open blockers after they had shipped fixed. Each finding was re-checked against the code on this branch and re-stated with its real verdict."
   }
 }
