@@ -48,6 +48,11 @@ class BPFN_Admin {
 				'icon'  => 'dashicons-chart-bar',
 				'group' => 'main',
 			),
+			'display'  => array(
+				'label' => __( 'Display', 'buddypress-favorite-notification' ),
+				'icon'  => 'dashicons-visibility',
+				'group' => 'settings',
+			),
 			'tools'    => array(
 				'label' => __( 'Tools', 'buddypress-favorite-notification' ),
 				'icon'  => 'dashicons-admin-tools',
@@ -244,6 +249,7 @@ class BPFN_Admin {
 
 		$view_map = array(
 			'overview' => 'overview',
+			'display'  => 'display',
 			'tools'    => 'tools',
 			'discover' => 'discover',
 		);

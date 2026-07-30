@@ -72,6 +72,58 @@ class BPFN_Module_Admin {
 	 */
 	public function admin_init() {
 		$this->handle_cleanup_settings_save();
+		$this->handle_display_settings_save();
+	}
+
+	/**
+	 * Handle the display settings save (Display tab).
+	 *
+	 * @since 2.1.0
+	 */
+	private function handle_display_settings_save() {
+		if ( ! isset( $_POST['bpfn_save_display_settings'] ) ) {
+			return;
+		}
+
+		// Verify nonce.
+		if ( ! isset( $_POST['bpfn_display_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['bpfn_display_nonce'] ) ), 'bpfn_display_settings' ) ) {
+			return;
+		}
+
+		// Check permissions.
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		// Both values are validated against the registered sets rather than
+		// merely sanitized, so a hand-crafted POST cannot persist a mode or
+		// icon the renderer has no branch for.
+		$modes = BPFN_Module_Favorite_Display::get_display_modes();
+		$mode  = isset( $_POST['bpfn_display_mode'] ) ? sanitize_key( wp_unslash( $_POST['bpfn_display_mode'] ) ) : 'inline';
+		if ( ! isset( $modes[ $mode ] ) ) {
+			$mode = 'inline';
+		}
+		update_option( 'bpfn_display_mode', $mode );
+
+		$icons = BPFN_Module_Favorite_Display::get_icon_choices();
+		$icon  = isset( $_POST['bpfn_favorite_icon'] ) ? sanitize_key( wp_unslash( $_POST['bpfn_favorite_icon'] ) ) : 'heart';
+		if ( ! isset( $icons[ $icon ] ) ) {
+			$icon = 'heart';
+		}
+		update_option( 'bpfn_favorite_icon', $icon );
+
+		// Redirect back to the Display tab with a success flag.
+		wp_safe_redirect(
+			add_query_arg(
+				array(
+					'page'             => 'bpfn-dashboard',
+					'tab'              => 'display',
+					'settings_updated' => 'true',
+				),
+				admin_url( 'admin.php' )
+			)
+		);
+		exit;
 	}
 
 	/**

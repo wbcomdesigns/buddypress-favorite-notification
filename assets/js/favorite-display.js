@@ -10,6 +10,12 @@
          */
         lastRefreshed: {},
 
+        /**
+         * Element that had focus when the modal was opened, so focus can be
+         * restored to it on close.
+         */
+        lastFocused: null,
+
         init: function() {
             this.bindEvents();
         },
@@ -67,8 +73,13 @@
                 }
             });
 
-            // View all favorites modal.
+            // View all favorites modal. `.bpfn-view-all-favorites` is the
+            // counter button rendered in modal mode; `.bpfn-others-count` is
+            // the "and N others" link rendered in inline mode.
             $(document).on('click', '.bpfn-view-all-favorites, .bpfn-others-count', this.showAllFavorites.bind(this));
+
+            // Load the next page of likers into the open modal.
+            $(document).on('click', '.bpfn-load-more-favorites', this.loadMoreFavorites.bind(this));
 
             // Close modal.
             $(document).on('click', '.bpfn-modal-close, .bpfn-modal-overlay', function(e) {
@@ -81,6 +92,26 @@
             $(document).keyup(function(e) {
                 if (e.key === "Escape") {
                     self.closeModal();
+                }
+            });
+
+            // Keep Tab inside the dialog while it is open.
+            $(document).on('keydown', '.bpfn-modal-overlay', function(e) {
+                if (e.key !== 'Tab') {
+                    return;
+                }
+                var $focusable = $(this).find('button, a[href]').filter(':visible');
+                if (!$focusable.length) {
+                    return;
+                }
+                var first = $focusable.first()[0];
+                var last = $focusable.last()[0];
+                if (e.shiftKey && document.activeElement === first) {
+                    e.preventDefault();
+                    last.focus();
+                } else if (!e.shiftKey && document.activeElement === last) {
+                    e.preventDefault();
+                    first.focus();
                 }
             });
 
@@ -225,9 +256,89 @@
             });
         },
 
+        /**
+         * Append the next page of likers to the open modal.
+         *
+         * @param {Event} e Click event.
+         */
+        loadMoreFavorites: function(e) {
+            e.preventDefault();
+
+            var self = this;
+            var $button = $(e.currentTarget);
+            var activityId = $button.data('activity-id');
+            var nextPage = parseInt($button.data('next-page'), 10) || 2;
+
+            if (!activityId || $button.prop('disabled')) {
+                return;
+            }
+
+            var originalLabel = $button.text();
+            $button.prop('disabled', true).text(this.str('loading', 'Loading…'));
+
+            $.ajax({
+                url: bpfnFavorites.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'bpfn_get_all_favorites',
+                    activity_id: activityId,
+                    page: nextPage,
+                    nonce: bpfnFavorites.nonce
+                },
+                success: function(response) {
+                    if (!response.success || !response.data) {
+                        $button.prop('disabled', false).text(originalLabel);
+                        return;
+                    }
+
+                    var $list = $('.bpfn-modal .bpfn-favorites-user-list');
+                    // Index of the first incoming row = how many were already
+                    // there, captured before the append.
+                    var priorCount = $list.children('.bpfn-favorite-user-item').length;
+                    if (response.data.items) {
+                        $list.append(response.data.items);
+                    }
+
+                    if (response.data.has_more) {
+                        $button.prop('disabled', false)
+                            .text(originalLabel)
+                            .data('next-page', nextPage + 1);
+                    } else {
+                        // Nothing left to fetch — drop the control rather than
+                        // leaving a button that does nothing.
+                        $button.closest('.bpfn-favorites-pagination').remove();
+                    }
+
+                    // Move focus to the first newly added row so keyboard and
+                    // screen-reader users land on the new content instead of
+                    // being dropped at the top of the dialog.
+                    var $added = $list.children('.bpfn-favorite-user-item').eq(priorCount);
+                    if ($added.length) {
+                        $added.find('a').first().trigger('focus');
+                    }
+                },
+                error: function() {
+                    $button.prop('disabled', false).text(originalLabel);
+                }
+            });
+        },
+
         showModal: function(html) {
+            var $existing = $('.bpfn-modal-overlay');
+
+            // Remember what opened the dialog so focus can be restored on close.
+            // Only capture it when no dialog is open yet: showAllFavorites()
+            // calls this twice (loading state, then content), and by the second
+            // call focus is on the close button of the dialog we are about to
+            // remove — capturing then would record that instead of the counter,
+            // and removing it leaves document.activeElement as <body>, so focus
+            // would be dumped at the top of the page on close.
+            if (!$existing.length) {
+                this.lastFocused = document.activeElement;
+            }
+
             // Remove existing modal.
-            $('.bpfn-modal-overlay').remove();
+            $existing.remove();
 
             var $modal = $('<div class="bpfn-modal-overlay">' +
                 '<div class="bpfn-modal" role="dialog" aria-modal="true">' +
@@ -243,13 +354,26 @@
 
             // Prevent body scroll when modal is open.
             $('body').addClass('bpfn-modal-open');
+
+            $modal.find('.bpfn-modal-close').trigger('focus');
         },
 
         closeModal: function() {
-            $('.bpfn-modal-overlay').fadeOut(200, function() {
+            var $overlay = $('.bpfn-modal-overlay');
+            if (!$overlay.length) {
+                return;
+            }
+
+            $overlay.fadeOut(200, function() {
                 $(this).remove();
             });
             $('body').removeClass('bpfn-modal-open');
+
+            // Return focus to the counter/link that opened the dialog.
+            if (this.lastFocused && document.body.contains(this.lastFocused)) {
+                $(this.lastFocused).trigger('focus');
+            }
+            this.lastFocused = null;
         }
     };
 

@@ -6,7 +6,7 @@ Requires at least: 6.5
 Tested up to: 7.0
 Requires PHP: 8.0
 Requires Plugins: buddypress
-Stable tag: 2.0.1
+Stable tag: 2.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: buddypress-favorite-notification
@@ -30,8 +30,9 @@ It also adds a Facebook-style "who liked this" line under each activity, and giv
 * Works with all BuddyPress activity types, including group activities, blog posts, and comments.
 
 **Favorite count display**
-* An inline "who liked this" line under each activity: "John Doe", "John Doe and Jane Smith", or "John, Jane, and 10 others".
-* A "View all" modal listing the members who favorited an activity, with clickable profile links. The modal loads up to 50 members and shows a "+N more" count beyond that; raise or lower the cap with the `bpfn_who_favorited_limit` filter.
+* Three display modes, chosen in Settings: inline usernames ("John, Jane, and 10 others"), an icon with the count, or an icon and count that opens the full list.
+* A choice of favorite icon - heart, star, bookmark, thumbs up, or none - so favorites are not mistaken for the Like reaction.
+* A "View all" modal listing the members who favorited an activity, with clickable profile links. It loads a page at a time with a Load more control, so it stays usable on activities with thousands of likes. Set the page size with the `bpfn_favorites_modal_per_page` filter.
 * Updates over AJAX as members like and unlike, with a 5-minute cache so the line loads instantly.
 * The favorite display is shown to logged-in members only.
 
@@ -54,7 +55,8 @@ It also adds a Facebook-style "who liked this" line under each activity, and giv
 * Turning a channel off stops that notification. Notifications are on by default, so members only visit this screen if they want less.
 
 **Developer friendly**
-* Action and filter hooks throughout, including `bpfn_notification_string`, `bpfn_who_favorited_limit`, `bpfn_email_from_name`, and `bpfn_email_from_email`.
+* Action and filter hooks throughout, including `bpfn_notification_string`, `bpfn_email_from_name`, and `bpfn_email_from_email`.
+* Display hooks for full control of the favorite line: `bpfn_favorite_icon_html`, `bpfn_favorite_display_format`, `bpfn_favorite_display_html`, `bpfn_display_modes`, and `bpfn_favorite_icons`.
 * Email templates can be overridden from your theme.
 * Modular architecture with separate notification, email, realtime, settings, admin, and favorite display modules.
 * Translation ready with an included POT file, and RTL support.
@@ -94,6 +96,12 @@ Our support team is ready to help with setup, configuration, and troubleshooting
 * BuddyPress required - the plugin deactivates itself and explains why if BuddyPress is not active
 * Compatible with BuddyPress Nouveau and Legacy templates
 * Works with modern WordPress themes, including BuddyX and Reign
+
+= What's New in 2.1.0 =
+
+The "who liked this" line is now yours to shape. A new Display tab lets you keep the familiar inline usernames, swap them for a compact icon and count, or make that count open the full list of members. You can also change the icon itself: a heart reads as the Like reaction to many members, so a star or bookmark keeps favorites visually distinct.
+
+The full list now pages through with a Load more control instead of stopping at the first 50 members, which matters once an activity collects thousands of likes. Nothing changes on update unless you change the setting: existing sites keep inline usernames.
 
 = What's New in 2.0.1 =
 
@@ -235,6 +243,21 @@ No. The plugin does not collect, store, or share personal data outside your Word
 5. Discover - more free tools from Wbcom Designs.
 
 == Changelog ==
+
+= 2.1.0 - July 2026 =
+
+Choose how the "who favorited this" line looks, and page through the full list of members.
+
+* New      - Added a Display tab with a Display Mode setting: inline usernames, icon and count only, or icon and count that opens the full list.
+* New      - Added a Favorite Icon setting (heart, star, bookmark, thumbs up, or none) so favorites can be told apart from the Like reaction.
+* New      - The who-favorited list now loads a page at a time with a Load more control, instead of stopping at the first 50 members.
+* New      - Added the bpfn_favorite_icon_html, bpfn_favorite_display_format, and bpfn_favorite_display_html filters for full control over the display markup.
+* New      - Added the bpfn_display_modes, bpfn_favorite_icons, and bpfn_favorites_modal_per_page filters.
+* Improve  - Existing sites keep inline usernames until the new setting is changed, so updating changes nothing on its own.
+* Improve  - Counter and Load more controls meet the 40px minimum tap target and keep keyboard focus inside the open dialog, returning focus to the counter on close.
+* Fix      - The favorite display and its post-favorite refresh were two separate copies of the same markup, so any format or icon change reverted the moment a member clicked like. Both now render from one code path.
+* Fix      - Favorite counts could stay stale for up to five minutes after a like. Cache entries are now versioned per activity and invalidated together, whatever page of the list produced them.
+* Dev      - bpfn_who_favorited_limit now defaults to 0 (no limit) and acts as a ceiling on the paginated list. Sites filtering it to a positive number keep that maximum.
 
 = 2.0.1 - July 2026 =
 

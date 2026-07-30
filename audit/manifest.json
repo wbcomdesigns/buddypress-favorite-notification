@@ -3,7 +3,7 @@
   "plugin": {
     "slug": "buddypress-favorite-notification",
     "name": "BuddyPress Favorite Notification",
-    "version": "2.0.1",
+    "version": "2.1.0",
     "namespace": "(none, BPFN_ prefix)",
     "main_file": "bp-favorite-notification.php",
     "text_domain": "buddypress-favorite-notification",
@@ -16,7 +16,7 @@
       "wp": "6.1",
       "php": "7.4",
       "buddypress": "required (hard dependency)",
-      "header_source": "bp-favorite-notification.php:6-9 — Version 2.0.1, Requires at least 6.1, Requires PHP 7.4, Requires Plugins: buddypress. BPFN_VERSION = '2.0.1' at :25."
+      "header_source": "bp-favorite-notification.php:6-9 — Version 2.1.0, Requires at least 6.1, Requires PHP 7.4, Requires Plugins: buddypress. BPFN_VERSION = '2.1.0' at :26."
     }
   },
   "rest": { "namespace": null, "endpoints": [] },
@@ -33,11 +33,13 @@
   "ajax_dead_listeners": [],
   "ajax_notes": "8 distinct AJAX actions over 10 add_action registrations (the 2 favorite-display actions each register priv + nopriv). The nopriv registrations are effectively unreachable: BPFN_Module_Favorite_Display::display_favorite_count() returns early for logged-out visitors (class-favorite-display.php:315), so the markup that carries the nonce and triggers these endpoints is never printed for anonymous users. bpfn_get_stats (listed in the 2026-06-05 manifest) does NOT exist — class-admin.php:59-63 registers exactly three actions.",
   "admin_pages": [
-    { "title": "BuddyPress Favorite Notification", "menu_title": "Favorite Notifications", "slug": "bpfn-dashboard", "parent": "wbcomplugins (shared WB Plugins hub)", "capability": "manage_options", "registered_at": "includes/admin/class-bpfn-admin.php:106-113 (add_submenu_page)", "hook_suffix": "*_page_bpfn-dashboard", "renderer": "BPFN_Admin::render_page (class-bpfn-admin.php:233)", "shell": "includes/admin/views/shell.php", "tabs": ["overview", "tools", "discover"], "tab_source": "BPFN_Admin::get_tabs() class-bpfn-admin.php:44-63, filterable via bpfn_admin_tabs", "views": ["includes/admin/views/overview.php", "includes/admin/views/tools.php", "includes/admin/views/discover.php"], "status": "ACTIVE" },
+    { "title": "BuddyPress Favorite Notification", "menu_title": "Favorite Notifications", "slug": "bpfn-dashboard", "parent": "wbcomplugins (shared WB Plugins hub)", "capability": "manage_options", "registered_at": "includes/admin/class-bpfn-admin.php:106-113 (add_submenu_page)", "hook_suffix": "*_page_bpfn-dashboard", "renderer": "BPFN_Admin::render_page (class-bpfn-admin.php:233)", "shell": "includes/admin/views/shell.php", "tabs": ["overview", "display", "tools", "discover"], "tab_source": "BPFN_Admin::get_tabs() class-bpfn-admin.php:44-68, filterable via bpfn_admin_tabs", "views": ["includes/admin/views/overview.php", "includes/admin/views/display.php", "includes/admin/views/tools.php", "includes/admin/views/discover.php"], "status": "ACTIVE" },
     { "title": "WB Plugins (shared hub landing)", "slug": "wbcomplugins", "parent": "(top-level)", "capability": "manage_options", "icon": "dashicons-lightbulb", "position": 59, "registered_at": "includes/admin/class-bpfn-admin.php:94-104 (add_menu_page, only if no other Wbcom plugin created it)", "renderer": "BPFN_Admin::render_hub -> includes/admin/views/hub.php", "note": "BPFN_Admin::takeover_hub_landing() (class-bpfn-admin.php:121-128, admin_menu prio 999) removes all toplevel_page_wbcomplugins actions and re-binds render_hub, so this plugin owns the hub landing even when a legacy wbcom-wrapper plugin registered it first.", "status": "ACTIVE (shared, cooperative)" }
   ],
   "admin_pages_notes": "The 2026-06-05 manifest is superseded: there is no top-level `bpfn-dashboard` add_menu_page, no Settings tab, and no `bpfn-settings` options page. The former Settings tab's only field ('Enhanced Notifications', option `bpfn_options`) was removed on 2.0.x — rationale documented at includes/admin/class-bpfn-admin.php:10-14: BuddyPress runs notification descriptions through wp_kses() allowing only `<a href class>`, so the enhanced template could never render on any surface.",
   "settings": [
+    { "key": "bpfn_display_mode", "group": "(standalone option, custom POST handler)", "type": "string inline|counter|modal", "default": "inline", "controls": "Display tab: how the who-favorited line renders in the activity stream", "written_at": "includes/modules/class-admin.php::handle_display_settings_save (nonce bpfn_display_settings)", "read_at": ["includes/modules/class-favorite-display.php::get_display_mode", "includes/admin/views/display.php"], "validated_against": "BPFN_Module_Favorite_Display::get_display_modes()" },
+    { "key": "bpfn_favorite_icon", "group": "(standalone option, custom POST handler)", "type": "string heart|star|bookmark|thumb|none", "default": "heart", "controls": "Display tab: which glyph precedes the favorite count", "written_at": "includes/modules/class-admin.php::handle_display_settings_save (nonce bpfn_display_settings)", "read_at": ["includes/modules/class-favorite-display.php::get_icon_html", "includes/admin/views/display.php"], "validated_against": "BPFN_Module_Favorite_Display::get_icon_choices()" },
     { "key": "bpfn_auto_cleanup_enabled", "group": "(standalone option, custom POST handler)", "type": "string yes|no", "default": "yes", "controls": "Tools tab: enable monthly cron cleanup", "written_at": "includes/modules/class-admin.php:98", "read_at": ["includes/modules/class-admin.php:255 (setup_automatic_cleanup)", "includes/modules/class-admin.php:266 (run_automatic_cleanup)", "includes/admin/views/tools.php:23"] },
     { "key": "bpfn_auto_cleanup_days", "group": "(standalone option)", "type": "int (min 7, default 30)", "default": "30", "controls": "Tools tab: retention period", "written_at": "includes/modules/class-admin.php:105", "read_at": ["includes/modules/class-admin.php:147 (ajax_clear_old_notifications)", "includes/modules/class-admin.php:272 (run_automatic_cleanup)", "includes/admin/views/tools.php:24"] },
     { "key": "bpfn_last_auto_cleanup", "group": "(state)", "type": "array", "default": "array()", "controls": "Last cleanup log (read-only display)", "written_at": "includes/modules/class-admin.php:277", "read_at": ["includes/admin/views/tools.php:25"] },
@@ -83,6 +85,12 @@
   "services_not_loaded": [],
   "services_notes": "7 modules loaded on bp_init prio 5 via BP_Favorite_Notification::load_modules() (bp-favorite-notification.php:172-197). The 2026-06-05 manifest's services_not_loaded entry for BPFN_Module_Settings is STALE — it was added to the module map on branch 2.0.0. Two classes live outside the module map: BPFN_Admin (includes/admin/class-bpfn-admin.php, instantiated at bp-favorite-notification.php:140 under is_admin()) and BPFN_Favorites_Migration (instantiated at bp-favorite-notification.php:165).",
   "hooks_fired": [
+    { "name": "bpfn_display_modes", "type": "filter", "args_count": 1, "where": "includes/modules/class-favorite-display.php::get_display_modes", "consumed_by": [] },
+    { "name": "bpfn_favorite_icons", "type": "filter", "args_count": 1, "where": "includes/modules/class-favorite-display.php::get_icon_choices", "consumed_by": [] },
+    { "name": "bpfn_favorite_display_format", "type": "filter", "args_count": 4, "where": "includes/modules/class-favorite-display.php::get_display_mode", "consumed_by": [] },
+    { "name": "bpfn_favorite_icon_html", "type": "filter", "args_count": 3, "where": "includes/modules/class-favorite-display.php::get_icon_html", "consumed_by": [] },
+    { "name": "bpfn_favorite_display_html", "type": "filter", "args_count": 4, "where": "includes/modules/class-favorite-display.php::render_display", "consumed_by": [] },
+    { "name": "bpfn_favorites_modal_per_page", "type": "filter", "args_count": 2, "where": "includes/modules/class-favorite-display.php::ajax_get_all_favorites", "consumed_by": [] },
     { "name": "bpfn_init", "type": "action", "args_count": 1, "where": "bp-favorite-notification.php:157", "consumed_by": [] },
     { "name": "bpfn_load_modules", "type": "action", "args_count": 1, "where": "bp-favorite-notification.php:196", "consumed_by": [] },
     { "name": "bpfn_activate", "type": "action", "args_count": 0, "where": "bp-favorite-notification.php:254", "consumed_by": [] },
@@ -133,12 +141,12 @@
     { "name": "bpfn_who_favorited_limit", "type": "filter", "where": "includes/modules/class-favorite-display.php:390; also :455", "consumed_by": [] }
   ],
   "hooks_fired_count": {
-    "distinct": 48,
+    "distinct": 54,
     "actions": 18,
-    "filters": 30,
-    "call_sites": 52,
+    "filters": 36,
+    "call_sites": 58,
     "method": "Multiline-aware scan of do_action|apply_filters with a literal 'bpfn_*' first argument across all non-vendor PHP (includes/, templates/, bp-favorite-notification.php).",
-    "note": "This supersedes both the 2026-06-05 manifest's list and any 'over 20 hooks' / '38 hooks' claim. Hooks REMOVED since the 2026-06-05 manifest (no longer fired anywhere): bpfn_admin_init_settings, bpfn_sanitize_options, bpfn_after_notification_item, bpfn_notification_template, bpfn_use_enhanced_template, bpfn_is_feature_enabled. Hooks ADDED since: bpfn_admin_tabs, bpfn_dashboard_stats_ttl, bpfn_default_user_settings, bpfn_activity_type_map, bpfn_notification_icons, bpfn_who_favorited_limit."
+    "note": "This supersedes both the 2026-06-05 manifest's list and any 'over 20 hooks' / '38 hooks' claim. Hooks REMOVED since the 2026-06-05 manifest (no longer fired anywhere): bpfn_admin_init_settings, bpfn_sanitize_options, bpfn_after_notification_item, bpfn_notification_template, bpfn_use_enhanced_template, bpfn_is_feature_enabled. Hooks ADDED since: bpfn_admin_tabs, bpfn_dashboard_stats_ttl, bpfn_default_user_settings, bpfn_activity_type_map, bpfn_notification_icons, bpfn_who_favorited_limit. Targeted delta 2026-07-29 (2.1.0 display-mode work) ADDED: bpfn_display_modes, bpfn_favorite_icons, bpfn_favorite_display_format, bpfn_favorite_icon_html, bpfn_favorite_display_html, bpfn_favorites_modal_per_page. bpfn_who_favorited_limit changed meaning: default 0 (no ceiling) instead of 50, now bounding a paginated list. Run /wp-plugin-onboard --refresh at release for a full rescan."
   },
   "hooks_consumed_external": {
     "buddypress": ["bp_loaded", "bp_init", "bp_setup_nav", "bp_actions", "bp_notification_settings", "bp_activity_add_user_favorite", "bp_activity_remove_user_favorite", "bp_activity_before_post_footer_content", "bp_activity_entry_content"],
