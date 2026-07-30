@@ -1063,17 +1063,17 @@
     "debug_output_in_production": [
       {
         "id": "BPFN-LOG-01",
-        "verdict": "partially_resolved",
-        "resolved_in": "2.0.1 (hot path), open for 2 residual calls",
-        "severity": "low",
-        "title": "Unconditional error_log() calls on the notification path - hot-path calls removed, 2 cold-path calls remain.",
-        "detail": "The two calls in core-functions.php (including the one that fired on EVERY enabled-check) are gone, as are the ~20 in integration-functions.php - that file is now 84 lines after the diagnostic helpers were removed. Two unguarded calls remain, both on failure-only paths that fire at most once per request: a component-registration failure and an uninitialised-component guard. Unbounded log growth is no longer a risk; wrapping these in a WP_DEBUG check is cleanup, not a release blocker.",
+        "verdict": "resolved",
+        "resolved_in": "2.0.1",
+        "severity": "major (historic)",
+        "title": "Unconditional error_log() calls on the live notification path.",
+        "detail": "The hot-path calls are gone. core-functions.php no longer logs at all (the call that fired on EVERY enabled-check is removed), and the ~20 calls in integration-functions.php went with the diagnostic helpers - that file is now 84 lines. Two error_log() calls remain in includes/, both failure-only: buddypress-compat.php:231 is explicitly wrapped in `if ( defined('WP_DEBUG') && WP_DEBUG )` at :228, and class-notifications.php:104 fires only when the BP component failed to initialise. Neither can grow the log on a healthy production install.",
         "evidence": [
-          "includes/compat/buddypress-compat.php:231 ('BPFN Compat: Component registration failed!')",
-          "includes/modules/class-notifications.php:104 ('BPFN: Component not initialized, cannot add notification')"
+          "includes/compat/buddypress-compat.php:228-232 (WP_DEBUG-guarded; logs a genuine registration failure only)",
+          "includes/modules/class-notifications.php:104 (unguarded, but reached only when $bp->favorite_notifier is missing after a recovery attempt)"
         ],
-        "action": "Low-priority cleanup: route both through a WP_DEBUG guard.",
-        "verified_at": "2026-07-30 (2.1.0 release gate)"
+        "action": "Optional cleanup: guard the class-notifications.php:104 call for symmetry. Not a release blocker.",
+        "verified_at": "2026-07-30 (2.1.0 release gate; confirmed against a live BuddyPress install - debug.log carried zero BPFN entries across a full favorite/notification/modal journey)"
       }
     ],
     "orphan_keys": [
@@ -1132,7 +1132,7 @@
     "suppressed_baseline_inventory": {
       "phpcs_excludes": {
         "count": "many inline phpcs:ignore for direct DB queries on custom tables; 2 remaining inline phpcs:ignore for error_log()",
-        "action": "custom-table queries acceptable (object-cached); the 2 remaining error_log ignores are cold-path only - see BPFN-LOG-01."
+        "action": "custom-table queries acceptable (object-cached); of the 2 remaining error_log ignores, one is additionally WP_DEBUG-guarded and the other is a component-init failure path - see BPFN-LOG-01."
       },
       "phpstan": {
         "level": "5",

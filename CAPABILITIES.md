@@ -63,3 +63,4 @@ No REST routes, no blocks, no shortcodes, no custom post types, no taxonomies, a
 | PHPStan (level 5) | `[OK] No errors` — 6 baseline entries dropped on this release |
 | Contract audit | 0 errors, 0 warnings, 5 baselined (all verified false positives) |
 | Documentation truth | `audit/manifest.json` re-verified finding by finding against shipped code |
+| Pristine install (Docker, WP 7.0.2 + BuddyPress 14.5.2) | activation clean, both tables created, full favorite -> notification -> modal journey exercised, zero plugin entries in debug.log |
