@@ -5,7 +5,7 @@
  * Description: Adds notification for the activity Favorite for the activity user.
  * Version: 2.1.0
  * Requires at least: 6.5
- * Requires PHP: 8.0
+ * Requires PHP: 8.1
  * Requires Plugins: buddypress
  * Text Domain: buddypress-favorite-notification
  * Domain Path: /languages
