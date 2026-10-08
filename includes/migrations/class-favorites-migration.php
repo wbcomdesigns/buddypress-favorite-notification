@@ -128,10 +128,11 @@ class BPFN_Favorites_Migration {
 				$result = $wpdb->insert(
 					$this->table_name,
 					array(
-						'activity_id' => $activity_id,
-						'user_id'     => $user_id,
+						'activity_id'  => $activity_id,
+						'user_id'      => $user_id,
+						'favorited_at' => current_time( 'mysql', true ),
 					),
-					array( '%d', '%d' )
+					array( '%d', '%d', '%s' )
 				);
 
 				if ( $result ) {
@@ -162,12 +163,7 @@ class BPFN_Favorites_Migration {
 	private function complete_migration( $status ) {
 		$status['status']   = 'completed';
 		$status['end_time'] = current_time( 'mysql' );
-		$status['message']  = sprintf(
-			/* translators: 1: Number of users, 2: Number of favorites. */
-			esc_html__( 'Migration complete! Processed %1$d users and added %2$d favorites.', 'buddypress-favorite-notification' ),
-			$status['users_processed'],
-			$status['favorites_added']
-		);
+		$status['message']  = self::completion_message( (int) $status['favorites_added'] );
 
 		// Save final log.
 		update_option( 'bpfn_migration_log', $status );
@@ -242,10 +238,11 @@ class BPFN_Favorites_Migration {
 				$result = $wpdb->insert(
 					$this->table_name,
 					array(
-						'activity_id' => $activity_id,
-						'user_id'     => $user_id,
+						'activity_id'  => $activity_id,
+						'user_id'      => $user_id,
+						'favorited_at' => current_time( 'mysql', true ),
 					),
-					array( '%d', '%d' )
+					array( '%d', '%d', '%s' )
 				);
 
 				if ( $result ) {
@@ -261,12 +258,7 @@ class BPFN_Favorites_Migration {
 		}
 
 		$log['end_time'] = current_time( 'mysql' );
-		$log['message']  = sprintf(
-			/* translators: 1: Number of users, 2: Number of favorites. */
-			esc_html__( 'Migration complete! Processed %1$d users and added %2$d favorites.', 'buddypress-favorite-notification' ),
-			$log['users_processed'],
-			$log['favorites_added']
-		);
+		$log['message']  = self::completion_message( (int) $log['favorites_added'] );
 
 		// Save migration log.
 		update_option( 'bpfn_migration_log', $log );
@@ -293,14 +285,6 @@ class BPFN_Favorites_Migration {
 	 */
 	public function get_migration_log() {
 		return get_option( 'bpfn_migration_log', array() );
-	}
-
-	/**
-	 * Reset migration status (for testing).
-	 */
-	public function reset_migration() {
-		delete_option( 'bpfn_favorites_migrated' );
-		delete_option( 'bpfn_migration_log' );
 	}
 
 	/**
@@ -338,12 +322,33 @@ class BPFN_Favorites_Migration {
 			}
 		}
 
+		// Pending means user meta holds favorites the table does not. Every favorite
+		// made while the plugin is active is synced to both, so comparing counts is
+		// enough (O(1) on big sites). Not gated on the "migrated" flag: favorites made
+		// while the plugin was deactivated still need migrating after that flag is set.
+		$missing = max( 0, $total_meta_favorites - (int) $favorites_in_table );
+
 		return array(
 			'users_with_favorites'  => (int) $users_with_meta,
 			'meta_favorites_count'  => $total_meta_favorites,
 			'table_favorites_count' => (int) $favorites_in_table,
+			'missing_count'         => $missing,
 			'migrated'              => $this->is_migrated(),
-			'migration_pending'     => ! $this->is_migrated() && $total_meta_favorites > 0,
+			'migration_pending'     => $missing > 0,
+		);
+	}
+
+	/**
+	 * The one "migration finished" message (AJAX result, background status, Tools tab).
+	 *
+	 * @param int $favorites_added Favorites copied into the table.
+	 * @return string
+	 */
+	public static function completion_message( $favorites_added ) {
+		return sprintf(
+			/* translators: %d: number of favorites copied into the favorites table. */
+			_n( 'Migration complete. %d favorite was added.', 'Migration complete. %d favorites were added.', $favorites_added, 'buddypress-favorite-notification' ),
+			$favorites_added
 		);
 	}
 
@@ -376,6 +381,14 @@ class BPFN_Favorites_Migration {
 			'total_users'     => $total_users,
 			'favorites_added' => isset( $status['favorites_added'] ) ? $status['favorites_added'] : 0,
 			'errors'          => isset( $status['errors'] ) ? count( $status['errors'] ) : 0,
+			// Built here so the admin script never assembles English or plurals itself.
+			'progress_text'   => sprintf(
+				/* translators: 1: members processed so far, 2: total members with favorites. */
+				_n( '%1$d of %2$d member processed', '%1$d of %2$d members processed', $total_users, 'buddypress-favorite-notification' ),
+				$processed,
+				$total_users
+			),
+			'message'         => self::completion_message( isset( $status['favorites_added'] ) ? (int) $status['favorites_added'] : 0 ),
 		);
 	}
 
@@ -384,25 +397,5 @@ class BPFN_Favorites_Migration {
 	 */
 	public function register_hooks() {
 		add_action( 'bpfn_process_migration_batch', array( $this, 'process_migration_batch' ) );
-	}
-
-	/**
-	 * Cancel ongoing migration.
-	 *
-	 * @return array Cancellation result.
-	 */
-	public function cancel_migration() {
-		$status                 = get_option( 'bpfn_migration_status', array() );
-		$status['status']       = 'cancelled';
-		$status['cancelled_at'] = current_time( 'mysql' );
-		update_option( 'bpfn_migration_status', $status );
-
-		// Clear scheduled events.
-		wp_clear_scheduled_hook( 'bpfn_process_migration_batch' );
-
-		return array(
-			'success' => true,
-			'message' => esc_html__( 'Migration cancelled.', 'buddypress-favorite-notification' ),
-		);
 	}
 }

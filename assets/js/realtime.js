@@ -17,11 +17,11 @@
         // Configuration
         config: {
             container: null,
-            position: 'bottom-right',
-            maxNotifications: 5,
+            // A burst of favorites must not cover the page: 2 cards on desktop,
+            // 1 on phones. The bell count still carries the total.
+            maxNotifications: window.matchMedia && window.matchMedia('(max-width: 480px)').matches ? 1 : 2,
             autoDismiss: 5000,
-            lastChecked: 0,
-            checkInterval: 15000
+            lastChecked: 0
         },
 
         // State
@@ -48,22 +48,12 @@
             
             self.log('Starting realtime initialization');
             
-            return self.initializeHeartbeat()
-                .then(function() {
-                    self.setupUI();
-                    self.bindEvents();
-                    self.state.initialized = true;
-                    self.log('Realtime initialization completed');
-                    return Promise.resolve();
-                })
-                .catch(function(error) {
-                    self.log('Heartbeat failed, falling back to polling');
-                    self.initializePolling();
-                    self.setupUI();
-                    self.bindEvents();
-                    self.state.initialized = true;
-                    return Promise.resolve();
-                });
+            return self.initializeHeartbeat().then(function() {
+                self.setupUI();
+                self.bindEvents();
+                self.state.initialized = true;
+                self.log('Realtime initialization completed');
+            });
         },
 
         /**
@@ -115,89 +105,6 @@
         },
 
         /**
-         * Initialize polling fallback
-         */
-        initializePolling: function() {
-            var self = this;
-            
-            self.polling = {
-                interval: self.config.checkInterval,
-                timeout: null,
-                isActive: false
-            };
-            
-            self.startPolling();
-        },
-
-        /**
-         * Start polling
-         */
-        startPolling: function() {
-            var self = this;
-            
-            if (self.polling.isActive) {
-                return;
-            }
-            
-            self.polling.isActive = true;
-            self.scheduleNextPoll();
-        },
-
-        /**
-         * Schedule next poll
-         */
-        scheduleNextPoll: function() {
-            var self = this;
-            
-            if (!self.polling.isActive) {
-                return;
-            }
-            
-            self.polling.timeout = setTimeout(function() {
-                self.performPoll();
-            }, self.polling.interval);
-        },
-
-        /**
-         * Perform polling request
-         */
-        performPoll: function() {
-            var self = this;
-            
-            if (self.state.isChecking) {
-                self.scheduleNextPoll();
-                return;
-            }
-            
-            self.state.isChecking = true;
-            
-            $.ajax({
-                url: self.config.ajax_url,
-                type: 'POST',
-                timeout: 10000,
-                data: {
-                    action: 'bpfn_check_notifications',
-                    last_checked: self.config.lastChecked,
-                    nonce: self.config.nonce
-                },
-                success: function(response) {
-                    self.state.isChecking = false;
-                    
-                    if (response && response.success && response.data) {
-                        self.handleNotificationResponse(response.data);
-                    }
-                    
-                    self.scheduleNextPoll();
-                },
-                error: function(xhr, status, error) {
-                    self.state.isChecking = false;
-                    self.log('Polling error: ' + error);
-                    self.scheduleNextPoll();
-                }
-            });
-        },
-
-        /**
          * Handle notification response
          */
         handleNotificationResponse: function(data) {
@@ -210,7 +117,7 @@
             if (data.notifications && data.notifications.length > 0) {
                 self.log('Processing ' + data.notifications.length + ' new notifications');
                 
-                data.notifications.forEach(function(notification, index) {
+                data.notifications.slice(0, self.config.maxNotifications).forEach(function(notification, index) {
                     setTimeout(function() {
                         self.showNotification(notification);
                     }, index * 200);
@@ -230,8 +137,7 @@
             var self = this;
             
             if (!self.config.container || !self.config.container.length) {
-                self.config.container = $('<div id="bpfn-realtime-container"></div>');
-                self.config.container.addClass('bpfn-position-' + self.config.position);
+                self.config.container = $('<div id="bpfn-realtime-container" aria-live="polite"></div>');
                 $('body').append(self.config.container);
             }
         },
@@ -245,17 +151,9 @@
             // Close button
             $(document).on('click', '.bpfn-realtime-close', function() {
                 var $notification = $(this).closest('.bpfn-realtime-notification');
-                self.dismissNotification($notification);
+                self.dismissNotification($notification, true); // Explicit close: the member saw it.
             });
-            
-            // Action buttons
-            $(document).on('click', '.bpfn-realtime-action', function(e) {
-                if ($(this).hasClass('dismiss')) {
-                    e.preventDefault();
-                    var $notification = $(this).closest('.bpfn-realtime-notification');
-                    self.dismissNotification($notification);
-                }
-            });
+
         },
 
         /**
@@ -305,49 +203,26 @@
             var strings = window.BPFNRealtime && window.BPFNRealtime.strings || {};
             var timeAgo = data.time_ago || strings.just_now || 'just now';
             
-            var html = 
-                '<div class="bpfn-realtime-notification type-' + type + '" data-id="' + (data.notification_id || '') + '">' +
-                    '<div class="bpfn-realtime-header">' +
-                        '<span class="bpfn-realtime-title">' +
-                            '<i class="dashicons dashicons-heart"></i>' +
-                            (strings.new_notification || 'New notification') +
+            // Server-escaped fields (BPFN_Module_Realtime::format_realtime_notification).
+            var html =
+                '<div class="bpfn-realtime-notification type-' + type + '" data-id="' + (data.notification_id || '') + '" role="status">' +
+                    '<a class="bpfn-realtime-link" href="' + (data.link || '#') + '">' +
+                        (data.user_avatar ? '<span class="bpfn-realtime-avatar">' + data.user_avatar + '</span>' : '') +
+                        '<span class="bpfn-realtime-message">' +
+                            (data.text || strings.default_message || 'Someone favorited your activity') +
+                            '<span class="bpfn-realtime-time">' + timeAgo + '</span>' +
                         '</span>' +
-                        '<button class="bpfn-realtime-close" aria-label="' + (strings.dismiss || 'Dismiss') + '">&times;</button>' +
-                    '</div>' +
-                    '<div class="bpfn-realtime-body">' +
-                        '<div class="bpfn-realtime-content">';
-            
-            // Add avatar if available
-            if (data.user_avatar) {
-                html += '<div class="bpfn-realtime-avatar">' + data.user_avatar + '</div>';
-            }
-            
-            html += '<div class="bpfn-realtime-message">' +
-                        (data.text || strings.default_message || 'Someone favorited your activity') +
-                        '<div class="bpfn-realtime-time">' + timeAgo + '</div>' +
-                    '</div>' +
-                '</div>' +
-            '</div>';
-            
-            // Add actions
-            html += '<div class="bpfn-realtime-actions">' +
-                '<a href="' + (data.link || '#') + '" class="bpfn-realtime-action primary">' +
-                    (strings.view_activity || 'View Activity') +
-                '</a>' +
-                '<a href="#" class="bpfn-realtime-action secondary dismiss">' +
-                    (strings.dismiss || 'Dismiss') +
-                '</a>' +
-            '</div>';
-            
-            html += '</div>';
-            
+                    '</a>' +
+                    '<button type="button" class="bpfn-realtime-close" aria-label="' + (strings.dismiss || 'Dismiss') + '">&times;</button>' +
+                '</div>';
+
             return $(html);
         },
 
         /**
          * Dismiss notification
          */
-        dismissNotification: function($notification) {
+        dismissNotification: function($notification, markRead) {
             var self = this;
             var notificationId = $notification.data('id');
             
@@ -363,8 +238,9 @@
                     return n.element.get(0) !== $notification.get(0);
                 });
                 
-                // Mark as read if has ID
-                if (notificationId && !notificationId.toString().startsWith('test-')) {
+                // Only an explicit close marks read. Auto-hide and overflow
+                // removal must leave it unread in the member's notifications.
+                if (markRead && notificationId) {
                     self.markAsRead(notificationId);
                 }
             }, 300);
@@ -435,12 +311,6 @@
             
             // Clean up event handlers
             $(document).off('.bpfn-heartbeat .bpfn-realtime');
-            
-            // Clear polling
-            if (self.polling && self.polling.timeout) {
-                clearTimeout(self.polling.timeout);
-                self.polling.isActive = false;
-            }
             
             // Remove UI elements
             if (self.config.container) {

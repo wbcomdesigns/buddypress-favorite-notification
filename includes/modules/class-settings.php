@@ -21,7 +21,7 @@ class BPFN_Module_Settings {
 	 *
 	 * @var string
 	 */
-	private $slug = 'notifications';
+	private $slug = 'favorite-notifications'; // Must differ from BP's own Email tab ('notifications').
 
 	/**
 	 * Constructor.
@@ -43,11 +43,10 @@ class BPFN_Module_Settings {
 		// Add to BP notification settings table.
 		add_action( 'bp_notification_settings', array( $this, 'notification_settings' ) );
 
-		// Persist that row into THIS plugin's preference store. BuddyPress core saves
-		// `notifications[favorite_activity]` to the `favorite_activity` user meta, which
-		// this plugin never reads - so without this the row was dead UI. See
-		// save_bp_notification_settings() below.
-		add_action( 'bp_core_notification_settings_after_save', array( $this, 'save_bp_notification_settings' ) );
+		// BuddyPress writes our email rows (Settings > Notifications) and our email
+		// unsubscribe links to user meta. Mirror both into the prefs table.
+		add_action( 'added_user_meta', array( $this, 'mirror_email_meta' ), 10, 4 );
+		add_action( 'updated_user_meta', array( $this, 'mirror_email_meta' ), 10, 4 );
 
 		// NOTE: This module no longer registers an admin options page or the
 		// `bpfn_options` Settings API option. Those are owned solely by
@@ -71,7 +70,7 @@ class BPFN_Module_Settings {
 			array(
 				'name'            => esc_html__( 'Favorite Notifications', 'buddypress-favorite-notification' ),
 				'slug'            => $this->slug,
-				'parent_url'      => trailingslashit( bp_displayed_user_domain() . bp_get_settings_slug() ),
+				'parent_url'      => bp_displayed_user_url( bp_members_get_path_chunks( array( bp_get_settings_slug() ) ) ),
 				'parent_slug'     => bp_get_settings_slug(),
 				'screen_function' => array( $this, 'settings_screen' ),
 				'position'        => 30,
@@ -111,8 +110,8 @@ class BPFN_Module_Settings {
 		$user_id  = bp_displayed_user_id();
 		$settings = bpfn_get_user_settings( $user_id );
 
-		// Get notification types.
 		$notification_types = $this->get_notification_types();
+		$show_realtime      = BPFN_Module_Realtime::is_enabled();
 
 		// Load settings template.
 		include BPFN_TEMPLATES_PATH . 'settings/notifications.php';
@@ -144,15 +143,19 @@ class BPFN_Module_Settings {
 		// Get notification types.
 		$notification_types = $this->get_notification_types();
 
-		// Process form data.
+		$current     = bpfn_get_user_settings( $user_id );
+		$realtime_on = BPFN_Module_Realtime::is_enabled();
+
 		foreach ( $notification_types as $type => $config ) {
 			$settings[ $type ] = array(
 				// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Checkbox presence check only.
 				'is_enabled'       => isset( $_POST['bpfn'][ $type ]['web'] ) ? 1 : 0,
+				// Email lives in BuddyPress's Email tab (notification_settings()), not here.
+				'email_enabled'    => $current[ $type ]['email_enabled'],
+				// The column is hidden while the owner has real-time off; keep the stored
+				// choice instead of reading the absent checkbox as "off".
 				// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Checkbox presence check only.
-				'email_enabled'    => isset( $_POST['bpfn'][ $type ]['email'] ) ? 1 : 0,
-				// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Checkbox presence check only.
-				'realtime_enabled' => isset( $_POST['bpfn'][ $type ]['realtime'] ) ? 1 : 0,
+				'realtime_enabled' => $realtime_on ? ( isset( $_POST['bpfn'][ $type ]['realtime'] ) ? 1 : 0 ) : $current[ $type ]['realtime_enabled'],
 			);
 		}
 
@@ -167,59 +170,36 @@ class BPFN_Module_Settings {
 		}
 
 		// Redirect to prevent resubmission.
-		bp_core_redirect( bp_displayed_user_domain() . bp_get_settings_slug() . '/' . $this->slug . '/' );
+		bp_core_redirect( bp_displayed_user_url( bp_members_get_path_chunks( array( bp_get_settings_slug(), $this->slug ) ) ) );
 	}
 
 	/**
-	 * Persist the BuddyPress notification-settings row into this plugin's own store.
+	 * Mirror BuddyPress's email meta into the prefs table.
 	 *
-	 * BuddyPress core's Settings > Notifications screen posts `notifications[favorite_activity]`
-	 * and saves every posted key to user meta. This plugin keeps its preferences in the
-	 * {prefix}bp_favorite_notification_prefs table instead, so the row rendered by
-	 * notification_settings() displayed the right value but saved nowhere we read - it
-	 * could not work. This handler runs on BuddyPress's own post-save hook and writes the
-	 * value to the same store, with the same keys, as the plugin's Settings > Favorite
-	 * Notifications screen, so the two screens can never disagree.
+	 * Fires for both the Settings > Notifications rows (BP core saves each posted
+	 * `notifications[key]` as user meta) and BP email unsubscribe links (which write
+	 * the key from bp_email_get_unsubscribe_type_schema). Only the email channel of
+	 * the matching type changes; web and real-time choices are kept.
 	 *
-	 * That row is BuddyPress's "send email / do not send email" column, so it maps to the
-	 * `email_enabled` channel of `activity_post` - exactly the value the row displays. The
-	 * other channels (web, real-time) are preserved untouched; they are only editable on
-	 * the plugin's own screen.
-	 *
-	 * Nonce and capability are already enforced by BuddyPress core before this fires:
-	 * bp_settings_action_notifications() runs check_admin_referer( 'bp_settings_notifications' )
-	 * and the screen itself is gated by bp_core_can_edit_settings().
-	 *
-	 * @since 2.0.1
+	 * @param int    $meta_id    Meta ID.
+	 * @param int    $user_id    User ID.
+	 * @param string $meta_key   Meta key.
+	 * @param mixed  $meta_value Meta value.
 	 */
-	public function save_bp_notification_settings() {
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified by BuddyPress core in bp_settings_action_notifications() before this hook fires.
-		if ( ! isset( $_POST['notifications']['favorite_activity'] ) ) {
+	public function mirror_email_meta( $meta_id, $user_id, $meta_key, $meta_value ) {
+		$type = array_search( $meta_key, bpfn_email_meta_keys(), true );
+		if ( false === $type ) {
 			return;
 		}
 
-		$user_id = bp_displayed_user_id();
-		if ( ! $user_id ) {
-			return;
-		}
-
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- See above.
-		$value = sanitize_text_field( wp_unslash( $_POST['notifications']['favorite_activity'] ) );
-
-		// Read the current row so the web/real-time channels survive this save.
 		$settings = bpfn_get_user_settings( $user_id );
-		$current  = isset( $settings['activity_post'] ) ? $settings['activity_post'] : array();
+		$enabled  = 'no' === $meta_value ? 0 : 1;
+		if ( (int) $settings[ $type ]['email_enabled'] === $enabled ) {
+			return; // Already in step - also stops the write-back in bpfn_save_user_settings() looping.
+		}
 
-		bpfn_save_user_settings(
-			$user_id,
-			array(
-				'activity_post' => array(
-					'is_enabled'       => isset( $current['is_enabled'] ) ? (int) $current['is_enabled'] : 1,
-					'email_enabled'    => ( 'yes' === $value ) ? 1 : 0,
-					'realtime_enabled' => isset( $current['realtime_enabled'] ) ? (int) $current['realtime_enabled'] : 1,
-				),
-			)
-		);
+		$settings[ $type ]['email_enabled'] = $enabled;
+		bpfn_save_user_settings( $user_id, array( $type => $settings[ $type ] ) );
 	}
 
 	/**
@@ -257,6 +237,23 @@ class BPFN_Module_Settings {
 					<td class="no">
 						<input type="radio" id="notification-favorite-activity-no" name="notifications[favorite_activity]" value="no" <?php checked( $settings['activity_post']['email_enabled'], 0 ); ?> />
 						<label class="bp-screen-reader-text" for="notification-favorite-activity-no">
+							<?php esc_html_e( 'No, do not send email', 'buddypress-favorite-notification' ); ?>
+						</label>
+					</td>
+				</tr>
+
+				<tr id="favorite-notification-settings-comment">
+					<td></td>
+					<td><?php esc_html_e( 'A member favorites your comment', 'buddypress-favorite-notification' ); ?></td>
+					<td class="yes">
+						<input type="radio" id="notification-favorite-comment-yes" name="notifications[favorite_activity_comment]" value="yes" <?php checked( $settings['activity_comment']['email_enabled'], 1 ); ?> />
+						<label class="bp-screen-reader-text" for="notification-favorite-comment-yes">
+							<?php esc_html_e( 'Yes, send email', 'buddypress-favorite-notification' ); ?>
+						</label>
+					</td>
+					<td class="no">
+						<input type="radio" id="notification-favorite-comment-no" name="notifications[favorite_activity_comment]" value="no" <?php checked( $settings['activity_comment']['email_enabled'], 0 ); ?> />
+						<label class="bp-screen-reader-text" for="notification-favorite-comment-no">
 							<?php esc_html_e( 'No, do not send email', 'buddypress-favorite-notification' ); ?>
 						</label>
 					</td>

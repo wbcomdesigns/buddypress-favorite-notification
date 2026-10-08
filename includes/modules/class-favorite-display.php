@@ -65,11 +65,10 @@ class BPFN_Module_Favorite_Display {
 		add_action( 'bp_activity_add_user_favorite', array( $this, 'sync_favorite_add' ), 10, 2 );
 		add_action( 'bp_activity_remove_user_favorite', array( $this, 'sync_favorite_remove' ), 10, 2 );
 
-		// AJAX handlers.
+		// AJAX handlers. Members only: display_favorite_count() renders nothing for
+		// visitors, so a logged-out endpoint would only be an unused public surface.
 		add_action( 'wp_ajax_bpfn_get_all_favorites', array( $this, 'ajax_get_all_favorites' ) );
-		add_action( 'wp_ajax_nopriv_bpfn_get_all_favorites', array( $this, 'ajax_get_all_favorites' ) );
 		add_action( 'wp_ajax_bpfn_refresh_favorite_display', array( $this, 'ajax_refresh_favorite_display' ) );
-		add_action( 'wp_ajax_nopriv_bpfn_refresh_favorite_display', array( $this, 'ajax_refresh_favorite_display' ) );
 	}
 
 	/**
@@ -86,10 +85,12 @@ class BPFN_Module_Favorite_Display {
 		$wpdb->insert(
 			$this->table_name,
 			array(
-				'activity_id' => $activity_id,
-				'user_id'     => $user_id,
+				'activity_id'  => $activity_id,
+				'user_id'      => $user_id,
+				// Explicit GMT: the column DEFAULT is the MySQL server clock.
+				'favorited_at' => current_time( 'mysql', true ),
 			),
-			array( '%d', '%d' )
+			array( '%d', '%d', '%s' )
 		);
 
 		// Clear cache for this activity.
@@ -218,9 +219,7 @@ class BPFN_Module_Favorite_Display {
 							'html'    => false,
 						)
 					),
-					'link'   => function_exists( 'bp_members_get_user_url' ) ?
-								bp_members_get_user_url( $user_id ) :
-								bp_core_get_user_domain( $user_id ),
+					'link'   => bp_members_get_user_url( $user_id ),
 				);
 			}
 		}
@@ -262,7 +261,7 @@ class BPFN_Module_Favorite_Display {
 
 		if ( 2 === $total && isset( $users[0], $users[1] ) ) {
 			return sprintf(
-				/* translators: 1: Link to the first person who favorited, 2: Link to the second person who favorited. */
+				/* translators: 1: one or more linked member names, 2: the last linked name or an "N others" link. */
 				__( '%1$s and %2$s', 'buddypress-favorite-notification' ),
 				sprintf(
 					'<a href="%s" class="bpfn-user-link">%s</a>',
@@ -315,7 +314,7 @@ class BPFN_Module_Favorite_Display {
 			);
 
 			return sprintf(
-				/* translators: 1: Comma-separated links to the people who favorited, 2: Link reading "N others". */
+				/* translators: 1: one or more linked member names, 2: the last linked name or an "N others" link. */
 				__( '%1$s and %2$s', 'buddypress-favorite-notification' ),
 				implode( ', ', $names ),
 				$others_link
@@ -325,7 +324,7 @@ class BPFN_Module_Favorite_Display {
 		$last = array_pop( $names );
 		if ( ! empty( $names ) ) {
 			return sprintf(
-				/* translators: 1: Comma-separated links to the people who favorited, 2: Link to the last person who favorited. */
+				/* translators: 1: one or more linked member names, 2: the last linked name or an "N others" link. */
 				__( '%1$s and %2$s', 'buddypress-favorite-notification' ),
 				implode( ', ', $names ),
 				$last
@@ -402,6 +401,28 @@ class BPFN_Module_Favorite_Display {
 	}
 
 	/**
+	 * The saved display mode, normalised to a registered one (default inline).
+	 *
+	 * @param mixed $mode Raw value. Null reads the stored option.
+	 * @return string
+	 */
+	public static function get_saved_mode( $mode = null ) {
+		$mode = null === $mode ? get_option( 'bpfn_display_mode', 'inline' ) : sanitize_key( $mode );
+		return isset( self::get_display_modes()[ $mode ] ) ? $mode : 'inline';
+	}
+
+	/**
+	 * The saved icon, normalised to a registered one (default heart).
+	 *
+	 * @param mixed $icon Raw value. Null reads the stored option.
+	 * @return string
+	 */
+	public static function get_saved_icon( $icon = null ) {
+		$icon = null === $icon ? get_option( 'bpfn_favorite_icon', 'heart' ) : sanitize_key( $icon );
+		return isset( self::get_icon_choices()[ $icon ] ) ? $icon : 'heart';
+	}
+
+	/**
 	 * Resolve the display mode for an activity.
 	 *
 	 * @param int   $activity_id The activity ID.
@@ -410,12 +431,8 @@ class BPFN_Module_Favorite_Display {
 	 * @return string One of the registered mode slugs.
 	 */
 	public function get_display_mode( $activity_id, $count = 0, $users_data = array() ) {
-		$mode  = get_option( 'bpfn_display_mode', 'inline' );
+		$mode  = self::get_saved_mode();
 		$modes = self::get_display_modes();
-
-		if ( ! isset( $modes[ $mode ] ) ) {
-			$mode = 'inline';
-		}
 
 		/**
 		 * Filter the favorite display format for a single activity.
@@ -441,11 +458,7 @@ class BPFN_Module_Favorite_Display {
 	 */
 	public function get_icon_html( $activity_id, $count = 0 ) {
 		$icons  = self::get_icon_choices();
-		$choice = get_option( 'bpfn_favorite_icon', 'heart' );
-
-		if ( ! isset( $icons[ $choice ] ) ) {
-			$choice = 'heart';
-		}
+		$choice = self::get_saved_icon();
 
 		$entity = isset( $icons[ $choice ]['entity'] ) ? $icons[ $choice ]['entity'] : '';
 
@@ -679,7 +692,8 @@ class BPFN_Module_Favorite_Display {
 
 		$activity_id = isset( $_POST['activity_id'] ) ? absint( $_POST['activity_id'] ) : 0;
 
-		if ( ! $activity_id ) {
+		// Who favorited a hidden or private-group activity is not public.
+		if ( ! $activity_id || ! bp_activity_user_can_read( new BP_Activity_Activity( $activity_id ), get_current_user_id() ) ) {
 			wp_send_json_error( array( 'message' => esc_html__( 'Invalid activity ID', 'buddypress-favorite-notification' ) ) );
 		}
 
@@ -897,7 +911,8 @@ class BPFN_Module_Favorite_Display {
 
 		$activity_id = isset( $_POST['activity_id'] ) ? absint( $_POST['activity_id'] ) : 0;
 
-		if ( ! $activity_id ) {
+		// Who favorited a hidden or private-group activity is not public.
+		if ( ! $activity_id || ! bp_activity_user_can_read( new BP_Activity_Activity( $activity_id ), get_current_user_id() ) ) {
 			wp_send_json_error( array( 'message' => esc_html__( 'Invalid activity ID', 'buddypress-favorite-notification' ) ) );
 		}
 
@@ -921,14 +936,5 @@ class BPFN_Module_Favorite_Display {
 				'html'  => $this->render_display( $activity_id ),
 			)
 		);
-	}
-
-	/**
-	 * Get table name.
-	 *
-	 * @return string Table name.
-	 */
-	public function get_table_name() {
-		return $this->table_name;
 	}
 }

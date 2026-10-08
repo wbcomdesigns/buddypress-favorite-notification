@@ -53,11 +53,11 @@ if ( is_array( $bpfn_stats_cached ) ) {
 		$bpfn_stats['total_favorites'] = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$favorites_table}" );
 
 		$bpfn_stats['favorites_last_7_days'] = (int) $wpdb->get_var(
-			"SELECT COUNT(*) FROM {$favorites_table} WHERE favorited_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)"
+			"SELECT COUNT(*) FROM {$favorites_table} WHERE favorited_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL 7 DAY)"
 		);
 
 		$bpfn_stats['active_users_7_days'] = (int) $wpdb->get_var(
-			"SELECT COUNT(DISTINCT user_id) FROM {$favorites_table} WHERE favorited_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)"
+			"SELECT COUNT(DISTINCT user_id) FROM {$favorites_table} WHERE favorited_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL 7 DAY)"
 		);
 
 		$bpfn_most_liked = $wpdb->get_row(
@@ -70,19 +70,19 @@ if ( is_array( $bpfn_stats_cached ) ) {
 
 		$bpfn_stats['recent_activities'] = $wpdb->get_results(
 			"SELECT activity_id, user_id, favorited_at FROM {$favorites_table}
-		WHERE favorited_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+		WHERE favorited_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL 7 DAY)
 		ORDER BY favorited_at DESC LIMIT 10"
 		);
 
 		$bpfn_stats['trending_7_days'] = $wpdb->get_results(
 			"SELECT activity_id, COUNT(*) as favorite_count FROM {$favorites_table}
-		WHERE favorited_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+		WHERE favorited_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL 7 DAY)
 		GROUP BY activity_id ORDER BY favorite_count DESC LIMIT 10"
 		);
 
 		$bpfn_stats['trending_30_days'] = $wpdb->get_results(
 			"SELECT activity_id, COUNT(*) as favorite_count FROM {$favorites_table}
-		WHERE favorited_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+		WHERE favorited_at >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL 30 DAY)
 		GROUP BY activity_id ORDER BY favorite_count DESC LIMIT 10"
 		);
 	}
@@ -106,7 +106,7 @@ if ( is_array( $bpfn_stats_cached ) ) {
 		$bpfn_stats['notifications_last_7_days'] = (int) $wpdb->get_var(
 			$wpdb->prepare(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name from BP.
-				"SELECT COUNT(*) FROM {$bpfn_notifications_table} WHERE component_name = %s AND date_notified >= DATE_SUB(NOW(), INTERVAL 7 DAY)",
+				"SELECT COUNT(*) FROM {$bpfn_notifications_table} WHERE component_name = %s AND date_notified >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL 7 DAY)",
 				$bpfn_component
 			)
 		);
@@ -150,7 +150,8 @@ if ( ! empty( $bpfn_activity_ids ) && function_exists( 'bp_activity_get' ) ) {
 			'per_page'          => count( $bpfn_activity_ids ),
 			'show_hidden'       => true,
 			'update_meta_cache' => false,
-			'display_comments'  => false,
+			// 'stream' returns favorited comments as items; false dropped them, so they showed as 'Activity not found'.
+			'display_comments'  => 'stream',
 		)
 	);
 	if ( ! empty( $bpfn_activities['activities'] ) ) {
@@ -177,7 +178,7 @@ if ( ! empty( $bpfn_user_ids ) ) {
 			if ( $bpfn_stats['favorites_last_7_days'] > 0 ) {
 				echo esc_html(
 					sprintf(
-						/* translators: %s: Number of new favorites. */
+						/* translators: %s: how many were added in the last 7 days. */
 						__( '+%s in last 7 days', 'buddypress-favorite-notification' ),
 						number_format_i18n( $bpfn_stats['favorites_last_7_days'] )
 					)
@@ -196,7 +197,7 @@ if ( ! empty( $bpfn_user_ids ) ) {
 			if ( $bpfn_stats['notifications_last_7_days'] > 0 ) {
 				echo esc_html(
 					sprintf(
-						/* translators: %s: Number of new notifications. */
+						/* translators: %s: how many were added in the last 7 days. */
 						__( '+%s in last 7 days', 'buddypress-favorite-notification' ),
 						number_format_i18n( $bpfn_stats['notifications_last_7_days'] )
 					)
@@ -270,14 +271,21 @@ if ( ! empty( $bpfn_user_ids ) ) {
 							</td>
 							<td>
 								<?php
+								// favorited_at is GMT; strtotime() reads it as UTC because WordPress runs PHP in UTC.
+								$bpfn_fav_ts = strtotime( $bpfn_activity->favorited_at );
+								?>
+								<time datetime="<?php echo esc_attr( gmdate( 'c', $bpfn_fav_ts ) ); ?>"><?php echo esc_html( wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $bpfn_fav_ts ) ); ?></time>
+								<br><small>
+								<?php
 								echo esc_html(
 									sprintf(
-										/* translators: %s: human-readable time difference. */
+										/* translators: %s: human-readable time difference, e.g. "5 mins". */
 										__( '%s ago', 'buddypress-favorite-notification' ),
-										human_time_diff( strtotime( $bpfn_activity->favorited_at ) )
+										human_time_diff( $bpfn_fav_ts )
 									)
 								);
 								?>
+								</small>
 							</td>
 						</tr>
 					<?php endforeach; ?>

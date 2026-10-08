@@ -53,19 +53,20 @@ $plugin_count = count( $bpfn_plugins );
 		<div class="bpfn-page-header__title">
 			<span class="dashicons dashicons-lightbulb" aria-hidden="true"></span>
 			<div>
-				<h1><?php esc_html_e( 'WB Plugins', 'buddypress-favorite-notification' ); ?></h1>
+				<h1>WB Plugins</h1>
 				<p class="bpfn-page-header__subtitle">
 					<?php
 					echo esc_html(
 						sprintf(
-							/* translators: %d: active Wbcom plugin count */
+							/* translators: 1: number of active plugins, 2: brand name "Wbcom". */
 							_n(
-								'%d Wbcom plugin active on this site.',
-								'%d Wbcom plugins active on this site.',
+								'%1$d %2$s plugin active on this site.',
+								'%1$d %2$s plugins active on this site.',
 								$plugin_count,
 								'buddypress-favorite-notification'
 							),
-							$plugin_count
+							$plugin_count,
+							'Wbcom'
 						)
 					);
 					?>
@@ -79,9 +80,17 @@ $plugin_count = count( $bpfn_plugins );
 			<span class="bpfn-empty-state__icon" aria-hidden="true">
 				<span class="dashicons dashicons-lightbulb"></span>
 			</span>
-			<p class="bpfn-empty-state__title"><?php esc_html_e( 'No Wbcom plugins attached to this hub yet', 'buddypress-favorite-notification' ); ?></p>
+			<p class="bpfn-empty-state__title">
+			<?php
+				/* translators: %s: brand name "Wbcom". */
+				echo esc_html( sprintf( __( 'No %s plugins attached to this hub yet', 'buddypress-favorite-notification' ), 'Wbcom' ) );
+			?>
+				</p>
 			<p class="bpfn-empty-state__desc">
-				<?php esc_html_e( 'Activate one or more Wbcom plugins and they will appear here automatically.', 'buddypress-favorite-notification' ); ?>
+				<?php
+				/* translators: %s: brand name "Wbcom". */
+				echo esc_html( sprintf( __( 'Activate one or more %s plugins and they will appear here automatically.', 'buddypress-favorite-notification' ), 'Wbcom' ) );
+				?>
 			</p>
 		</div>
 	<?php else : ?>
@@ -106,11 +115,19 @@ $plugin_count = count( $bpfn_plugins );
 
 	<div class="bpfn-card" style="margin-top: 20px;">
 		<div class="bpfn-card__head">
-			<p class="bpfn-card__title"><?php esc_html_e( 'About WB Plugins', 'buddypress-favorite-notification' ); ?></p>
+			<p class="bpfn-card__title">
+			<?php
+			/* translators: %s: hub menu name "WB Plugins". */
+			echo esc_html( sprintf( __( 'About %s', 'buddypress-favorite-notification' ), 'WB Plugins' ) );
+			?>
+			</p>
 		</div>
 		<div class="bpfn-card__body">
 			<p style="margin: 0 0 8px;">
-				<?php esc_html_e( 'This hub is the single entry point for every Wbcom Designs plugin installed on your site. Each plugin lives on its own page under this menu and keeps its own settings and data.', 'buddypress-favorite-notification' ); ?>
+				<?php
+				/* translators: %s: company name "Wbcom Designs". */
+				echo esc_html( sprintf( __( 'This hub is the single entry point for every %s plugin installed on your site. Each plugin lives on its own page under this menu and keeps its own settings and data.', 'buddypress-favorite-notification' ), 'Wbcom Designs' ) );
+				?>
 			</p>
 			<p style="margin: 0;">
 				<a href="https://wbcomdesigns.com/" target="_blank" rel="noopener noreferrer">
