@@ -257,6 +257,8 @@ Site owners now control every behaviour that costs them data or server load, and
 * Improve  - Realtime popups are compact cards that use your theme's surface colours, show at most two at a time (one on phones), and no longer cover the page when many favorites arrive together.
 * Improve  - On phones the who-favorited list opens as a bottom sheet sized to the list instead of a mostly empty full-screen panel.
 * Improve  - The admin settings sidebar no longer makes the plugin pages scroll sideways on phones.
+* Improve  - Every count now uses proper plural forms and brand names stay out of translatable text, so the plugin translates correctly into any language.
+* Improve  - German, French, Spanish, Italian, and Brazilian Portuguese translations are complete.
 * Fix      - The plugin's member settings tab replaced the BuddyPress Email tab and its own Web and Real-time switches never appeared.
 * Fix      - Emails were not sent to members who had turned web notifications off.
 * Fix      - Closing a realtime popup did not mark the notification read, and opening it from the popup did not either.
