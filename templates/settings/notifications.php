@@ -20,18 +20,19 @@ $show_realtime      = ! empty( $show_realtime );
 <form method="post" action="" class="bpfn-settings-form">
 
 	<div class="bpfn-settings-intro">
-		<p><?php esc_html_e( 'Choose how you want to receive favorite notifications:', 'buddypress-favorite-notification' ); ?></p>
-		<?php if ( bp_is_active( 'settings' ) ) : ?>
-			<p>
-				<?php
+		<p>
+			<?php
+			esc_html_e( 'Choose which favorite notifications you get on the site.', 'buddypress-favorite-notification' );
+			if ( bp_is_active( 'settings' ) ) {
+				echo ' ';
 				printf(
 					/* translators: %s: link to the member's Email settings tab. */
 					esc_html__( 'Email alerts are set in your %s.', 'buddypress-favorite-notification' ),
 					'<a href="' . esc_url( bp_members_get_user_url( bp_displayed_user_id(), bp_members_get_path_chunks( array( bp_get_settings_slug(), 'notifications' ) ) ) ) . '">' . esc_html__( 'Email settings', 'buddypress-favorite-notification' ) . '</a>'
 				);
-				?>
-			</p>
-		<?php endif; ?>
+			}
+			?>
+		</p>
 	</div>
 
 	<table class="bpfn-notification-settings">

@@ -87,6 +87,10 @@
     text-align: center;
 }
 
+.bpfn-notification-settings th.channel {
+    white-space: nowrap;
+}
+
 .bpfn-notification-settings .description {
     margin: 5px 0 0;
     font-size: 0.9em;
@@ -97,18 +101,23 @@
     margin-bottom: 20px;
 }
 
+/* Own the link look: themes (Reign) paint links the same colour as body text. */
+.bpfn-settings-intro a {
+    color: var(--bpfn-link, #1d84b5);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
 .bpfn-settings-actions {
     margin-top: 30px;
     padding-top: 20px;
     border-top: 1px solid var(--bpfn-border, #eeeeee);
 }
 
-/* Responsive: the 5-column matrix scrolls inside itself on small screens. */
+/* Responsive: drop the decorative icon column so the type text gets the width. */
 @media (max-width: 640px) {
-    .bpfn-notification-settings {
-        display: block;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
+    .bpfn-notification-settings .icon {
+        display: none;
     }
 
     .bpfn-notification-settings th,

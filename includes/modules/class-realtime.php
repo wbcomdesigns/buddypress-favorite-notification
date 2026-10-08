@@ -134,7 +134,15 @@ class BPFN_Module_Realtime {
 			wp_send_json_error( array( 'message' => esc_html__( 'Notification not found', 'buddypress-favorite-notification' ) ) );
 		}
 
-		$success = bp_notifications_mark_notification( $notification_id, false );
+		// Not bp_notifications_mark_notification(): it checks bp_displayed_user_id(),
+		// which is 0 in admin-ajax, so it always failed. Ownership is in the WHERE.
+		$success = BP_Notifications_Notification::update(
+			array( 'is_new' => 0 ),
+			array(
+				'id'      => $notification_id,
+				'user_id' => get_current_user_id(),
+			)
+		);
 
 		if ( $success ) {
 			wp_send_json_success(
@@ -233,7 +241,8 @@ class BPFN_Module_Realtime {
 			$notification->item_id,
 			$notification->secondary_item_id,
 			1,
-			'array'
+			'array',
+			(int) $notification->id // Adds `rid`, so opening the activity marks it read.
 		);
 
 		if ( ! is_array( $formatted ) ) {

@@ -150,7 +150,8 @@ if ( ! empty( $bpfn_activity_ids ) && function_exists( 'bp_activity_get' ) ) {
 			'per_page'          => count( $bpfn_activity_ids ),
 			'show_hidden'       => true,
 			'update_meta_cache' => false,
-			'display_comments'  => false,
+			// 'stream' returns favorited comments as items; false dropped them, so they showed as 'Activity not found'.
+			'display_comments'  => 'stream',
 		)
 	);
 	if ( ! empty( $bpfn_activities['activities'] ) ) {

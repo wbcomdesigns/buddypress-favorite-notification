@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-08T13:11:55+00:00\n"
+"POT-Creation-Date: 2026-10-08T13:28:19+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: buddypress-favorite-notification\n"
@@ -241,7 +241,7 @@ msgid "Shows the icon and the total as a button. Members click it to open the fu
 msgstr ""
 
 #: includes/admin/views/display.php:37
-#: includes/admin/views/tools.php:32
+#: includes/admin/views/tools.php:35
 msgid "Settings saved successfully!"
 msgstr ""
 
@@ -313,8 +313,8 @@ msgid "A longer interval puts less load on a busy site."
 msgstr ""
 
 #: includes/admin/views/display.php:162
-#: includes/admin/views/tools.php:133
-#: templates/settings/notifications.php:99
+#: includes/admin/views/tools.php:136
+#: templates/settings/notifications.php:100
 msgid "Save Settings"
 msgstr ""
 
@@ -350,127 +350,127 @@ msgstr ""
 msgid "Visit wbcomdesigns.com for more plugins and themes →"
 msgstr ""
 
-#: includes/admin/views/overview.php:173
+#: includes/admin/views/overview.php:174
 msgid "Total Favorites"
 msgstr ""
 
 #. translators: %s: Number of new favorites.
 #. translators: %s: Number of new notifications.
-#: includes/admin/views/overview.php:181
-#: includes/admin/views/overview.php:200
+#: includes/admin/views/overview.php:182
+#: includes/admin/views/overview.php:201
 #, php-format
 msgid "+%s in last 7 days"
 msgstr ""
 
-#: includes/admin/views/overview.php:186
-#: includes/admin/views/overview.php:205
+#: includes/admin/views/overview.php:187
+#: includes/admin/views/overview.php:206
 msgid "All time"
 msgstr ""
 
-#: includes/admin/views/overview.php:192
+#: includes/admin/views/overview.php:193
 msgid "Notifications Sent"
 msgstr ""
 
-#: includes/admin/views/overview.php:211
+#: includes/admin/views/overview.php:212
 msgid "Active Users"
 msgstr ""
 
-#: includes/admin/views/overview.php:213
+#: includes/admin/views/overview.php:214
 msgid "Last 7 days"
 msgstr ""
 
-#: includes/admin/views/overview.php:216
+#: includes/admin/views/overview.php:217
 msgid "Most Liked Activity"
 msgstr ""
 
 #. translators: %d: Activity ID.
-#: includes/admin/views/overview.php:223
-#: includes/admin/views/overview.php:265
-#: includes/admin/views/overview.php:336
+#: includes/admin/views/overview.php:224
+#: includes/admin/views/overview.php:266
+#: includes/admin/views/overview.php:337
 #, php-format
 msgid "Activity #%d"
 msgstr ""
 
-#: includes/admin/views/overview.php:227
+#: includes/admin/views/overview.php:228
 msgid "No data yet"
 msgstr ""
 
-#: includes/admin/views/overview.php:236
+#: includes/admin/views/overview.php:237
 msgid "Recent Favorites (Last 7 Days)"
 msgstr ""
 
-#: includes/admin/views/overview.php:240
+#: includes/admin/views/overview.php:241
 msgid "No favorites in the last 7 days."
 msgstr ""
 
-#: includes/admin/views/overview.php:245
+#: includes/admin/views/overview.php:246
 msgid "User"
 msgstr ""
 
-#: includes/admin/views/overview.php:246
-#: includes/admin/views/overview.php:311
+#: includes/admin/views/overview.php:247
+#: includes/admin/views/overview.php:312
 msgid "Activity"
 msgstr ""
 
-#: includes/admin/views/overview.php:247
+#: includes/admin/views/overview.php:248
 msgid "Date"
 msgstr ""
 
-#: includes/admin/views/overview.php:255
+#: includes/admin/views/overview.php:256
 msgid "Unknown User"
 msgstr ""
 
 #. translators: %s: human-readable time difference.
 #. translators: %s: Human-readable time difference, e.g. "5 mins".
-#: includes/admin/views/overview.php:282
-#: includes/modules/class-realtime.php:255
+#: includes/admin/views/overview.php:283
+#: includes/modules/class-realtime.php:264
 #, php-format
 msgid "%s ago"
 msgstr ""
 
-#: includes/admin/views/overview.php:305
+#: includes/admin/views/overview.php:306
 msgid "No trending activities in this window yet."
 msgstr ""
 
-#: includes/admin/views/overview.php:310
+#: includes/admin/views/overview.php:311
 msgid "Rank"
 msgstr ""
 
-#: includes/admin/views/overview.php:312
+#: includes/admin/views/overview.php:313
 #: includes/modules/class-settings.php:221
 msgid "Favorites"
 msgstr ""
 
-#: includes/admin/views/overview.php:313
+#: includes/admin/views/overview.php:314
 msgid "Author"
 msgstr ""
 
-#: includes/admin/views/overview.php:314
+#: includes/admin/views/overview.php:315
 msgid "Preview"
 msgstr ""
 
-#: includes/admin/views/overview.php:318
-#: includes/admin/views/overview.php:326
+#: includes/admin/views/overview.php:319
+#: includes/admin/views/overview.php:327
 msgid "Unknown"
 msgstr ""
 
-#: includes/admin/views/overview.php:319
+#: includes/admin/views/overview.php:320
 msgid "Activity not found"
 msgstr ""
 
-#: includes/admin/views/overview.php:352
+#: includes/admin/views/overview.php:353
 msgid "Trending Activities (Last 7 Days)"
 msgstr ""
 
-#: includes/admin/views/overview.php:361
+#: includes/admin/views/overview.php:362
 msgid "Trending Activities (Last 30 Days)"
 msgstr ""
 
-#: includes/admin/views/overview.php:370
+#: includes/admin/views/overview.php:371
 msgid "Quick Actions"
 msgstr ""
 
-#: includes/admin/views/overview.php:376
+#: includes/admin/views/overview.php:377
 msgid "Tools & Maintenance"
 msgstr ""
 
@@ -502,111 +502,111 @@ msgstr ""
 msgid "(opens in a new tab)"
 msgstr ""
 
-#: includes/admin/views/tools.php:38
+#: includes/admin/views/tools.php:41
 msgid "Migrate Favorites"
 msgstr ""
 
-#: includes/admin/views/tools.php:39
+#: includes/admin/views/tools.php:42
 msgid "Move legacy usermeta favorites into the optimized custom table."
 msgstr ""
 
-#: includes/admin/views/tools.php:44
+#: includes/admin/views/tools.php:47
 msgid "Migration completed."
 msgstr ""
 
 #. translators: 1: Number of users, 2: Number of favorites.
-#: includes/admin/views/tools.php:54
+#: includes/admin/views/tools.php:57
 #, php-format
 msgid "Processed %1$d users and migrated %2$d favorites."
 msgstr ""
 
 #. translators: 1: Number of users, 2: Number of favorites.
-#: includes/admin/views/tools.php:66
+#: includes/admin/views/tools.php:69
 #, php-format
 msgid "Found %1$d users with %2$d favorites to migrate."
 msgstr ""
 
-#: includes/admin/views/tools.php:74
+#: includes/admin/views/tools.php:77
 msgid "Run Migration"
 msgstr ""
 
-#: includes/admin/views/tools.php:79
+#: includes/admin/views/tools.php:82
 msgid "No favorites found to migrate."
 msgstr ""
 
-#: includes/admin/views/tools.php:86
+#: includes/admin/views/tools.php:89
 msgid "Database Maintenance"
 msgstr ""
 
-#: includes/admin/views/tools.php:87
+#: includes/admin/views/tools.php:90
 msgid "Remove read notifications older than the retention period to keep the database lean."
 msgstr ""
 
-#: includes/admin/views/tools.php:95
+#: includes/admin/views/tools.php:98
 msgid "Automatic Cleanup"
 msgstr ""
 
-#: includes/admin/views/tools.php:104
+#: includes/admin/views/tools.php:107
 msgid "Enable automatic monthly cleanup"
 msgstr ""
 
-#: includes/admin/views/tools.php:106
+#: includes/admin/views/tools.php:109
 msgid "Automatically remove old read notifications once per month via WP Cron."
 msgstr ""
 
-#: includes/admin/views/tools.php:111
+#: includes/admin/views/tools.php:114
 msgid "Retention Period"
 msgstr ""
 
 #. translators: %d: number of days.
-#: includes/admin/views/tools.php:120
+#: includes/admin/views/tools.php:123
 #, php-format
 msgid "%d days"
 msgstr ""
 
-#: includes/admin/views/tools.php:127
+#: includes/admin/views/tools.php:130
 msgid "Only read/dismissed notifications older than this will be deleted."
 msgstr ""
 
-#: includes/admin/views/tools.php:141
+#: includes/admin/views/tools.php:144
 msgid "Last automatic cleanup failed:"
 msgstr ""
 
 #. translators: 1: Date, 2: Error message.
-#: includes/admin/views/tools.php:145
+#: includes/admin/views/tools.php:148
 #, php-format
 msgid "%1$s - %2$s. No notifications were removed."
 msgstr ""
 
-#: includes/admin/views/tools.php:155
+#: includes/admin/views/tools.php:158
 msgid "Last automatic cleanup:"
 msgstr ""
 
 #. translators: 1: Date, 2: Number deleted, 3: Number remaining.
-#: includes/admin/views/tools.php:159
+#: includes/admin/views/tools.php:162
 #, php-format
 msgid "%1$s — deleted %2$d notifications, %3$d remaining."
 msgstr ""
 
-#: includes/admin/views/tools.php:160
+#: includes/admin/views/tools.php:163
 msgid "N/A"
 msgstr ""
 
 #. translators: %s: Next cleanup date/time.
-#: includes/admin/views/tools.php:175
+#: includes/admin/views/tools.php:178
 #, php-format
 msgid "Next automatic cleanup: %s"
 msgstr ""
 
-#: includes/admin/views/tools.php:187
+#: includes/admin/views/tools.php:190
 msgid "Manual Cleanup"
 msgstr ""
 
-#: includes/admin/views/tools.php:188
+#: includes/admin/views/tools.php:191
 msgid "Run cleanup immediately without waiting for the automatic schedule."
 msgstr ""
 
-#: includes/admin/views/tools.php:193
+#: includes/admin/views/tools.php:196
 msgid "Clear Old Notifications Now"
 msgstr ""
 
@@ -678,22 +678,14 @@ msgid "Close"
 msgstr ""
 
 #: includes/modules/class-assets.php:141
-msgid "New notification"
-msgstr ""
-
-#: includes/modules/class-assets.php:142
-msgid "View Activity"
-msgstr ""
-
-#: includes/modules/class-assets.php:143
 msgid "Dismiss"
 msgstr ""
 
-#: includes/modules/class-assets.php:147
+#: includes/modules/class-assets.php:145
 msgid "just now"
 msgstr ""
 
-#: includes/modules/class-assets.php:148
+#: includes/modules/class-assets.php:146
 msgid "Someone favorited your activity"
 msgstr ""
 
@@ -890,11 +882,11 @@ msgstr ""
 msgid "Notification not found"
 msgstr ""
 
-#: includes/modules/class-realtime.php:142
+#: includes/modules/class-realtime.php:150
 msgid "Notification dismissed"
 msgstr ""
 
-#: includes/modules/class-realtime.php:147
+#: includes/modules/class-realtime.php:155
 msgid "Failed to dismiss notification"
 msgstr ""
 
@@ -952,40 +944,40 @@ msgstr ""
 msgid "Notify me when someone favorites my comments"
 msgstr ""
 
-#: templates/settings/notifications.php:23
-msgid "Choose how you want to receive favorite notifications:"
+#: templates/settings/notifications.php:25
+msgid "Choose which favorite notifications you get on the site."
 msgstr ""
 
 #. translators: %s: link to the member's Email settings tab.
-#: templates/settings/notifications.php:29
+#: templates/settings/notifications.php:30
 #, php-format
 msgid "Email alerts are set in your %s."
 msgstr ""
 
-#: templates/settings/notifications.php:30
+#: templates/settings/notifications.php:31
 msgid "Email settings"
 msgstr ""
 
-#: templates/settings/notifications.php:41
+#: templates/settings/notifications.php:42
 msgid "Notification Type"
 msgstr ""
 
-#: templates/settings/notifications.php:42
+#: templates/settings/notifications.php:43
 msgid "Web"
 msgstr ""
 
-#: templates/settings/notifications.php:44
+#: templates/settings/notifications.php:45
 msgid "Real-time"
 msgstr ""
 
 #. translators: %s: Notification type label.
-#: templates/settings/notifications.php:68
+#: templates/settings/notifications.php:69
 #, php-format
 msgid "Enable web notifications for %s"
 msgstr ""
 
 #. translators: %s: Notification type label.
-#: templates/settings/notifications.php:84
+#: templates/settings/notifications.php:85
 #, php-format
 msgid "Enable real-time notifications for %s"
 msgstr ""

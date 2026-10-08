@@ -315,7 +315,7 @@ class BPFN_Admin {
 		$stats     = $migration->get_migration_stats();
 
 		// Don't show if migration is complete.
-		if ( $stats['migrated'] || ! $stats['migration_pending'] ) {
+		if ( ! $stats['migration_pending'] ) {
 			delete_option( 'bpfn_show_migration_notice' );
 			return;
 		}
@@ -333,7 +333,7 @@ class BPFN_Admin {
 						array( 'a' => array( 'href' => array() ) )
 					),
 					(int) $stats['users_with_favorites'],
-					(int) $stats['meta_favorites_count'],
+					(int) $stats['missing_count'],
 					esc_url( $tools_url )
 				);
 				?>

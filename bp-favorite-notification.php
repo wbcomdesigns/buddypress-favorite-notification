@@ -107,7 +107,7 @@ class BP_Favorite_Notification {
 	 */
 	public function check_dependencies() {
 		// BuddyPress 12.0 added the URL API (bp_members_get_user_url()) used throughout.
-		if ( ! class_exists( 'BuddyPress' ) || version_compare( buddypress()->version, '12.0', '<' ) ) {
+		if ( ! class_exists( 'BuddyPress' ) || version_compare( bp_get_version(), '12.0', '<' ) ) {
 			add_action( 'admin_notices', array( $this, 'admin_notice_buddypress_required' ) );
 			return false;
 		}

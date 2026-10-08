@@ -254,8 +254,14 @@ Site owners now control every behaviour that costs them data or server load, and
 * Improve  - The Recent Favorites table on the Overview tab shows the actual date and time as well as how long ago.
 * Improve  - The Settings saved notice can be dismissed.
 * Improve  - Realtime popups use the WordPress Heartbeat API only, and load only for members who have them switched on.
+* Improve  - Realtime popups are compact cards that use your theme's surface colours, show at most two at a time (one on phones), and no longer cover the page when many favorites arrive together.
+* Improve  - On phones the who-favorited list opens as a bottom sheet sized to the list instead of a mostly empty full-screen panel.
+* Improve  - The admin settings sidebar no longer makes the plugin pages scroll sideways on phones.
 * Fix      - The plugin's member settings tab replaced the BuddyPress Email tab and its own Web and Real-time switches never appeared.
 * Fix      - Emails were not sent to members who had turned web notifications off.
+* Fix      - Closing a realtime popup did not mark the notification read, and opening it from the popup did not either.
+* Fix      - Favorited comments showed as "Activity not found" in the Overview trending tables.
+* Fix      - The Tools tab kept asking to migrate favorites that were already in the favorites table.
 * Fix      - Automatic cleanup could delete read notifications hours before the retention period ended when the database clock differed from WordPress.
 * Fix      - Favorite times on the Overview tab were shifted by the database server's time zone.
 * Fix      - Enabling automatic cleanup ran it straight away instead of a month later.

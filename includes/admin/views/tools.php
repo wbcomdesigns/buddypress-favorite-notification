@@ -24,6 +24,9 @@ $bpfn_auto_enabled = BPFN_Module_Admin::is_auto_cleanup_enabled();
 $bpfn_cleanup_days = BPFN_Module_Admin::get_retention_days();
 $bpfn_last_cleanup = get_option( 'bpfn_last_auto_cleanup', array() );
 $bpfn_next_cleanup = wp_next_scheduled( 'bpfn_auto_cleanup_notifications' );
+$bpfn_date_format  = get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
+// Stored as site-local current_time( 'mysql' ); mysql2date() formats it without a zone shift.
+$bpfn_last_date = isset( $bpfn_last_cleanup['date'] ) ? mysql2date( $bpfn_date_format, $bpfn_last_cleanup['date'] ) : '';
 ?>
 
 <?php if ( $bpfn_saved ) : ?>
@@ -39,7 +42,7 @@ $bpfn_next_cleanup = wp_next_scheduled( 'bpfn_auto_cleanup_notifications' );
 		<p class="bpfn-card__desc"><?php esc_html_e( 'Move legacy usermeta favorites into the optimized custom table.', 'buddypress-favorite-notification' ); ?></p>
 	</div>
 	<div class="bpfn-card__body">
-		<?php if ( $bpfn_mstats['migrated'] ) : ?>
+		<?php if ( $bpfn_mstats['migrated'] && ! $bpfn_mstats['migration_pending'] ) : ?>
 			<div class="bpfn-notice bpfn-notice--success">
 				<p><strong><?php esc_html_e( 'Migration completed.', 'buddypress-favorite-notification' ); ?></strong></p>
 			</div>
@@ -65,7 +68,7 @@ $bpfn_next_cleanup = wp_next_scheduled( 'bpfn_auto_cleanup_notifications' );
 					/* translators: 1: Number of users, 2: Number of favorites. */
 					esc_html__( 'Found %1$d users with %2$d favorites to migrate.', 'buddypress-favorite-notification' ),
 					(int) $bpfn_mstats['users_with_favorites'],
-					(int) $bpfn_mstats['meta_favorites_count']
+					(int) $bpfn_mstats['missing_count']
 				);
 				?>
 			</p>
@@ -143,7 +146,7 @@ $bpfn_next_cleanup = wp_next_scheduled( 'bpfn_auto_cleanup_notifications' );
 					printf(
 						/* translators: 1: Date, 2: Error message. */
 						esc_html__( '%1$s - %2$s. No notifications were removed.', 'buddypress-favorite-notification' ),
-						esc_html( $bpfn_last_cleanup['date'] ),
+						esc_html( $bpfn_last_date ),
 						esc_html( $bpfn_last_cleanup['error'] )
 					);
 					?>
@@ -157,7 +160,7 @@ $bpfn_next_cleanup = wp_next_scheduled( 'bpfn_auto_cleanup_notifications' );
 					printf(
 						/* translators: 1: Date, 2: Number deleted, 3: Number remaining. */
 						esc_html__( '%1$s — deleted %2$d notifications, %3$d remaining.', 'buddypress-favorite-notification' ),
-						isset( $bpfn_last_cleanup['date'] ) ? esc_html( $bpfn_last_cleanup['date'] ) : esc_html__( 'N/A', 'buddypress-favorite-notification' ),
+						'' !== $bpfn_last_date ? esc_html( $bpfn_last_date ) : esc_html__( 'N/A', 'buddypress-favorite-notification' ),
 						isset( $bpfn_last_cleanup['deleted'] ) ? (int) $bpfn_last_cleanup['deleted'] : 0,
 						isset( $bpfn_last_cleanup['remaining'] ) ? (int) $bpfn_last_cleanup['remaining'] : 0
 					);
@@ -173,7 +176,7 @@ $bpfn_next_cleanup = wp_next_scheduled( 'bpfn_auto_cleanup_notifications' );
 					printf(
 						/* translators: %s: Next cleanup date/time. */
 						esc_html__( 'Next automatic cleanup: %s', 'buddypress-favorite-notification' ),
-						esc_html( wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $bpfn_next_cleanup ) )
+						esc_html( wp_date( $bpfn_date_format, $bpfn_next_cleanup ) )
 					);
 					?>
 				</small>

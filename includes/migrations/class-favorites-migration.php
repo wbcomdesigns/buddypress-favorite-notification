@@ -332,12 +332,19 @@ class BPFN_Favorites_Migration {
 			}
 		}
 
+		// Pending means user meta holds favorites the table does not. Every favorite
+		// made while the plugin is active is synced to both, so comparing counts is
+		// enough (O(1) on big sites). Not gated on the "migrated" flag: favorites made
+		// while the plugin was deactivated still need migrating after that flag is set.
+		$missing = max( 0, $total_meta_favorites - (int) $favorites_in_table );
+
 		return array(
 			'users_with_favorites'  => (int) $users_with_meta,
 			'meta_favorites_count'  => $total_meta_favorites,
 			'table_favorites_count' => (int) $favorites_in_table,
+			'missing_count'         => $missing,
 			'migrated'              => $this->is_migrated(),
-			'migration_pending'     => ! $this->is_migrated() && $total_meta_favorites > 0,
+			'migration_pending'     => $missing > 0,
 		);
 	}
 
