@@ -225,15 +225,13 @@
                         // Update progress bar
                         $('.bpfn-progress-fill').css('width', progress.percent + '%');
                         $('.bpfn-progress-text').text(
-                            progress.percent + '% (' + progress.users_processed + '/' + progress.total_users + ' ' + str('users', 'users') + ')'
+                            progress.percent + '% - ' + progress.progress_text
                         );
 
                         if (progress.status === 'completed') {
                             // Migration complete
                             $result.html('<div class="notice notice-success inline"><p>' +
-                                str('migration_complete', 'Migration completed! Processed %1$s users and added %2$s favorites.')
-                                    .replace('%1$s', progress.users_processed)
-                                    .replace('%2$s', progress.favorites_added) +
+                                progress.message +
                             '</p></div>');
                             setTimeout(function() {
                                 location.reload();

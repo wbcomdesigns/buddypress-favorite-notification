@@ -52,12 +52,7 @@ $bpfn_last_date = isset( $bpfn_last_cleanup['date'] ) ? mysql2date( $bpfn_date_f
 				?>
 				<p>
 					<?php
-					printf(
-						/* translators: 1: Number of users, 2: Number of favorites. */
-						esc_html__( 'Processed %1$d users and migrated %2$d favorites.', 'buddypress-favorite-notification' ),
-						isset( $bpfn_log['users_processed'] ) ? (int) $bpfn_log['users_processed'] : 0,
-						isset( $bpfn_log['favorites_added'] ) ? (int) $bpfn_log['favorites_added'] : 0
-					);
+					echo esc_html( BPFN_Favorites_Migration::completion_message( isset( $bpfn_log['favorites_added'] ) ? (int) $bpfn_log['favorites_added'] : 0 ) );
 					?>
 				</p>
 			<?php endif; ?>
@@ -65,9 +60,8 @@ $bpfn_last_date = isset( $bpfn_last_cleanup['date'] ) ? mysql2date( $bpfn_date_f
 			<p>
 				<?php
 				printf(
-					/* translators: 1: Number of users, 2: Number of favorites. */
-					esc_html__( 'Found %1$d users with %2$d favorites to migrate.', 'buddypress-favorite-notification' ),
-					(int) $bpfn_mstats['users_with_favorites'],
+					/* translators: %d: number of favorites not yet in the favorites table. */
+					esc_html( _n( 'Found %d favorite to migrate.', 'Found %d favorites to migrate.', (int) $bpfn_mstats['missing_count'], 'buddypress-favorite-notification' ) ),
 					(int) $bpfn_mstats['missing_count']
 				);
 				?>
@@ -120,7 +114,7 @@ $bpfn_last_date = isset( $bpfn_last_cleanup['date'] ) ? mysql2date( $bpfn_date_f
 									<?php
 									printf(
 										/* translators: %d: number of days. */
-										esc_html__( '%d days', 'buddypress-favorite-notification' ),
+										esc_html( _n( '%d day', '%d days', (int) $bpfn_days_opt, 'buddypress-favorite-notification' ) ),
 										(int) $bpfn_days_opt
 									);
 									?>
@@ -157,12 +151,20 @@ $bpfn_last_date = isset( $bpfn_last_cleanup['date'] ) ? mysql2date( $bpfn_date_f
 				<p>
 					<strong><?php esc_html_e( 'Last automatic cleanup:', 'buddypress-favorite-notification' ); ?></strong><br>
 					<?php
+					$bpfn_deleted   = isset( $bpfn_last_cleanup['deleted'] ) ? (int) $bpfn_last_cleanup['deleted'] : 0;
+					$bpfn_remaining = isset( $bpfn_last_cleanup['remaining'] ) ? (int) $bpfn_last_cleanup['remaining'] : 0;
+					echo esc_html( '' !== $bpfn_last_date ? $bpfn_last_date : __( 'N/A', 'buddypress-favorite-notification' ) ) . '<br>';
+					// Two counts, two full sentences, each with its own plural form.
 					printf(
-						/* translators: 1: Date, 2: Number deleted, 3: Number remaining. */
-						esc_html__( '%1$s — deleted %2$d notifications, %3$d remaining.', 'buddypress-favorite-notification' ),
-						'' !== $bpfn_last_date ? esc_html( $bpfn_last_date ) : esc_html__( 'N/A', 'buddypress-favorite-notification' ),
-						isset( $bpfn_last_cleanup['deleted'] ) ? (int) $bpfn_last_cleanup['deleted'] : 0,
-						isset( $bpfn_last_cleanup['remaining'] ) ? (int) $bpfn_last_cleanup['remaining'] : 0
+						/* translators: %d: number of notifications deleted. */
+						esc_html( _n( 'Deleted %d notification.', 'Deleted %d notifications.', $bpfn_deleted, 'buddypress-favorite-notification' ) ),
+						(int) $bpfn_deleted
+					);
+					echo ' ';
+					printf(
+						/* translators: %d: number of favorite notifications still stored. */
+						esc_html( _n( '%d notification remains.', '%d notifications remain.', $bpfn_remaining, 'buddypress-favorite-notification' ) ),
+						(int) $bpfn_remaining
 					);
 					?>
 				</p>

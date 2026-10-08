@@ -261,7 +261,7 @@ class BPFN_Module_Favorite_Display {
 
 		if ( 2 === $total && isset( $users[0], $users[1] ) ) {
 			return sprintf(
-				/* translators: 1: Link to the first person who favorited, 2: Link to the second person who favorited. */
+				/* translators: 1: one or more linked member names, 2: the last linked name or an "N others" link. */
 				__( '%1$s and %2$s', 'buddypress-favorite-notification' ),
 				sprintf(
 					'<a href="%s" class="bpfn-user-link">%s</a>',
@@ -314,7 +314,7 @@ class BPFN_Module_Favorite_Display {
 			);
 
 			return sprintf(
-				/* translators: 1: Comma-separated links to the people who favorited, 2: Link reading "N others". */
+				/* translators: 1: one or more linked member names, 2: the last linked name or an "N others" link. */
 				__( '%1$s and %2$s', 'buddypress-favorite-notification' ),
 				implode( ', ', $names ),
 				$others_link
@@ -324,7 +324,7 @@ class BPFN_Module_Favorite_Display {
 		$last = array_pop( $names );
 		if ( ! empty( $names ) ) {
 			return sprintf(
-				/* translators: 1: Comma-separated links to the people who favorited, 2: Link to the last person who favorited. */
+				/* translators: 1: one or more linked member names, 2: the last linked name or an "N others" link. */
 				__( '%1$s and %2$s', 'buddypress-favorite-notification' ),
 				implode( ', ', $names ),
 				$last

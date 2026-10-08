@@ -147,7 +147,7 @@ $bpfn_mode_help = array(
 								<option value="<?php echo esc_attr( (string) $bpfn_secs ); ?>" <?php selected( $bpfn_realtime_secs, $bpfn_secs ); ?>>
 									<?php
 									/* translators: %d: number of seconds. */
-									printf( esc_html__( '%d seconds', 'buddypress-favorite-notification' ), (int) $bpfn_secs );
+									printf( esc_html( _n( '%d second', '%d seconds', (int) $bpfn_secs, 'buddypress-favorite-notification' ) ), (int) $bpfn_secs );
 									?>
 								</option>
 							<?php endforeach; ?>

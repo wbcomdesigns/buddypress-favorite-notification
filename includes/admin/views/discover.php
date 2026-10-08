@@ -90,8 +90,18 @@ $bpfn_ecosystem = array(
 
 <div class="bpfn-card">
 	<div class="bpfn-card__head">
-		<p class="bpfn-card__title"><?php esc_html_e( 'More Free Tools from Wbcom Designs', 'buddypress-favorite-notification' ); ?></p>
-		<p class="bpfn-card__desc"><?php esc_html_e( 'Favorite Notification keeps members coming back when their activity gets liked. These free Wbcom Designs plugins give them more worth coming back to: the theme and network itself, forums, media, events, gamification, directories, jobs, courses, and services.', 'buddypress-favorite-notification' ); ?></p>
+		<p class="bpfn-card__title">
+		<?php
+		/* translators: %s: company name "Wbcom Designs". */
+		echo esc_html( sprintf( __( 'More Free Tools from %s', 'buddypress-favorite-notification' ), 'Wbcom Designs' ) );
+		?>
+		</p>
+		<p class="bpfn-card__desc">
+		<?php
+		/* translators: 1: plugin name "Favorite Notification", 2: company name "Wbcom Designs". */
+		echo esc_html( sprintf( __( '%1$s keeps members coming back when their activity gets liked. These free %2$s plugins give them more worth coming back to: the theme and network itself, forums, media, events, gamification, directories, jobs, courses, and services.', 'buddypress-favorite-notification' ), 'Favorite Notification', 'Wbcom Designs' ) );
+		?>
+		</p>
 	</div>
 	<div class="bpfn-card__body">
 		<div class="bpfn-discover-grid">

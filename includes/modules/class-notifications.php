@@ -21,23 +21,37 @@ if ( ! defined( 'ABSPATH' ) ) {
 class BPFN_Module_Notifications {
 
 	/**
-	 * Notification types, keyed by the preference type they belong to.
+	 * Types added with register_notification_type(), keyed like get_types().
 	 *
 	 * @var array
 	 */
-	private $notification_types = array();
+	private $custom_types = array();
 
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->notification_types = array(
+		add_action( 'bp_activity_add_user_favorite', array( $this, 'add_favorite_notification' ), 10, 2 );
+		add_action( 'bp_activity_remove_user_favorite', array( $this, 'remove_favorite_notification' ), 10, 2 );
+	}
+
+	/**
+	 * Notification types, keyed by the preference type they belong to.
+	 *
+	 * Built on each call, not in the constructor: labels must be translated in
+	 * the locale active when the notification is rendered (BuddyPress switches
+	 * locale mid-request), not the one active when the module loaded.
+	 *
+	 * @return array
+	 */
+	private function get_types() {
+		return $this->custom_types + array(
 			'activity_post'    => array(
 				'labels'        => array(
 					/* translators: %s: User display name. */
 					'single'   => __( '%s favorited your activity', 'buddypress-favorite-notification' ),
 					/* translators: %d: Number of people. */
-					'multiple' => __( '%d people favorited your activity', 'buddypress-favorite-notification' ),
+					'multiple' => _n_noop( '%d person favorited your activity', '%d people favorited your activity', 'buddypress-favorite-notification' ),
 				),
 				'action_prefix' => 'fav_notify',
 				'css_type'      => 'favorite',
@@ -47,15 +61,12 @@ class BPFN_Module_Notifications {
 					/* translators: %s: User display name. */
 					'single'   => __( '%s favorited your comment', 'buddypress-favorite-notification' ),
 					/* translators: %d: Number of people. */
-					'multiple' => __( '%d people favorited your comment', 'buddypress-favorite-notification' ),
+					'multiple' => _n_noop( '%d person favorited your comment', '%d people favorited your comment', 'buddypress-favorite-notification' ),
 				),
 				'action_prefix' => 'fav_comment_notify',
 				'css_type'      => 'favorite_comment',
 			),
 		);
-
-		add_action( 'bp_activity_add_user_favorite', array( $this, 'add_favorite_notification' ), 10, 2 );
-		add_action( 'bp_activity_remove_user_favorite', array( $this, 'remove_favorite_notification' ), 10, 2 );
 	}
 
 	/**
@@ -85,7 +96,8 @@ class BPFN_Module_Notifications {
 			return;
 		}
 
-		$prefix          = isset( $this->notification_types[ $type ] ) ? $this->notification_types[ $type ]['action_prefix'] : 'fav_notify';
+		$types           = $this->get_types();
+		$prefix          = isset( $types[ $type ] ) ? $types[ $type ]['action_prefix'] : 'fav_notify';
 		$notification_id = bp_notifications_add_notification(
 			array(
 				'user_id'           => $activity->user_id,
@@ -147,13 +159,15 @@ class BPFN_Module_Notifications {
 		}
 
 		$type   = self::get_type_for_action( $action );
-		$config = $this->notification_types[ $type ];
+		$config = $this->get_types()[ $type ];
 		$name   = bp_core_get_user_displayname( $secondary_item_id );
 		$name   = $name ? $name : __( 'Someone', 'buddypress-favorite-notification' );
 
-		$text = $total_items > 1
-			? sprintf( $config['labels']['multiple'], $total_items )
-			: sprintf( $config['labels']['single'], $name );
+		$multiple = $config['labels']['multiple'];
+		if ( is_array( $multiple ) ) { // _n_noop() pair; custom types may pass a plain string.
+			$multiple = translate_nooped_plural( $multiple, $total_items, 'buddypress-favorite-notification' );
+		}
+		$text = $total_items > 1 ? sprintf( $multiple, $total_items ) : sprintf( $config['labels']['single'], $name );
 
 		// `rid` lets BuddyPress core mark this notification read when the
 		// recipient opens the activity (bp_activity_screen_single_activity_permalink).
@@ -199,7 +213,7 @@ class BPFN_Module_Notifications {
 	 * @param array  $args The notification type configuration.
 	 */
 	public function register_notification_type( $type, $args ) {
-		$this->notification_types[ $type ] = wp_parse_args(
+		$this->custom_types[ $type ] = wp_parse_args(
 			$args,
 			array(
 				'labels'        => array(

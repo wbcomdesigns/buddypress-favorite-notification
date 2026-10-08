@@ -178,7 +178,7 @@ if ( ! empty( $bpfn_user_ids ) ) {
 			if ( $bpfn_stats['favorites_last_7_days'] > 0 ) {
 				echo esc_html(
 					sprintf(
-						/* translators: %s: Number of new favorites. */
+						/* translators: %s: how many were added in the last 7 days. */
 						__( '+%s in last 7 days', 'buddypress-favorite-notification' ),
 						number_format_i18n( $bpfn_stats['favorites_last_7_days'] )
 					)
@@ -197,7 +197,7 @@ if ( ! empty( $bpfn_user_ids ) ) {
 			if ( $bpfn_stats['notifications_last_7_days'] > 0 ) {
 				echo esc_html(
 					sprintf(
-						/* translators: %s: Number of new notifications. */
+						/* translators: %s: how many were added in the last 7 days. */
 						__( '+%s in last 7 days', 'buddypress-favorite-notification' ),
 						number_format_i18n( $bpfn_stats['notifications_last_7_days'] )
 					)
@@ -279,7 +279,7 @@ if ( ! empty( $bpfn_user_ids ) ) {
 								<?php
 								echo esc_html(
 									sprintf(
-										/* translators: %s: human-readable time difference. */
+										/* translators: %s: human-readable time difference, e.g. "5 mins". */
 										__( '%s ago', 'buddypress-favorite-notification' ),
 										human_time_diff( $bpfn_fav_ts )
 									)

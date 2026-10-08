@@ -121,8 +121,8 @@ class BPFN_Admin {
 		// First Wbcom plugin to load creates the shared WB Plugins hub.
 		if ( empty( $GLOBALS['admin_page_hooks']['wbcomplugins'] ) ) {
 			add_menu_page(
-				esc_html__( 'WB Plugins', 'buddypress-favorite-notification' ),
-				esc_html__( 'WB Plugins', 'buddypress-favorite-notification' ),
+				'WB Plugins', // Brand name: never translated.
+				'WB Plugins',
 				$cap,
 				'wbcomplugins',
 				array( $this, 'render_hub' ),
@@ -192,20 +192,12 @@ class BPFN_Admin {
 				'nonce'    => wp_create_nonce( 'bpfn-admin-nonce' ),
 				'strings'  => array(
 					'clearing'              => __( 'Clearing...', 'buddypress-favorite-notification' ),
-					/* translators: %s: Number of notifications cleared. */
-					'cleared'               => __( 'Successfully cleared %s old notifications.', 'buddypress-favorite-notification' ),
-					/* translators: %s: Number of notifications remaining. */
-					'remaining'             => __( '%s notifications remaining', 'buddypress-favorite-notification' ),
 					'clear_failed'          => __( 'Failed to clear notifications.', 'buddypress-favorite-notification' ),
 					'migrating'             => __( 'Starting migration...', 'buddypress-favorite-notification' ),
 					'migrate_failed'        => __( 'Migration failed.', 'buddypress-favorite-notification' ),
-					/* translators: 1: Number of users processed, 2: Number of favorites added. */
-					'migration_complete'    => __( 'Migration completed! Processed %1$s users and added %2$s favorites.', 'buddypress-favorite-notification' ),
 					/* translators: %s: Migration status keyword (e.g. failed, cancelled). */
 					'migration_status'      => __( 'Migration %s', 'buddypress-favorite-notification' ),
-					'users'                 => __( 'users', 'buddypress-favorite-notification' ),
 					'error_generic'         => __( 'An error occurred:', 'buddypress-favorite-notification' ),
-					'dismiss_notice'        => __( 'Dismiss this notice.', 'buddypress-favorite-notification' ),
 					'confirm_continue'      => __( 'Continue', 'buddypress-favorite-notification' ),
 					'confirm_cancel'        => __( 'Cancel', 'buddypress-favorite-notification' ),
 					'confirm_danger'        => __( 'Are you sure? This cannot be undone.', 'buddypress-favorite-notification' ),
@@ -324,15 +316,14 @@ class BPFN_Admin {
 		?>
 		<div class="notice notice-info is-dismissible" data-dismissible="bpfn-migration-notice">
 			<p>
-				<strong><?php esc_html_e( 'BuddyPress Favorite Notification:', 'buddypress-favorite-notification' ); ?></strong>
+				<strong>BuddyPress Favorite Notification:</strong>
 				<?php
 				printf(
 					wp_kses(
-						/* translators: 1: Number of users, 2: Number of favorites, 3: Tools page link. */
-						__( 'Found %1$d users with %2$d favorites that need to be migrated to the new optimized system. <a href="%3$s">Run migration now</a>', 'buddypress-favorite-notification' ),
+						/* translators: 1: number of favorites not yet in the favorites table, 2: Tools page link. */
+						_n( '%1$d favorite needs to be moved to the optimized favorites table. <a href="%2$s">Run migration now</a>', '%1$d favorites need to be moved to the optimized favorites table. <a href="%2$s">Run migration now</a>', (int) $stats['missing_count'], 'buddypress-favorite-notification' ),
 						array( 'a' => array( 'href' => array() ) )
 					),
-					(int) $stats['users_with_favorites'],
 					(int) $stats['missing_count'],
 					esc_url( $tools_url )
 				);

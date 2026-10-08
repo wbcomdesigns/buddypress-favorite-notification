@@ -163,12 +163,7 @@ class BPFN_Favorites_Migration {
 	private function complete_migration( $status ) {
 		$status['status']   = 'completed';
 		$status['end_time'] = current_time( 'mysql' );
-		$status['message']  = sprintf(
-			/* translators: 1: Number of users, 2: Number of favorites. */
-			esc_html__( 'Migration complete! Processed %1$d users and added %2$d favorites.', 'buddypress-favorite-notification' ),
-			$status['users_processed'],
-			$status['favorites_added']
-		);
+		$status['message']  = self::completion_message( (int) $status['favorites_added'] );
 
 		// Save final log.
 		update_option( 'bpfn_migration_log', $status );
@@ -263,12 +258,7 @@ class BPFN_Favorites_Migration {
 		}
 
 		$log['end_time'] = current_time( 'mysql' );
-		$log['message']  = sprintf(
-			/* translators: 1: Number of users, 2: Number of favorites. */
-			esc_html__( 'Migration complete! Processed %1$d users and added %2$d favorites.', 'buddypress-favorite-notification' ),
-			$log['users_processed'],
-			$log['favorites_added']
-		);
+		$log['message']  = self::completion_message( (int) $log['favorites_added'] );
 
 		// Save migration log.
 		update_option( 'bpfn_migration_log', $log );
@@ -349,6 +339,20 @@ class BPFN_Favorites_Migration {
 	}
 
 	/**
+	 * The one "migration finished" message (AJAX result, background status, Tools tab).
+	 *
+	 * @param int $favorites_added Favorites copied into the table.
+	 * @return string
+	 */
+	public static function completion_message( $favorites_added ) {
+		return sprintf(
+			/* translators: %d: number of favorites copied into the favorites table. */
+			_n( 'Migration complete. %d favorite was added.', 'Migration complete. %d favorites were added.', $favorites_added, 'buddypress-favorite-notification' ),
+			$favorites_added
+		);
+	}
+
+	/**
 	 * Get migration progress (for background processing).
 	 *
 	 * @return array Progress data.
@@ -377,6 +381,14 @@ class BPFN_Favorites_Migration {
 			'total_users'     => $total_users,
 			'favorites_added' => isset( $status['favorites_added'] ) ? $status['favorites_added'] : 0,
 			'errors'          => isset( $status['errors'] ) ? count( $status['errors'] ) : 0,
+			// Built here so the admin script never assembles English or plurals itself.
+			'progress_text'   => sprintf(
+				/* translators: 1: members processed so far, 2: total members with favorites. */
+				_n( '%1$d of %2$d member processed', '%1$d of %2$d members processed', $total_users, 'buddypress-favorite-notification' ),
+				$processed,
+				$total_users
+			),
+			'message'         => self::completion_message( isset( $status['favorites_added'] ) ? (int) $status['favorites_added'] : 0 ),
 		);
 	}
 
