@@ -298,14 +298,6 @@ class BPFN_Favorites_Migration {
 	}
 
 	/**
-	 * Reset migration status (for testing).
-	 */
-	public function reset_migration() {
-		delete_option( 'bpfn_favorites_migrated' );
-		delete_option( 'bpfn_migration_log' );
-	}
-
-	/**
 	 * Get migration statistics.
 	 *
 	 * @return array Migration stats.
@@ -386,25 +378,5 @@ class BPFN_Favorites_Migration {
 	 */
 	public function register_hooks() {
 		add_action( 'bpfn_process_migration_batch', array( $this, 'process_migration_batch' ) );
-	}
-
-	/**
-	 * Cancel ongoing migration.
-	 *
-	 * @return array Cancellation result.
-	 */
-	public function cancel_migration() {
-		$status                 = get_option( 'bpfn_migration_status', array() );
-		$status['status']       = 'cancelled';
-		$status['cancelled_at'] = current_time( 'mysql' );
-		update_option( 'bpfn_migration_status', $status );
-
-		// Clear scheduled events.
-		wp_clear_scheduled_hook( 'bpfn_process_migration_batch' );
-
-		return array(
-			'success' => true,
-			'message' => esc_html__( 'Migration cancelled.', 'buddypress-favorite-notification' ),
-		);
 	}
 }

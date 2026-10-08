@@ -3,7 +3,7 @@
  * Plugin Name: BuddyPress Favorite Notification
  * Plugin URI: http://www.wbcomdesigns.com/
  * Description: Adds notification for the activity Favorite for the activity user.
- * Version: 2.1.0
+ * Version: 2.2.0
  * Requires at least: 6.5
  * Requires PHP: 8.1
  * Requires Plugins: buddypress
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants.
-define( 'BPFN_VERSION', '2.1.0' );
+define( 'BPFN_VERSION', '2.2.0' );
 define( 'BPFN_PLUGIN_FILE', __FILE__ );
 define( 'BPFN_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'BPFN_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
@@ -92,9 +92,6 @@ class BP_Favorite_Notification {
 		// Check dependencies.
 		add_action( 'plugins_loaded', array( $this, 'check_dependencies' ), 5 );
 
-		// Initialize plugin.
-		add_action( 'bp_loaded', array( $this, 'init' ), 10 );
-
 		// Load textdomain.
 		// Textdomain is auto-loaded by WordPress since 4.6 for plugins hosted on .org.
 
@@ -109,13 +106,17 @@ class BP_Favorite_Notification {
 	 * @return bool True if dependencies are met, false otherwise.
 	 */
 	public function check_dependencies() {
-		if ( ! class_exists( 'BuddyPress' ) ) {
+		// BuddyPress 12.0 added the URL API (bp_members_get_user_url()) used throughout.
+		if ( ! class_exists( 'BuddyPress' ) || version_compare( buddypress()->version, '12.0', '<' ) ) {
 			add_action( 'admin_notices', array( $this, 'admin_notice_buddypress_required' ) );
 			return false;
 		}
 
 		// Load core files.
 		$this->load_dependencies();
+
+		// bp_loaded fires on plugins_loaded 10, after this check (priority 5).
+		add_action( 'bp_loaded', array( $this, 'init' ), 10 );
 
 		return true;
 	}
@@ -160,6 +161,9 @@ class BP_Favorite_Notification {
 	public function init() {
 		// Load modules - let compat layer handle component setup.
 		add_action( 'bp_init', array( $this, 'load_modules' ), 5 );
+
+		// After BuddyPress registers its email taxonomy (bp_init, 2).
+		add_action( 'bp_init', array( $this, 'maybe_upgrade' ), 20 );
 
 		// Initialize migration hooks.
 		$this->init_migration_hooks();
@@ -208,23 +212,6 @@ class BP_Favorite_Notification {
 	}
 
 	/**
-	 * Notification callback.
-	 *
-	 * @param string $action            The notification action.
-	 * @param int    $item_id           The item ID.
-	 * @param int    $secondary_item_id The secondary item ID.
-	 * @param int    $total_items       The total number of items.
-	 * @param string $format            The notification format.
-	 * @return string|false The formatted notification or false.
-	 */
-	public function notification_callback( $action, $item_id, $secondary_item_id, $total_items, $format = 'string' ) {
-		if ( isset( $this->modules['notifications'] ) ) {
-			return $this->modules['notifications']->format_notification( $action, $item_id, $secondary_item_id, $total_items, $format );
-		}
-		return false;
-	}
-
-	/**
 	 * Admin notice for BuddyPress requirement.
 	 */
 	public function admin_notice_buddypress_required() {
@@ -234,7 +221,7 @@ class BP_Favorite_Notification {
 			<?php
 			printf(
 				/* translators: 1: Plugin name, 2: BuddyPress. */
-				esc_html__( '%1$s is ineffective now as it requires %2$s to be installed and active.', 'buddypress-favorite-notification' ),
+				esc_html__( '%1$s is inactive because it requires %2$s 12.0 or later to be installed and active.', 'buddypress-favorite-notification' ),
 				'<strong>' . 'BuddyPress Favorite Notification' . '</strong>',
 				'<strong>' . 'BuddyPress' . '</strong>'
 			);
@@ -244,13 +231,12 @@ class BP_Favorite_Notification {
 		<?php
 	}
 
-
 	/**
 	 * Plugin activation.
 	 */
 	public function activate() {
 		$this->create_tables();
-		update_option( 'bpfn_version', BPFN_VERSION );
+		$this->maybe_upgrade();
 
 		// Check if migration is needed.
 		require_once BPFN_INCLUDES_PATH . 'migrations/class-favorites-migration.php';
@@ -266,6 +252,33 @@ class BP_Favorite_Notification {
 		set_transient( 'bpfn_activation_redirect', 1, 30 );
 
 		do_action( 'bpfn_activate' );
+	}
+
+	/**
+	 * Run once per version change: fresh install, upgrade, or reactivation of a newer copy.
+	 *
+	 * Sites that ran a version before 2.2.0 keep the behaviour they had: automatic
+	 * cleanup and real-time toasts were on by default then, so those options are
+	 * written as 'yes' unless the owner already saved a choice. A fresh install
+	 * leaves them unset, which reads as off.
+	 */
+	public function maybe_upgrade() {
+		$installed = get_option( 'bpfn_version' );
+		if ( $installed && version_compare( $installed, BPFN_VERSION, '>=' ) ) {
+			return;
+		}
+
+		if ( $installed && version_compare( $installed, '2.2.0', '<' ) ) {
+			add_option( 'bpfn_auto_cleanup_enabled', 'yes' );
+			add_option( 'bpfn_realtime_enabled', 'yes' );
+		}
+
+		// activate() runs after plugins_loaded, so check_dependencies() never loaded these.
+		require_once BPFN_INCLUDES_PATH . 'functions/core-functions.php';
+		require_once BPFN_INCLUDES_PATH . 'modules/class-email.php';
+		BPFN_Module_Email::install();
+
+		update_option( 'bpfn_version', BPFN_VERSION );
 	}
 
 	/**

@@ -6,8 +6,9 @@ Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 8.1
 Tested with BuddyPress: 14.5.2
+Requires BuddyPress: 12.0
 Requires Plugins: buddypress
-Stable tag: 2.1.0
+Stable tag: 2.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: buddypress-favorite-notification
@@ -25,8 +26,8 @@ It also adds a Facebook-style "who liked this" line under each activity, and giv
 
 **Notifications when content is appreciated**
 * A BuddyPress notification to the author whenever their activity or comment is favorited.
-* Realtime on-screen popups powered by the WordPress Heartbeat API, with an AJAX fallback, so a member sees the favorite as it happens.
-* HTML email alerts with separate templates for favorited activities and favorited comments.
+* Optional realtime on-screen popups powered by the WordPress Heartbeat API, so a member sees the favorite as it happens. Switched on by the site owner on the Display tab, checking every 30 or 60 seconds.
+* Email alerts for favorited activities and favorited comments, sent through BuddyPress Emails. Edit the wording in Dashboard > Emails like any other BuddyPress email, and every email carries a working unsubscribe link.
 * No notification when you favorite your own content.
 * Works with all BuddyPress activity types, including group activities, blog posts, and comments.
 
@@ -43,7 +44,7 @@ It also adds a Facebook-style "who liked this" line under each activity, and giv
 * Trending activities over the last 7 days and the last 30 days, top 10 each, with rank, content preview, author, and a direct link.
 
 **Tools and maintenance**
-* Automatic monthly cleanup of old read notifications, on by default, with a retention period of 7, 15, 30, 60, or 90 days.
+* Optional automatic monthly cleanup of old read notifications, with a retention period of 7, 15, 30, 60, or 90 days. Off until the site owner turns it on.
 * A manual cleanup button, the last cleanup result, and the next scheduled run.
 * Chunked background migration of existing favorites, processed in batches so large sites do not time out, with progress tracking and a log.
 
@@ -52,13 +53,13 @@ It also adds a Facebook-style "who liked this" line under each activity, and giv
 * Object caching on the favorite counts and the who-liked queries.
 
 **Member preferences**
-* Members get a **Settings > Favorite Notifications** screen in their BuddyPress profile where they can turn favorite notifications on or off per activity type (posts, comments) and per channel (web, email, realtime).
-* Turning a channel off stops that notification. Notifications are on by default, so members only visit this screen if they want less.
+* Members choose favorite emails in their BuddyPress **Settings > Email** tab, next to every other BuddyPress email.
+* A **Settings > Favorite Notifications** tab turns web notifications and realtime popups on or off per activity type (posts, comments).
+* Everything is on by default, so members only visit these screens if they want less.
 
 **Developer friendly**
-* Action and filter hooks throughout, including `bpfn_notification_string`, `bpfn_email_from_name`, and `bpfn_email_from_email`.
+* Action and filter hooks throughout, including `bpfn_notification_string` and `bpfn_email_tokens`.
 * Display hooks for full control of the favorite line: `bpfn_favorite_icon_html`, `bpfn_favorite_display_format`, `bpfn_favorite_display_html`, `bpfn_display_modes`, and `bpfn_favorite_icons`.
-* Email templates can be overridden from your theme.
 * Modular architecture with separate notification, email, realtime, settings, admin, and favorite display modules.
 * Translation ready with an included POT file, and RTL support.
 
@@ -167,7 +168,7 @@ Yes. BuddyPress must be installed and active. The plugin extends the BuddyPress 
 
 = Do I need to configure anything? =
 
-No. There is no settings page. Once the plugin is active, authors are notified when their activity or comment is favorited. The one admin page, **WB Plugins > Favorite Notifications**, is for statistics and maintenance: an Overview tab, a Tools tab, and a Discover tab.
+No. Once the plugin is active, authors are notified and emailed when their activity or comment is favorited. The admin page, **WB Plugins > Favorite Notifications**, has an Overview tab for statistics, a Display tab for the favorite line and realtime popups, a Tools tab for cleanup and migration, and a Discover tab.
 
 = Will this work with my theme? =
 
@@ -175,7 +176,7 @@ Yes. The plugin works with any theme that supports BuddyPress, and follows Buddy
 
 = How do realtime notifications work? =
 
-Realtime popups use the WordPress Heartbeat API, which checks for new notifications every 15 seconds, with an AJAX fallback if Heartbeat is unavailable. When a new favorite is detected, a popup appears on screen without a page refresh.
+Turn them on in the **Real-time Popups** card on the Display tab. They use the WordPress Heartbeat API, which checks for new notifications every 30 or 60 seconds while a page is open. When a new favorite is detected, a popup appears on screen without a page refresh. Popups are off on new installs, because every logged-in member's browser makes a request at that interval.
 
 = Will I receive notifications for my own favorites? =
 
@@ -187,15 +188,11 @@ Yes, when several members favorite the same activity. Those favorites collapse i
 
 = Can members control their notifications? =
 
-Yes. Members have a **Settings > Favorite Notifications** screen in their BuddyPress profile with a switch for each activity type (posts, comments) and each channel (web, email, realtime). Notifications are on by default; turning one off stops it.
+Yes. Emails are set in the BuddyPress **Settings > Email** tab, which has a row for favorited activities and one for favorited comments. Web notifications and realtime popups are set in **Settings > Favorite Notifications**. Everything is on by default; turning one off stops it.
 
-= Can I customize email templates? =
+= Can I customize the emails? =
 
-Yes. Copy the templates from the plugin's `templates/emails/` directory into a `buddypress/bp-favorite-notification/emails/` directory in your theme, and your copies are used instead.
-
-= Can I change the email sender name and address? =
-
-Yes, with the `bpfn_email_from_name` and `bpfn_email_from_email` filters. There is no admin screen for this; by default emails are sent from your site name and your site's admin email address.
+Yes. Go to **Dashboard > Emails** and edit "favorited your update" or "favorited your comment" like any other BuddyPress email. They use your BuddyPress email design and sender settings, and your edits are kept when the plugin updates.
 
 = Who can see the "who liked this" display? =
 
@@ -203,11 +200,11 @@ Logged-in members only. Logged-out visitors do not see the favorite count line u
 
 = How many members does the "View all" modal show? =
 
-Up to 50, with a "+N more" count for anything beyond that. Developers can change the cap with the `bpfn_who_favorited_limit` filter.
+Everyone who favorited the activity, a page at a time with a Load more control. Developers can set the page size with `bpfn_favorites_modal_per_page`, or a maximum with `bpfn_who_favorited_limit`.
 
 = Will old notifications pile up in my database? =
 
-No. An automatic cleanup runs monthly and removes old read notifications. Set the retention period to 7, 15, 30, 60, or 90 days on the Tools tab, where you can also disable the cleanup, run it on demand, and see the next scheduled run.
+Only if you want them to. Turn on automatic cleanup on the Tools tab and it removes read notifications older than the retention period you choose (7, 15, 30, 60, or 90 days) once a month, starting a month after you enable it. You can also run it on demand and see the next scheduled run. Unread notifications are never removed.
 
 = I have an existing site with lots of favorites. Do I need to do anything? =
 
@@ -223,7 +220,7 @@ Yes. The plugin is fully internationalized and ships a POT file in the `language
 
 = Can developers extend this plugin? =
 
-Yes. The plugin has a modular architecture and provides action and filter hooks throughout, including `bpfn_notification_string`, `bpfn_who_favorited_limit`, `bpfn_admin_tabs`, `bpfn_email_from_name`, and `bpfn_email_from_email`.
+Yes. The plugin has a modular architecture and provides action and filter hooks throughout, including `bpfn_notification_string`, `bpfn_who_favorited_limit`, `bpfn_admin_tabs`, and `bpfn_email_tokens`.
 
 = Where can I get support? =
 
@@ -244,6 +241,31 @@ No. The plugin does not collect, store, or share personal data outside your Word
 5. Discover - more free tools from Wbcom Designs.
 
 == Changelog ==
+
+= 2.2.0 - October 2026 =
+
+Site owners now control every behaviour that costs them data or server load, and emails move into BuddyPress Emails.
+
+* New      - Emails are sent through BuddyPress Emails, so you can edit them in Dashboard > Emails and members get a working unsubscribe link.
+* New      - Added a Real-time Popups setting on the Display tab to switch popups on or off and check every 30 or 60 seconds.
+* New      - Members choose favorite emails in the BuddyPress Settings > Email tab, with separate rows for activities and comments.
+* New      - The plugin now redirects to its dashboard after activation.
+* Improve  - Automatic cleanup and realtime popups are off on new installs. Sites updating from an earlier version keep their current behaviour.
+* Improve  - The Recent Favorites table on the Overview tab shows the actual date and time as well as how long ago.
+* Improve  - The Settings saved notice can be dismissed.
+* Improve  - Realtime popups use the WordPress Heartbeat API only, and load only for members who have them switched on.
+* Fix      - The plugin's member settings tab replaced the BuddyPress Email tab and its own Web and Real-time switches never appeared.
+* Fix      - Emails were not sent to members who had turned web notifications off.
+* Fix      - Automatic cleanup could delete read notifications hours before the retention period ended when the database clock differed from WordPress.
+* Fix      - Favorite times on the Overview tab were shifted by the database server's time zone.
+* Fix      - Enabling automatic cleanup ran it straight away instead of a month later.
+* Fix      - A failed automatic cleanup was shown as a successful run that deleted nothing.
+* Fix      - A retention period outside 7, 15, 30, 60, or 90 days could be saved and the Tools tab then showed a different value.
+* Security - The who-favorited list no longer reveals who favorited activity in hidden or private groups.
+* Security - Realtime popup text is escaped before it reaches the page.
+* Dev      - Removed the plugin email templates and the bpfn_email_templates, bpfn_email_template_key, bpfn_email_template_path, bpfn_email_data, bpfn_email_subject, bpfn_email_message, bpfn_email_headers, bpfn_email_from_name, and bpfn_email_from_email filters. Use Dashboard > Emails or the new bpfn_email_tokens filter.
+* Dev      - Removed the bpfn_log_event action, the bpfn_enable_logging filter, and the bpfn_check_notifications AJAX action.
+* Dev      - Requires BuddyPress 12.0 or later.
 
 = 2.1.0 - July 2026 =
 
@@ -328,6 +350,9 @@ Major release with a favorite count display, an analytics dashboard, an indexed 
 * New      - Initial release: favorite notifications, BuddyPress integration, and user preferences.
 
 == Upgrade Notice ==
+
+= 2.2.0 =
+Emails move to Dashboard > Emails, realtime popups get an on/off switch, and several cleanup and time zone bugs are fixed. Custom email template files in your theme are no longer used; edit the emails in Dashboard > Emails instead. Requires BuddyPress 12.0.
 
 = 2.1.0 =
 Adds a Display tab to choose how the favorite line renders (inline usernames, icon and count, or a count that opens the full list) and which icon it uses. The member list now pages instead of stopping at 50. Existing sites keep inline usernames until you change the setting.

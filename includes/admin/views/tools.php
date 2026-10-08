@@ -20,7 +20,7 @@ $bpfn_mstats    = $bpfn_migration->get_migration_stats();
 // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display-only flash check.
 $bpfn_saved = isset( $_GET['settings_updated'] ) && 'true' === sanitize_text_field( wp_unslash( $_GET['settings_updated'] ) );
 
-$bpfn_auto_enabled = get_option( 'bpfn_auto_cleanup_enabled', 'yes' );
+$bpfn_auto_enabled = BPFN_Module_Admin::is_auto_cleanup_enabled();
 $bpfn_cleanup_days = BPFN_Module_Admin::get_retention_days();
 $bpfn_last_cleanup = get_option( 'bpfn_last_auto_cleanup', array() );
 $bpfn_next_cleanup = wp_next_scheduled( 'bpfn_auto_cleanup_notifications' );
@@ -100,7 +100,7 @@ $bpfn_next_cleanup = wp_next_scheduled( 'bpfn_auto_cleanup_notifications' );
 								name="bpfn_auto_cleanup_enabled"
 								id="bpfn_auto_cleanup_enabled"
 								value="yes"
-								<?php checked( $bpfn_auto_enabled, 'yes' ); ?> />
+								<?php checked( $bpfn_auto_enabled ); ?> />
 							<?php esc_html_e( 'Enable automatic monthly cleanup', 'buddypress-favorite-notification' ); ?>
 						</label>
 						<p class="description"><?php esc_html_e( 'Automatically remove old read notifications once per month via WP Cron.', 'buddypress-favorite-notification' ); ?></p>
@@ -166,7 +166,7 @@ $bpfn_next_cleanup = wp_next_scheduled( 'bpfn_auto_cleanup_notifications' );
 			</div>
 		<?php endif; ?>
 
-		<?php if ( $bpfn_next_cleanup && 'yes' === $bpfn_auto_enabled ) : ?>
+		<?php if ( $bpfn_next_cleanup && $bpfn_auto_enabled ) : ?>
 			<p style="margin-top: 8px;">
 				<small>
 					<?php

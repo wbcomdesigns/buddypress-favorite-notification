@@ -17,22 +17,46 @@ if ( ! defined( 'ABSPATH' ) ) {
 class BPFN_Module_Realtime {
 
 	/**
-	 * Constructor.
+	 * Heartbeat intervals (seconds) the owner can pick on the Display tab.
 	 */
-	public function __construct() {
-		$this->setup_hooks();
+	const INTERVALS = array( 30, 60 );
+
+	/**
+	 * Whether the site owner has switched real-time toasts on.
+	 *
+	 * Off unless saved: a fresh install must not add a 30-second request per
+	 * logged-in member. Sites upgraded from before 2.2.0 get 'yes' written once by
+	 * the upgrade routine, so nothing changes under them.
+	 *
+	 * @return bool
+	 */
+	public static function is_enabled() {
+		return 'yes' === get_option( 'bpfn_realtime_enabled', 'no' );
 	}
 
 	/**
-	 * Setup hooks.
+	 * Heartbeat interval in seconds, normalised to one of INTERVALS.
+	 *
+	 * @param mixed $seconds Raw value. Null reads the stored option.
+	 * @return int
 	 */
-	private function setup_hooks() {
-		// WordPress Heartbeat API.
+	public static function get_interval( $seconds = null ) {
+		if ( null === $seconds ) {
+			$seconds = get_option( 'bpfn_realtime_interval', 30 );
+		}
+		$seconds = absint( $seconds );
+		return in_array( $seconds, self::INTERVALS, true ) ? $seconds : 30;
+	}
+
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		if ( ! self::is_enabled() ) {
+			return;
+		}
 		add_filter( 'heartbeat_received', array( $this, 'heartbeat_received' ), 10, 2 );
 		add_filter( 'heartbeat_settings', array( $this, 'heartbeat_settings' ) );
-
-		// AJAX fallback.
-		add_action( 'wp_ajax_bpfn_check_notifications', array( $this, 'ajax_check_notifications' ) );
 		add_action( 'wp_ajax_bpfn_dismiss_notification', array( $this, 'ajax_dismiss_notification' ) );
 	}
 
@@ -48,23 +72,17 @@ class BPFN_Module_Realtime {
 			return $response;
 		}
 
-		// Verify nonce.
 		if ( ! wp_verify_nonce( $data['bpfn_realtime_check']['nonce'], 'bpfn_realtime_nonce' ) ) {
 			return $response;
 		}
 
 		$user_id = get_current_user_id();
-		if ( ! $this->is_realtime_enabled_for_user( $user_id ) ) {
+		if ( ! self::is_enabled_for_user( $user_id ) ) {
 			return $response;
 		}
 
-		// Get new notifications.
-		$last_checked  = intval( $data['bpfn_realtime_check']['last_checked'] );
-		$notifications = $this->get_new_notifications( $user_id, $last_checked );
-
-		// Add to response.
 		$response['bpfn_realtime_notifications'] = array(
-			'notifications' => $notifications,
+			'notifications' => $this->get_new_notifications( $user_id, intval( $data['bpfn_realtime_check']['last_checked'] ) ),
 			'count'         => bpfn_get_notification_count( $user_id ),
 			'timestamp'     => time(),
 		);
@@ -73,48 +91,16 @@ class BPFN_Module_Realtime {
 	}
 
 	/**
-	 * Configure heartbeat settings.
+	 * Use the owner's interval on pages where a member receives toasts.
 	 *
 	 * @param array $settings The heartbeat settings.
 	 * @return array Modified settings.
 	 */
 	public function heartbeat_settings( $settings ) {
-		if ( ! is_user_logged_in() || ! $this->is_realtime_enabled_for_user( get_current_user_id() ) ) {
-			return $settings;
+		if ( ! is_admin() && self::is_enabled_for_user( get_current_user_id() ) ) {
+			$settings['interval'] = self::get_interval();
 		}
-
-		// Set heartbeat interval (minimum 15 seconds).
-		$settings['interval'] = 15;
-
 		return $settings;
-	}
-
-	/**
-	 * AJAX check notifications (fallback).
-	 */
-	public function ajax_check_notifications() {
-		// Verify nonce.
-		$nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
-		if ( ! wp_verify_nonce( $nonce, 'bpfn-nonce' ) && ! wp_verify_nonce( $nonce, 'bpfn_realtime_nonce' ) ) {
-			wp_send_json_error( array( 'message' => esc_html__( 'Security check failed', 'buddypress-favorite-notification' ) ) );
-		}
-
-		if ( ! is_user_logged_in() ) {
-			wp_send_json_error( array( 'message' => esc_html__( 'Not logged in', 'buddypress-favorite-notification' ) ) );
-		}
-
-		$user_id      = get_current_user_id();
-		$last_checked = isset( $_POST['last_checked'] ) ? intval( $_POST['last_checked'] ) : 0;
-
-		$notifications = $this->get_new_notifications( $user_id, $last_checked );
-
-		wp_send_json_success(
-			array(
-				'notifications' => $notifications,
-				'count'         => bpfn_get_notification_count( $user_id ),
-				'timestamp'     => time(),
-			)
-		);
 	}
 
 	/**
@@ -163,22 +149,20 @@ class BPFN_Module_Realtime {
 	}
 
 	/**
-	 * Check if realtime is enabled for user.
+	 * Whether this member gets toasts: owner switch on and at least one type enabled.
 	 *
 	 * @param int $user_id User ID.
-	 * @return bool Whether realtime is enabled.
+	 * @return bool
 	 */
-	private function is_realtime_enabled_for_user( $user_id ) {
-		$settings = bpfn_get_user_settings( $user_id );
-
-		// Check if user has any notification type with realtime enabled.
-		foreach ( $settings as $type => $options ) {
+	public static function is_enabled_for_user( $user_id ) {
+		if ( ! $user_id || ! self::is_enabled() ) {
+			return false;
+		}
+		foreach ( bpfn_get_user_settings( $user_id ) as $options ) {
 			if ( ! empty( $options['realtime_enabled'] ) ) {
 				return true;
 			}
 		}
-
-		// User has explicitly disabled all realtime notifications.
 		return false;
 	}
 
@@ -215,8 +199,13 @@ class BPFN_Module_Realtime {
 		}
 
 		$processed = array();
+		$settings  = bpfn_get_user_settings( $user_id );
 
 		foreach ( $notifications as $notification ) {
+			$type = BPFN_Module_Notifications::get_type_for_action( $notification->component_action );
+			if ( empty( $settings[ $type ]['realtime_enabled'] ) ) {
+				continue;
+			}
 			$data = $this->format_realtime_notification( $notification );
 			if ( $data ) {
 				$processed[] = $data;
@@ -251,11 +240,16 @@ class BPFN_Module_Realtime {
 			return false;
 		}
 
-		// Add realtime specific data.
+		// realtime.js concatenates these into HTML, so escape here, where the data
+		// leaves PHP. text carries a member display name (member-controlled).
+		$formatted['text']              = esc_html( $formatted['text'] );
+		$formatted['link']              = esc_url( $formatted['link'] );
+		$formatted['notification_type'] = sanitize_html_class( $formatted['notification_type'] );
+
 		return array_merge(
 			$formatted,
 			array(
-				'notification_id' => $notification->id,
+				'notification_id' => (int) $notification->id,
 				'time_ago'        => sprintf(
 					/* translators: %s: Human-readable time difference, e.g. "5 mins". */
 					esc_html__( '%s ago', 'buddypress-favorite-notification' ),
@@ -263,21 +257,6 @@ class BPFN_Module_Realtime {
 				),
 				'timestamp'       => strtotime( $notification->date_notified ),
 			)
-		);
-	}
-
-	/**
-	 * Get polling configuration.
-	 *
-	 * @return array Polling config.
-	 */
-	public function get_polling_config() {
-		return array(
-			'enabled'           => true,
-			'interval'          => 15000,
-			'max_notifications' => 5,
-			'auto_dismiss_time' => 5000,
-			'position'          => 'bottom-right',
 		);
 	}
 }

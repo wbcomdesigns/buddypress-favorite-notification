@@ -25,5 +25,6 @@ parameters:
             - dist (?)
             - assets (?)
             - languages (?)
+            - bin (?)
     scanFiles:
         - vendor/gin0115/buddypress-stubs/buddypress-stubs.php

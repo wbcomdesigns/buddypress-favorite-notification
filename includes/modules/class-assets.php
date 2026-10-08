@@ -50,7 +50,7 @@ class BPFN_Module_Assets {
 		);
 
 		// Real-time notifications.
-		if ( $this->should_load_realtime() ) {
+		if ( BPFN_Module_Realtime::is_enabled_for_user( get_current_user_id() ) ) {
 			$this->enqueue_realtime_assets();
 		}
 
@@ -59,7 +59,7 @@ class BPFN_Module_Assets {
 
 		// Member "Settings > Favorite Notifications" screen styles
 		// (templates/settings/notifications.php, BPFN_Module_Settings).
-		if ( function_exists( 'bp_is_settings_component' ) && bp_is_settings_component() && bp_is_current_action( 'notifications' ) ) {
+		if ( function_exists( 'bp_is_settings_component' ) && bp_is_settings_component() && bp_is_current_action( 'favorite-notifications' ) ) {
 			wp_enqueue_style(
 				'bpfn-settings',
 				BPFN_ASSETS_URL . 'css/settings.css',
@@ -131,22 +131,13 @@ class BPFN_Module_Assets {
 			true
 		);
 
-		// Get realtime configuration.
-		$realtime_module = bpfn()->get_module( 'realtime' );
-		$polling_config  = $realtime_module ? $realtime_module->get_polling_config() : $this->get_fallback_realtime_config();
-
-		// Localize real-time script.
 		wp_localize_script(
 			'bpfn-realtime',
 			'BPFNRealtime',
 			array(
-				'ajax_url'         => admin_url( 'admin-ajax.php' ),
-				'nonce'            => wp_create_nonce( 'bpfn_realtime_nonce' ),
-				'checkInterval'    => $polling_config['interval'],
-				'position'         => $polling_config['position'],
-				'maxNotifications' => $polling_config['max_notifications'],
-				'autoDismiss'      => $polling_config['auto_dismiss_time'],
-				'strings'          => array(
+				'ajax_url' => admin_url( 'admin-ajax.php' ),
+				'nonce'    => wp_create_nonce( 'bpfn_realtime_nonce' ),
+				'strings'  => array(
 					'new_notification' => esc_html__( 'New notification', 'buddypress-favorite-notification' ),
 					'view_activity'    => esc_html__( 'View Activity', 'buddypress-favorite-notification' ),
 					'dismiss'          => esc_html__( 'Dismiss', 'buddypress-favorite-notification' ),
@@ -157,21 +148,6 @@ class BPFN_Module_Assets {
 					'default_message'  => esc_html__( 'Someone favorited your activity', 'buddypress-favorite-notification' ),
 				),
 			)
-		);
-	}
-
-	/**
-	 * Get fallback realtime configuration.
-	 *
-	 * @return array Fallback config.
-	 */
-	private function get_fallback_realtime_config() {
-		return array(
-			'enabled'           => true,
-			'interval'          => 15000,
-			'max_notifications' => 5,
-			'auto_dismiss_time' => 5000,
-			'position'          => 'bottom-right',
 		);
 	}
 
@@ -193,19 +169,4 @@ class BPFN_Module_Assets {
 
 		return true;
 	}
-
-	/**
-	 * Check if real-time assets should be loaded.
-	 *
-	 * @return bool Whether to load realtime assets.
-	 */
-	private function should_load_realtime() {
-		$user_id = get_current_user_id();
-		if ( ! $user_id ) {
-			return false;
-		}
-
-		return true;
-	}
-
 }

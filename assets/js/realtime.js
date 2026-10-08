@@ -20,8 +20,7 @@
             position: 'bottom-right',
             maxNotifications: 5,
             autoDismiss: 5000,
-            lastChecked: 0,
-            checkInterval: 15000
+            lastChecked: 0
         },
 
         // State
@@ -48,22 +47,12 @@
             
             self.log('Starting realtime initialization');
             
-            return self.initializeHeartbeat()
-                .then(function() {
-                    self.setupUI();
-                    self.bindEvents();
-                    self.state.initialized = true;
-                    self.log('Realtime initialization completed');
-                    return Promise.resolve();
-                })
-                .catch(function(error) {
-                    self.log('Heartbeat failed, falling back to polling');
-                    self.initializePolling();
-                    self.setupUI();
-                    self.bindEvents();
-                    self.state.initialized = true;
-                    return Promise.resolve();
-                });
+            return self.initializeHeartbeat().then(function() {
+                self.setupUI();
+                self.bindEvents();
+                self.state.initialized = true;
+                self.log('Realtime initialization completed');
+            });
         },
 
         /**
@@ -111,89 +100,6 @@
                 
                 self.log('Heartbeat initialized');
                 resolve();
-            });
-        },
-
-        /**
-         * Initialize polling fallback
-         */
-        initializePolling: function() {
-            var self = this;
-            
-            self.polling = {
-                interval: self.config.checkInterval,
-                timeout: null,
-                isActive: false
-            };
-            
-            self.startPolling();
-        },
-
-        /**
-         * Start polling
-         */
-        startPolling: function() {
-            var self = this;
-            
-            if (self.polling.isActive) {
-                return;
-            }
-            
-            self.polling.isActive = true;
-            self.scheduleNextPoll();
-        },
-
-        /**
-         * Schedule next poll
-         */
-        scheduleNextPoll: function() {
-            var self = this;
-            
-            if (!self.polling.isActive) {
-                return;
-            }
-            
-            self.polling.timeout = setTimeout(function() {
-                self.performPoll();
-            }, self.polling.interval);
-        },
-
-        /**
-         * Perform polling request
-         */
-        performPoll: function() {
-            var self = this;
-            
-            if (self.state.isChecking) {
-                self.scheduleNextPoll();
-                return;
-            }
-            
-            self.state.isChecking = true;
-            
-            $.ajax({
-                url: self.config.ajax_url,
-                type: 'POST',
-                timeout: 10000,
-                data: {
-                    action: 'bpfn_check_notifications',
-                    last_checked: self.config.lastChecked,
-                    nonce: self.config.nonce
-                },
-                success: function(response) {
-                    self.state.isChecking = false;
-                    
-                    if (response && response.success && response.data) {
-                        self.handleNotificationResponse(response.data);
-                    }
-                    
-                    self.scheduleNextPoll();
-                },
-                error: function(xhr, status, error) {
-                    self.state.isChecking = false;
-                    self.log('Polling error: ' + error);
-                    self.scheduleNextPoll();
-                }
             });
         },
 
@@ -435,12 +341,6 @@
             
             // Clean up event handlers
             $(document).off('.bpfn-heartbeat .bpfn-realtime');
-            
-            // Clear polling
-            if (self.polling && self.polling.timeout) {
-                clearTimeout(self.polling.timeout);
-                self.polling.isActive = false;
-            }
             
             // Remove UI elements
             if (self.config.container) {

@@ -54,6 +54,19 @@ class BPFN_Module_Admin {
 	}
 
 	/**
+	 * Whether the owner has switched automatic cleanup on.
+	 *
+	 * Off unless saved: deleting members' notifications is the owner's call.
+	 * BP_Favorite_Notification::maybe_upgrade() writes 'yes' once for sites that
+	 * ran a version before 2.2.0, when it was on by default.
+	 *
+	 * @return bool
+	 */
+	public static function is_auto_cleanup_enabled() {
+		return 'yes' === get_option( 'bpfn_auto_cleanup_enabled', 'no' );
+	}
+
+	/**
 	 * Schedule the monthly cleanup, first run one interval from now.
 	 *
 	 * Passing time() made the first run fire on the next page load, deleting
@@ -132,22 +145,13 @@ class BPFN_Module_Admin {
 			return;
 		}
 
-		// Both values are validated against the registered sets rather than
-		// merely sanitized, so a hand-crafted POST cannot persist a mode or
-		// icon the renderer has no branch for.
-		$modes = BPFN_Module_Favorite_Display::get_display_modes();
-		$mode  = isset( $_POST['bpfn_display_mode'] ) ? sanitize_key( wp_unslash( $_POST['bpfn_display_mode'] ) ) : 'inline';
-		if ( ! isset( $modes[ $mode ] ) ) {
-			$mode = 'inline';
-		}
-		update_option( 'bpfn_display_mode', $mode );
+		// Every value goes through the same accessor the renderer reads, so a
+		// hand-crafted POST cannot persist a value the renderer has no branch for.
+		update_option( 'bpfn_display_mode', BPFN_Module_Favorite_Display::get_saved_mode( isset( $_POST['bpfn_display_mode'] ) ? sanitize_key( wp_unslash( $_POST['bpfn_display_mode'] ) ) : '' ) );
+		update_option( 'bpfn_favorite_icon', BPFN_Module_Favorite_Display::get_saved_icon( isset( $_POST['bpfn_favorite_icon'] ) ? sanitize_key( wp_unslash( $_POST['bpfn_favorite_icon'] ) ) : '' ) );
 
-		$icons = BPFN_Module_Favorite_Display::get_icon_choices();
-		$icon  = isset( $_POST['bpfn_favorite_icon'] ) ? sanitize_key( wp_unslash( $_POST['bpfn_favorite_icon'] ) ) : 'heart';
-		if ( ! isset( $icons[ $icon ] ) ) {
-			$icon = 'heart';
-		}
-		update_option( 'bpfn_favorite_icon', $icon );
+		update_option( 'bpfn_realtime_enabled', isset( $_POST['bpfn_realtime_enabled'] ) ? 'yes' : 'no' );
+		update_option( 'bpfn_realtime_interval', BPFN_Module_Realtime::get_interval( isset( $_POST['bpfn_realtime_interval'] ) ? sanitize_text_field( wp_unslash( $_POST['bpfn_realtime_interval'] ) ) : 30 ) );
 
 		// Redirect back to the Display tab with a success flag.
 		wp_safe_redirect(
@@ -355,8 +359,7 @@ class BPFN_Module_Admin {
 		add_action( 'bpfn_auto_cleanup_notifications', array( $this, 'run_automatic_cleanup' ) );
 
 		// Schedule if not already scheduled and option is enabled.
-		$enabled = get_option( 'bpfn_auto_cleanup_enabled', 'yes' );
-		if ( 'yes' === $enabled && ! wp_next_scheduled( 'bpfn_auto_cleanup_notifications' ) ) {
+		if ( self::is_auto_cleanup_enabled() && ! wp_next_scheduled( 'bpfn_auto_cleanup_notifications' ) ) {
 			$this->schedule_cleanup();
 		}
 	}
@@ -365,9 +368,7 @@ class BPFN_Module_Admin {
 	 * Run automatic cleanup.
 	 */
 	public function run_automatic_cleanup() {
-		// Check if enabled.
-		$enabled = get_option( 'bpfn_auto_cleanup_enabled', 'yes' );
-		if ( 'yes' !== $enabled ) {
+		if ( ! self::is_auto_cleanup_enabled() ) {
 			return;
 		}
 
