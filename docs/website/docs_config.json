@@ -1,0 +1,61 @@
+{
+  "product": "BuddyPress Favourite Notification",
+  "productType": "plugin",
+  "shortId": "bpfavnotif",
+  "sections": [
+    {
+      "slug": "getting-started",
+      "title": "Getting Started",
+      "pages": [
+        { "slug": "overview", "title": "Overview", "file": "getting-started/overview.md" },
+        { "slug": "requirements", "title": "Requirements", "file": "getting-started/requirements.md" },
+        { "slug": "installation", "title": "Installation", "file": "getting-started/installation.md" }
+      ]
+    },
+    {
+      "slug": "features",
+      "title": "Features",
+      "pages": [
+        { "slug": "notifications", "title": "Favourite Notifications", "file": "features/notifications.md" },
+        { "slug": "email-alerts", "title": "Email Alerts", "file": "features/email-alerts.md" },
+        { "slug": "realtime-popups", "title": "Realtime Popups", "file": "features/realtime-popups.md" },
+        { "slug": "favourite-display", "title": "Favourite Count Display", "file": "features/favourite-display.md" },
+        { "slug": "admin-dashboard", "title": "Admin Dashboard", "file": "features/admin-dashboard.md" }
+      ]
+    },
+    {
+      "slug": "usage",
+      "title": "Usage",
+      "pages": [
+        { "slug": "member-preferences", "title": "Member Notification Preferences", "file": "usage/member-preferences.md" },
+        { "slug": "display-settings", "title": "Display Settings", "file": "usage/display-settings.md" },
+        { "slug": "tools-and-maintenance", "title": "Tools and Maintenance", "file": "usage/tools-and-maintenance.md" }
+      ]
+    },
+    {
+      "slug": "developer-guide",
+      "title": "Developer Guide",
+      "pages": [
+        { "slug": "architecture", "title": "Architecture", "file": "developer-guide/architecture.md" },
+        { "slug": "hooks-reference", "title": "Hooks Reference", "file": "developer-guide/hooks-reference.md" },
+        { "slug": "helper-functions", "title": "Helper Functions", "file": "developer-guide/helper-functions.md" },
+        { "slug": "email-template-overrides", "title": "Email Template Overrides", "file": "developer-guide/email-template-overrides.md" },
+        { "slug": "database", "title": "Database Tables", "file": "developer-guide/database.md" }
+      ]
+    },
+    {
+      "slug": "faq",
+      "title": "FAQ",
+      "pages": [
+        { "slug": "faq", "title": "Frequently Asked Questions", "file": "faq/faq.md" }
+      ]
+    },
+    {
+      "slug": "troubleshooting",
+      "title": "Troubleshooting",
+      "pages": [
+        { "slug": "troubleshooting", "title": "Troubleshooting", "file": "troubleshooting/troubleshooting.md" }
+      ]
+    }
+  ]
+}
