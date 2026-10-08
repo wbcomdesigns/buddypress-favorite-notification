@@ -37,7 +37,8 @@ $bpfn_mode_help = array(
 ?>
 
 <?php if ( $bpfn_saved ) : ?>
-	<div class="bpfn-notice bpfn-notice--success">
+	<?php // .notice.is-dismissible gets core's close button; .inline stops core moving it above the shell. ?>
+	<div class="bpfn-notice bpfn-notice--success notice is-dismissible inline">
 		<p><?php esc_html_e( 'Settings saved successfully!', 'buddypress-favorite-notification' ); ?></p>
 	</div>
 <?php endif; ?>
@@ -93,7 +94,7 @@ $bpfn_mode_help = array(
 							<?php endforeach; ?>
 						</select>
 						<p class="description">
-							<?php esc_html_e( 'A heart can read as the "Like" reaction. Pick a star or bookmark to keep favorites visually distinct from likes.', 'buddypress-favorite-notification' ); ?>
+							<?php esc_html_e( 'The icon shown in the "favorited by" line under each activity. A heart can read as the "Like" reaction, so a star or bookmark keeps favorites distinct. The Favorite button itself is drawn by BuddyPress and your theme.', 'buddypress-favorite-notification' ); ?>
 						</p>
 					</td>
 				</tr>

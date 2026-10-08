@@ -128,10 +128,11 @@ class BPFN_Favorites_Migration {
 				$result = $wpdb->insert(
 					$this->table_name,
 					array(
-						'activity_id' => $activity_id,
-						'user_id'     => $user_id,
+						'activity_id'  => $activity_id,
+						'user_id'      => $user_id,
+						'favorited_at' => current_time( 'mysql', true ),
 					),
-					array( '%d', '%d' )
+					array( '%d', '%d', '%s' )
 				);
 
 				if ( $result ) {
@@ -242,10 +243,11 @@ class BPFN_Favorites_Migration {
 				$result = $wpdb->insert(
 					$this->table_name,
 					array(
-						'activity_id' => $activity_id,
-						'user_id'     => $user_id,
+						'activity_id'  => $activity_id,
+						'user_id'      => $user_id,
+						'favorited_at' => current_time( 'mysql', true ),
 					),
-					array( '%d', '%d' )
+					array( '%d', '%d', '%s' )
 				);
 
 				if ( $result ) {

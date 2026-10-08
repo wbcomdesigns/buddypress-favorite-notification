@@ -31,7 +31,7 @@ It also adds a Facebook-style "who liked this" line under each activity, and giv
 
 **Favorite count display**
 * Three display modes, chosen in Settings: inline usernames ("John, Jane, and 10 others"), an icon with the count, or an icon and count that opens the full list.
-* A choice of favorite icon - heart, star, bookmark, thumbs up, or none - so favorites are not mistaken for the Like reaction.
+* A choice of icon for the "favorited by" line - heart, star, bookmark, thumbs up, or none - so favorites are not mistaken for the Like reaction. The Favorite button itself keeps the icon BuddyPress and your theme give it.
 * A "View all" modal listing the members who favorited an activity, with clickable profile links. It loads a page at a time with a Load more control, so it stays usable on activities with thousands of likes. Set the page size with the `bpfn_favorites_modal_per_page` filter.
 * Updates over AJAX as members like and unlike, with a 5-minute cache so the line loads instantly.
 * The favorite display is shown to logged-in members only.

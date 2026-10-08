@@ -27,6 +27,43 @@ if ( ! defined( 'ABSPATH' ) ) {
 class BPFN_Module_Admin {
 
 	/**
+	 * Retention periods (days) offered on the Tools tab. Documented in readme.txt.
+	 */
+	const RETENTION_DAYS = array( 7, 15, 30, 60, 90 );
+
+	/**
+	 * Default retention period (days).
+	 */
+	const DEFAULT_RETENTION_DAYS = 30;
+
+	/**
+	 * Normalise a retention value to one of RETENTION_DAYS.
+	 *
+	 * The single gate for every reader and the writer, so the Tools tab, the
+	 * manual button and the cron job can never disagree about the period in force.
+	 *
+	 * @param mixed $days Raw value. Null reads the stored option.
+	 * @return int
+	 */
+	public static function get_retention_days( $days = null ) {
+		if ( null === $days ) {
+			$days = get_option( 'bpfn_auto_cleanup_days', self::DEFAULT_RETENTION_DAYS );
+		}
+		$days = absint( $days );
+		return in_array( $days, self::RETENTION_DAYS, true ) ? $days : self::DEFAULT_RETENTION_DAYS;
+	}
+
+	/**
+	 * Schedule the monthly cleanup, first run one interval from now.
+	 *
+	 * Passing time() made the first run fire on the next page load, deleting
+	 * notifications seconds after the admin enabled the setting.
+	 */
+	private function schedule_cleanup() {
+		wp_schedule_event( time() + MONTH_IN_SECONDS, 'monthly', 'bpfn_auto_cleanup_notifications' );
+	}
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -150,17 +187,14 @@ class BPFN_Module_Admin {
 		update_option( 'bpfn_auto_cleanup_enabled', $enabled );
 
 		// Save retention period.
-		$days = isset( $_POST['bpfn_auto_cleanup_days'] ) ? absint( $_POST['bpfn_auto_cleanup_days'] ) : 30;
-		if ( $days < 7 ) {
-			$days = 7;
-		}
+		$days = self::get_retention_days( isset( $_POST['bpfn_auto_cleanup_days'] ) ? sanitize_text_field( wp_unslash( $_POST['bpfn_auto_cleanup_days'] ) ) : self::DEFAULT_RETENTION_DAYS );
 		update_option( 'bpfn_auto_cleanup_days', $days );
 
 		// Schedule or unschedule based on enabled status.
 		$next_scheduled = wp_next_scheduled( 'bpfn_auto_cleanup_notifications' );
 
 		if ( 'yes' === $enabled && ! $next_scheduled ) {
-			wp_schedule_event( time(), 'monthly', 'bpfn_auto_cleanup_notifications' );
+			$this->schedule_cleanup();
 		} elseif ( 'no' === $enabled && $next_scheduled ) {
 			wp_clear_scheduled_hook( 'bpfn_auto_cleanup_notifications' );
 		}
@@ -196,12 +230,7 @@ class BPFN_Module_Admin {
 		// Honour the configured retention period instead of the hard-coded
 		// 30-day default, so the manual "Clear Old Notifications Now" action
 		// matches the Automatic Cleanup setting shown on the Tools tab.
-		$days = absint( get_option( 'bpfn_auto_cleanup_days', 30 ) );
-		if ( $days < 7 ) {
-			$days = 7;
-		}
-
-		$result = bpfn_clear_old_notifications( $days );
+		$result = bpfn_clear_old_notifications( self::get_retention_days() );
 
 		// bpfn_clear_old_notifications() always returns a 'count' key (0 on
 		// failure), so testing isset( $result['count'] ) for success could never
@@ -328,7 +357,7 @@ class BPFN_Module_Admin {
 		// Schedule if not already scheduled and option is enabled.
 		$enabled = get_option( 'bpfn_auto_cleanup_enabled', 'yes' );
 		if ( 'yes' === $enabled && ! wp_next_scheduled( 'bpfn_auto_cleanup_notifications' ) ) {
-			wp_schedule_event( time(), 'monthly', 'bpfn_auto_cleanup_notifications' );
+			$this->schedule_cleanup();
 		}
 	}
 
@@ -342,25 +371,18 @@ class BPFN_Module_Admin {
 			return;
 		}
 
-		// Get retention period (default 30 days).
-		$days = get_option( 'bpfn_auto_cleanup_days', 30 );
-		$days = absint( $days );
-		if ( $days < 7 ) {
-			$days = 7; // Minimum 7 days.
-		}
-
-		// Run cleanup.
 		if ( function_exists( 'bpfn_clear_old_notifications' ) ) {
-			$result = bpfn_clear_old_notifications( $days );
+			$result = bpfn_clear_old_notifications( self::get_retention_days() );
 
-			update_option(
-				'bpfn_last_auto_cleanup',
-				array(
-					'date'      => current_time( 'mysql' ),
-					'deleted'   => (int) $result['count'],
-					'remaining' => isset( $result['remaining'] ) ? $result['remaining'] : 0,
-				)
-			);
+			// A failed run is recorded as a failure, never as "deleted 0, 0 remaining".
+			$record = array( 'date' => current_time( 'mysql' ) );
+			if ( ! empty( $result['error'] ) ) {
+				$record['error'] = $result['error'];
+			} else {
+				$record['deleted']   = (int) $result['count'];
+				$record['remaining'] = (int) $result['remaining'];
+			}
+			update_option( 'bpfn_last_auto_cleanup', $record );
 		}
 	}
 }

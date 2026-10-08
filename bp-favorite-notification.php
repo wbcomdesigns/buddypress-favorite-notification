@@ -262,6 +262,9 @@ class BP_Favorite_Notification {
 			update_option( 'bpfn_show_migration_notice', true );
 		}
 
+		// One-shot flag read by BPFN_Admin::activation_redirect() on the next admin load.
+		set_transient( 'bpfn_activation_redirect', 1, 30 );
+
 		do_action( 'bpfn_activate' );
 	}
 

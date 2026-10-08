@@ -86,10 +86,12 @@ class BPFN_Module_Favorite_Display {
 		$wpdb->insert(
 			$this->table_name,
 			array(
-				'activity_id' => $activity_id,
-				'user_id'     => $user_id,
+				'activity_id'  => $activity_id,
+				'user_id'      => $user_id,
+				// Explicit GMT: the column DEFAULT is the MySQL server clock.
+				'favorited_at' => current_time( 'mysql', true ),
 			),
-			array( '%d', '%d' )
+			array( '%d', '%d', '%s' )
 		);
 
 		// Clear cache for this activity.

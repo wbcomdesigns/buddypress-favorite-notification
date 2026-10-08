@@ -87,6 +87,29 @@ class BPFN_Admin {
 
 		// Migration admin nag.
 		add_action( 'admin_notices', array( $this, 'migration_notice' ) );
+
+		add_action( 'admin_init', array( $this, 'activation_redirect' ) );
+	}
+
+	/**
+	 * Send the admin to the plugin dashboard once, right after activation.
+	 *
+	 * Skipped for bulk activation, AJAX, network admin and users who cannot
+	 * open the page, so it never hijacks a flow that activated several plugins.
+	 */
+	public function activation_redirect() {
+		if ( ! get_transient( 'bpfn_activation_redirect' ) ) {
+			return;
+		}
+		delete_transient( 'bpfn_activation_redirect' );
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only check of core's bulk-activation flag.
+		if ( wp_doing_ajax() || is_network_admin() || isset( $_GET['activate-multi'] ) || ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		wp_safe_redirect( admin_url( 'admin.php?page=' . self::MENU_SLUG ) );
+		exit;
 	}
 
 	/**
