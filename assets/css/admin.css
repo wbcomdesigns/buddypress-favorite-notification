@@ -149,6 +149,7 @@
 }
 
 .bpfn-settings-sidebar {
+	box-sizing: border-box; /* width: 100% below 1024px must include the 1px border. */
 	width: 240px;
 	flex-shrink: 0;
 	background: var(--bpfn-admin-white);
