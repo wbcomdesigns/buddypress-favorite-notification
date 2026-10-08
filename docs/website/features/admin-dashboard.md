@@ -7,7 +7,7 @@ The plugin adds one admin page, **Favorite Notifications**, as a submenu under t
 The Overview tab shows favourite statistics and trending content:
 
 - **Stat cards**: total favourites, notifications sent, active users in the last 7 days, and the most liked activity with its favourite count. Each card also shows a 7-day trend where available.
-- **Recent Favorites**: a table of favourites from the last 7 days, with the member, a link to the activity, and how long ago it happened. Up to 10 rows.
+- **Recent Favorites**: a table of favourites from the last 7 days, with the member, a link to the activity, and the date. The Date column shows the actual date and time plus "X ago". Favourite times are stored in UTC and shown in your site's time zone. Up to 10 rows.
 - **Trending Activities (Last 7 Days)** and **Trending Activities (Last 30 Days)**: the top 10 activities by favourite count in each window, with rank, a link to the activity, the favourite count, the author, and a content preview.
 - **Quick Actions**: a shortcut to the Tools tab.
 
@@ -15,11 +15,11 @@ The stats are computed from the plugin's own favourites table and the BuddyPress
 
 ## Display tab
 
-Choose how the "who liked this" line renders (inline usernames, icon and count, or a count that opens the full list) and which icon it uses. See [Display Settings](../usage/display-settings.md).
+Choose how the "who liked this" line renders (inline usernames, icon and count, or a count that opens the full list), which icon it uses, and whether realtime popups are on. See [Display Settings](../usage/display-settings.md).
 
 ## Tools tab
 
-Run the favourites migration, configure the automatic cleanup of old read notifications, or run a cleanup on demand. See [Tools and Maintenance](../usage/tools-and-maintenance.md).
+Run the favourites migration, switch on the automatic cleanup of old read notifications, or run a cleanup on demand. See [Tools and Maintenance](../usage/tools-and-maintenance.md).
 
 ## Discover tab
 

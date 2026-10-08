@@ -14,11 +14,11 @@ Only the modal mode and the inline "N others" link open the full list. The count
 
 ## Favourite icon
 
-You can choose the icon that precedes the display, stored in the `bpfn_favorite_icon` option: **heart**, **star**, **bookmark**, **thumbs up**, or **none**. A heart reads as the Like reaction to many members, so a star or bookmark helps keep favourites visually distinct.
+You can choose the icon that precedes the display, stored in the `bpfn_favorite_icon` option: **heart**, **star**, **bookmark**, **thumbs up**, or **none**. A heart reads as the Like reaction to many members, so a star or bookmark helps keep favourites visually distinct. The icon applies to this line only. The BuddyPress Favorite button keeps the icon that BuddyPress and your theme give it.
 
 ## The "View all" list
 
-The full member list opens in a modal, loaded over AJAX. It shows a page of members at a time with a **Load more** control, so it stays usable on activities with thousands of likes. Each row links to the member's profile.
+The full member list opens in a modal, loaded over AJAX. It is for logged-in members only, and it only returns data for activities the member can read. Hidden and private group activity is refused. It shows a page of members at a time with a **Load more** control, so it stays usable on activities with thousands of likes. Each row links to the member's profile.
 
 - The page size defaults to 20 members and can be changed with the `bpfn_favorites_modal_per_page` filter.
 - By default there is no ceiling on how many members can be paged through. A site can set a hard ceiling with the `bpfn_who_favorited_limit` filter (default 0, meaning no limit); anything beyond a positive ceiling is shown as a "+N more" line.

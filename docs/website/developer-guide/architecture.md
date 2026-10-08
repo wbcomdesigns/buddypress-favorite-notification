@@ -20,11 +20,11 @@ Modules live in `includes/modules/` and are instantiated as `BPFN_Module_{Name}`
 | Module | Class | Responsibility |
 | --- | --- | --- |
 | notifications | `BPFN_Module_Notifications` | Create, remove, and format favourite notifications. |
-| email | `BPFN_Module_Email` | Send the HTML email on `bpfn_after_add_notification`. |
-| realtime | `BPFN_Module_Realtime` | Heartbeat and AJAX-fallback popups. |
+| email | `BPFN_Module_Email` | Register two BuddyPress email types and send them with `bp_send_email()` on `bp_activity_add_user_favorite`. |
+| realtime | `BPFN_Module_Realtime` | Heartbeat popups, when the owner has switched them on. |
 | assets | `BPFN_Module_Assets` | Enqueue front-end CSS and JS. |
-| admin | `BPFN_Module_Admin` | Admin AJAX (clear/migrate/progress), Tools and Display save handlers, auto-cleanup cron. |
-| settings | `BPFN_Module_Settings` | Front-end member preference screen and BuddyPress notification-settings row. |
+| admin | `BPFN_Module_Admin` | Admin AJAX (clear/migrate/progress), Tools and Display save handlers, opt-in auto-cleanup cron. |
+| settings | `BPFN_Module_Settings` | Front-end member preference screen (Web and Real-time) and the two email rows on BuddyPress's Settings > Email tab. |
 | favorite_display | `BPFN_Module_Favorite_Display` | The "who liked this" display and its AJAX endpoints. |
 
 Access a module from the singleton: `bpfn()->get_module( 'notifications' )` or the helper `bpfn_get_module( 'notifications' )`. Register your own with `bpfn_register_module()`.
@@ -37,7 +37,7 @@ Access a module from the singleton: `bpfn()->get_module( 'notifications' )` or t
 
 `includes/functions/` holds the public-facing procedural API:
 
-- `core-functions.php`: user settings, activity-type mapping, the enabled check, notification counts, event logging.
+- `core-functions.php`: user settings, email meta keys, activity-type mapping, the enabled check, notification counts.
 - `api-functions.php`: notification and module helpers.
 - `template-functions.php`: template output helpers and template-part loading.
 - `integration-functions.php`: the old-notification cleanup routine.

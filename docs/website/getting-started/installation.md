@@ -1,6 +1,6 @@
 # Installation
 
-Install BuddyPress first and confirm its Activity and Notifications components are active. Then install this plugin.
+Install BuddyPress 12.0 or later first and confirm its Activity and Notifications components are active. Then install this plugin.
 
 ## Automatic installation
 
@@ -23,6 +23,7 @@ Notifications start working immediately, with no configuration needed.
 On activation the plugin:
 
 - Creates two custom database tables, `{prefix}bp_favorite_notification_prefs` (member notification preferences) and `{prefix}bp_activity_favorites` (favourite tracking). See the [Database Tables](../developer-guide/database.md) page.
+- Creates the two BuddyPress emails if they are missing. It never overwrites an email you have edited.
 - Stores the current plugin version in the `bpfn_version` option.
 - Checks whether any pre-existing favourites need migrating into the new table, and if so raises an admin notice linking to the Tools tab. See [Tools and Maintenance](../usage/tools-and-maintenance.md).
 
@@ -36,9 +37,10 @@ There is nothing to switch on. Once BuddyPress is active and the plugin is activ
 To review what is happening on your site:
 
 1. Open **WB Plugins > Favorite Notifications > Overview** for favourite statistics and trending activities.
-2. Use the **Display** tab to choose how the favourite line renders and which icon it uses.
-3. Use the **Tools** tab to run the favourites migration, set the automatic cleanup retention period, or run a cleanup now.
-4. Members can review their own preferences at **Settings > Favorite Notifications** in their BuddyPress profile.
+2. Use the **Display** tab to choose how the favourite line renders and which icon it uses. You can also switch on realtime popups there.
+3. Use the **Tools** tab to run the favourites migration, switch on the automatic cleanup and set its retention period, or run a cleanup now.
+4. Edit the favourite emails in **Dashboard > Emails**.
+5. Members can review their own preferences at **Settings > Email** and **Settings > Favorite Notifications** in their BuddyPress profile.
 
 ## If BuddyPress is not active
 

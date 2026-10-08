@@ -1,41 +1,45 @@
 # Email Alerts
 
-Alongside the on-screen notification, the plugin can send the author an HTML email when their activity or comment is favourited.
+Alongside the on-screen notification, the plugin emails the author when their activity or comment is favourited. The emails are standard BuddyPress emails, so you edit them in the same place as every other BuddyPress email.
 
 ## When the email is sent
 
-The email is sent immediately after the BuddyPress notification is created, on the plugin's internal `bpfn_after_add_notification` action. This means an email is sent only when a notification is created, so the "no self-notification" rule and the member's preference both apply to email as well.
+The email is sent when a member favourites an activity or comment, on BuddyPress's `bp_activity_add_user_favorite` action. A member is never emailed for favouriting their own content.
 
-The email respects the recipient's "email" channel preference for the activity type. If the member has turned the email channel off, no email is sent even though the on-screen notification may still appear. See [Member Notification Preferences](../usage/member-preferences.md).
+An email does not depend on the web notification. If the author turned web notifications off but left email on, they still get the email. If they turned email off for that type, no email is sent. See [Member Notification Preferences](../usage/member-preferences.md).
 
-## Templates
+## Editing the emails
 
-There are two HTML templates, chosen by what was favourited:
+Go to **Dashboard > Emails**. Two email types are registered:
 
-- `templates/emails/activity-favorited.php` for a favourited activity.
-- `templates/emails/comment-favorited.php` for a favourited comment.
+- **Activity favourited** (`bpfn-activity-favorited`). Subject: `[{{{site.name}}}] {{favoriter.name}} favorited your update`.
+- **Comment favourited** (`bpfn-comment-favorited`). Subject: `[{{{site.name}}}] {{favoriter.name}} favorited your comment`.
 
-Both extend a shared base template (`templates/emails/base.php`). If a template file cannot be found, the plugin falls back to a built-in inline HTML message so an email is always sent.
+Edit the subject and body there like any other BuddyPress email. The messages use your site's BuddyPress email template and From settings.
 
-The subject lines are:
-
-- Activity: `[{site_name}] {user_name} favorited your activity`
-- Comment: `[{site_name}] {user_name} favorited your comment`
+The plugin creates the emails on install and upgrade if they are missing. It never overwrites an email you have edited. **BuddyPress > Tools > Reinstall emails** recreates them too.
 
 ## Tokens
 
-Templates and subject lines support these tokens, replaced at send time:
+These tokens work in the subject and body, along with BuddyPress's standard tokens such as `{{{site.name}}}`:
 
-`{site_name}`, `{site_url}`, `{user_name}`, `{recipient_name}`, `{activity_content}`, `{activity_link}`, `{settings_link}`, `{favorited_by}`, `{favorited_by_link}`.
+| Token | Value |
+| --- | --- |
+| `{{favoriter.name}}` | Name of the member who favourited. |
+| `{{{favoriter.url}}}` | Link to that member's profile. |
+| `{{activity.content}}` | A plain-text excerpt of the activity, 20 words. |
+| `{{{activity.url}}}` | Link to the favourited activity. |
+
+Developers can adjust the tokens with the `bpfn_email_tokens` filter. See the [Hooks Reference](../developer-guide/hooks-reference.md).
+
+## Unsubscribe
+
+Every email has a working unsubscribe link, using BuddyPress's own unsubscribe flow. Clicking it turns that email off for the member. The setting then shows as "No" on the member's **Settings > Email** tab.
 
 ## Sender name and address
 
-By default emails are sent from your site name and your site's admin email address (`admin_email`). There is no admin screen for this. Change them with the `bpfn_email_from_name` and `bpfn_email_from_email` filters. See the [Hooks Reference](../developer-guide/hooks-reference.md).
-
-## Customising the templates
-
-Copy the templates from the plugin's `templates/emails/` directory into a `buddypress/bp-favorite-notification/emails/` directory in your active theme, and your copies are used instead. See [Email Template Overrides](../developer-guide/email-template-overrides.md).
+The sender name and address come from your BuddyPress and WordPress email settings. The plugin has no separate sender setting.
 
 ## Delivery
 
-Emails are sent with WordPress's `wp_mail()`, so they go through whatever mail configuration or SMTP plugin your site already uses. The plugin does not send mail through any external service.
+Emails go through BuddyPress's email system and WordPress mail, so they use whatever mail configuration or SMTP plugin your site already has. The plugin does not send mail through any external service.

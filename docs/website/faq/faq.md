@@ -2,7 +2,7 @@
 
 ## Does this plugin require BuddyPress?
 
-Yes. BuddyPress must be installed and active, with the Activity and Notifications components enabled. The plugin extends those components and does nothing if BuddyPress is absent, showing an admin notice that explains why.
+Yes. BuddyPress 12.0 or later must be installed and active, with the Activity and Notifications components enabled. The plugin extends those components and does nothing if BuddyPress is absent, showing an admin notice that explains why.
 
 ## Do I need to configure anything?
 
@@ -18,23 +18,27 @@ Yes, per activity. When several members favourite the same activity, the entries
 
 ## Can members control their notifications?
 
-Yes. Each member has a **Settings > Favorite Notifications** screen in their BuddyPress profile with a switch per notification type (activity posts, comments) and per channel (web, email, realtime). Everything is on by default; turning one off stops it.
+Yes. Each member has two screens in their BuddyPress profile. **Settings > Email** has two rows, "A member favorites your activity" and "A member favorites your comment". **Settings > Favorite Notifications** has Web and Real-time switches per type (activity posts, comments). Everything is on by default; turning one off stops it.
 
 ## How do realtime notifications work?
 
-Realtime popups use the WordPress Heartbeat API, which the plugin sets to check every 15 seconds, with a plain AJAX fallback if Heartbeat is unavailable. A new favourite appears as a popup without a page refresh.
+Realtime popups are off for new installs. Switch them on under **WB Plugins > Favorite Notifications > Display**, and pick a check interval of 30 or 60 seconds. They use the WordPress Heartbeat API only. A new favourite appears as a popup without a page refresh.
 
-## Can I customise the email templates?
+## Can I customise the emails?
 
-Yes. Copy the templates from the plugin's `templates/emails/` directory into `your-theme/buddypress/bp-favorite-notification/emails/`, and your copies are used instead. See [Email Template Overrides](../developer-guide/email-template-overrides.md).
+Yes. Favourite emails are BuddyPress emails. Edit the subject and body in **Dashboard > Emails**, the same as any other BuddyPress email. See [Email Alerts](../features/email-alerts.md).
 
 ## Can I change the email sender name and address?
 
-Yes, with the `bpfn_email_from_name` and `bpfn_email_from_email` filters. There is no admin screen for this; by default emails come from your site name and your site's admin email address.
+Yes, in your BuddyPress and WordPress email settings. The emails use the site's BuddyPress email template and From settings. The plugin has no sender setting of its own.
+
+## Does the email have an unsubscribe link?
+
+Yes. Every email has a working unsubscribe link. Clicking it turns that email off for the member.
 
 ## Who can see the "who liked this" display?
 
-Logged-in members only. Logged-out visitors do not see the favourite line under activities.
+Logged-in members only. Logged-out visitors do not see the favourite line under activities. The member list only returns data for activities the member is allowed to read, so favourites on hidden or private group activity stay private.
 
 ## How many members does the "View all" list show?
 
@@ -42,11 +46,11 @@ The full list pages through with a **Load more** control, loading 20 members at 
 
 ## Can I change how the favourite line looks?
 
-Yes, on the **Display** tab. Choose inline usernames, an icon with the count, or an icon and count that opens the full list, and pick the icon (heart, star, bookmark, thumbs up, or none). See [Display Settings](../usage/display-settings.md).
+Yes, on the **Display** tab. Choose inline usernames, an icon with the count, or an icon and count that opens the full list, and pick the icon (heart, star, bookmark, thumbs up, or none). The icon applies to the "favorited by" line only, not the BuddyPress Favorite button. See [Display Settings](../usage/display-settings.md).
 
 ## Will old notifications pile up in my database?
 
-No. An automatic cleanup runs monthly and removes old read notifications. Set the retention period (minimum 7 days, default 30) on the Tools tab, where you can also disable it, run it on demand, and see the next scheduled run. Unread notifications are never deleted.
+Not if you switch on the automatic cleanup. It is off for new installs, and sites upgraded from before 2.2.0 keep it on. Enable it on the Tools tab and it runs monthly, removing old read notifications. Choose a retention period of 7, 15, 30, 60 or 90 days (default 30). On the Tools tab you can also run it on demand and see the next scheduled run. Unread notifications are never deleted.
 
 ## I have an existing site with lots of favourites. Do I need to do anything?
 

@@ -32,17 +32,18 @@ Any markup a `bpfn_favorite_display_html` callback returns is filtered through `
 
 ## Email filters
 
-| Filter | Purpose |
-| --- | --- |
-| `bpfn_email_from_name` | The From name. Defaults to the site name. |
-| `bpfn_email_from_email` | The From address. Defaults to `admin_email`. |
-| `bpfn_email_templates` | The registered email templates (subject and template path per key). |
-| `bpfn_email_template_key` | The template key chosen for an email. Args: `$key, $activity, $user_id`. |
-| `bpfn_email_template_path` | The resolved template file path. Args: `$path, $template`. |
-| `bpfn_email_data` | The full email data array before send. Args: `$email_data, $activity, $user_id`. |
-| `bpfn_email_subject` | The parsed subject. Args: `$subject, $tokens`. |
-| `bpfn_email_message` | The parsed message body. Args: `$message, $tokens`. |
-| `bpfn_email_headers` | The email headers array. Args: `$headers, $email_data`. |
+Favourite emails are BuddyPress emails, edited in **Dashboard > Emails**. The sender and headers come from BuddyPress and WordPress.
+
+| Filter | Since | Purpose |
+| --- | --- | --- |
+| `bpfn_email_tokens` | 2.2.0 | The token array passed to `bp_send_email()`: `favoriter.name`, `favoriter.url`, `activity.content`, `activity.url`, `unsubscribe`. Args: `$tokens, $activity, $user_id`. |
+
+```php
+add_filter( 'bpfn_email_tokens', function ( $tokens, $activity, $user_id ) {
+	$tokens['activity.content'] = wp_trim_words( wp_strip_all_tags( $activity->content ), 10, '...' );
+	return $tokens;
+}, 10, 3 );
+```
 
 ## Admin and general filters
 
@@ -53,7 +54,6 @@ Any markup a `bpfn_favorite_display_html` callback returns is filtered through `
 | `bpfn_notification_icons` | Icon markup map used by `bpfn_notification_icon()`. |
 | `bpfn_notification_icon_html` | The icon HTML for a type. Args: `$icon, $type`. |
 | `bpfn_should_show_notifications` | Whether notification UI should render on the current page. |
-| `bpfn_enable_logging` | Return true to enable the internal event log. Default false. |
 | `bpfn_get_notifications` | The formatted notifications array from `bpfn_get_notifications()`. |
 | `bpfn_format_notification_data` | The formatted data for a single notification. |
 
@@ -63,10 +63,9 @@ Any markup a `bpfn_favorite_display_html` callback returns is filtered through `
 | --- | --- | --- |
 | `bpfn_init` | Plugin initialised | `$plugin` |
 | `bpfn_load_modules` | After modules load | `$plugin` |
-| `bpfn_after_add_notification` | After a favourite notification is created (email hooks here at priority 20) | `$notification_id, $data, $activity, $user_id` |
-| `bpfn_after_send_email` | After an email is sent | `$sent, $email_data` |
+| `bpfn_after_add_notification` | After a favourite notification is created | `$notification_id, $data, $activity, $user_id` |
 | `bpfn_after_save_user_settings` | After member preferences are saved | `$user_id, $settings, $success` |
-| `bpfn_notification_settings` | Inside the BuddyPress notification-settings table | none |
+| `bpfn_notification_settings` | Inside the favourites table on the member's BuddyPress **Settings > Email** tab | none |
 | `bpfn_settings_setup_hooks` | Settings module hooks set up | `$module` |
 | `bpfn_registered_notification_type` | A custom notification type is registered | `$type, $args` |
 | `bpfn_notification_added` | A notification is added via `bpfn_add_notification()` | `$notification_id, $args` |
@@ -75,5 +74,4 @@ Any markup a `bpfn_favorite_display_html` callback returns is filtered through `
 | `bpfn_module_registered` | A module is registered via `bpfn_register_module()` | `$module_name, $module_instance` |
 | `bpfn_activate` / `bpfn_deactivate` | Activation / deactivation | none |
 | `bpfn_create_tables` | After the custom tables are created | `$wpdb, $charset_collate` |
-| `bpfn_log_event` | An internal event is logged (when logging is enabled) | `$log_data` |
 | `bpfn_template_not_found` | A template part could not be located | `$template, $args` |

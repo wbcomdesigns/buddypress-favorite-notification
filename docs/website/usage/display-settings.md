@@ -1,6 +1,6 @@
 # Display Settings
 
-The Display tab controls how the "who liked this" line under activities looks. Open **WB Plugins > Favorite Notifications > Display**.
+The Display tab controls how the "who liked this" line under activities looks, and whether real-time popups are on. Open **WB Plugins > Favorite Notifications > Display**.
 
 ## Display Mode
 
@@ -24,9 +24,20 @@ Choose the icon shown before the display:
 
 A heart can read as the platform's Like reaction, so a star or bookmark helps members tell favourites apart from likes. The choice is stored in the `bpfn_favorite_icon` option.
 
+The icon applies to the "favorited by" line under each activity only. The BuddyPress Favorite button keeps the icon that BuddyPress and your theme give it.
+
+## Real-time Popups
+
+The **Real-time Popups** card turns on popups that tell members, without a page refresh, when their activity is favourited.
+
+- **Real-time Popups**: tick "Show members a popup when their activity is favorited, without a page refresh". Off for new installs. Sites upgraded from before 2.2.0 keep popups on.
+- **Check Every**: 30 or 60 seconds. The default is 30.
+
+See [Realtime Popups](../features/realtime-popups.md).
+
 ## Saving
 
-Both settings save together on the Display tab through a nonce-protected form (`bpfn_display_settings`) that requires the `manage_options` capability. The submitted mode and icon are validated against the registered options, so only a real mode and a real icon can be stored. After saving, the tab reloads with a success message.
+All settings save together on the Display tab through a nonce-protected form (`bpfn_display_settings`) that requires the `manage_options` capability. The submitted mode, icon and interval are validated against the allowed values, so only a real option can be stored. After saving, the tab reloads with a success message.
 
 ## Effect on members
 

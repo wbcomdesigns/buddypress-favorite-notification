@@ -2,15 +2,24 @@
 
 Realtime popups show a favourite notification on screen the moment it happens, without a page refresh. They appear for logged-in members who have a page open on the site.
 
+## Turning popups on
+
+Popups are a site owner setting. Go to **WB Plugins > Favorite Notifications > Display** and find the **Real-time Popups** card:
+
+- **Real-time Popups**: tick "Show members a popup when their activity is favorited, without a page refresh".
+- **Check Every**: 30 or 60 seconds. The default is 30. A longer interval puts less load on a busy site.
+
+Popups are off for new installs. Sites upgraded from before 2.2.0 keep popups on. The settings are stored in the `bpfn_realtime_enabled` (`yes` or `no`) and `bpfn_realtime_interval` (`30` or `60`) options.
+
 ## How it works
 
-The plugin uses the WordPress Heartbeat API. While a member has a page open:
+The plugin uses the WordPress Heartbeat API only. While a member has a page open:
 
-1. The browser sends a heartbeat to the server on a fixed interval (the plugin sets it to 15 seconds).
+1. The browser sends a heartbeat to the server at the interval you chose.
 2. The server checks for new favourite notifications for that member since the last check.
 3. Any new notifications are returned in the heartbeat response, and the front-end script renders them as popups.
 
-If Heartbeat is unavailable, the front-end script falls back to a plain AJAX poll to the `bpfn_check_notifications` action, which returns the same data.
+There is no other transport. If Heartbeat is blocked, popups do not appear.
 
 ## What a popup shows
 
@@ -18,11 +27,11 @@ Each popup carries the notification text, a relative timestamp ("5 mins ago"), a
 
 ## Per-member control
 
-Realtime popups honour the member's "realtime" channel preference. The heartbeat integration is only active for a member who has realtime enabled for at least one notification type. A member who turns realtime off for every type stops receiving popups, and the heartbeat check short-circuits for them. See [Member Notification Preferences](../usage/member-preferences.md).
+Popups honour the member's "realtime" channel preference. The popup scripts load only for members who have realtime on for at least one notification type. A member who turns it off for every type receives no popups. The Real-time column on the member's settings screen only appears while you have popups switched on. See [Member Notification Preferences](../usage/member-preferences.md).
 
 ## Security
 
-Both the heartbeat check and the AJAX fallback verify a nonce (`bpfn_realtime_nonce`, with `bpfn-nonce` also accepted on the fallback) and confirm the member is logged in before returning any data. The dismiss action additionally confirms the notification belongs to the current member before marking it read.
+The heartbeat check verifies a nonce (`bpfn_realtime_nonce`) and confirms the member is logged in before returning any data. The dismiss action accepts the `bpfn-nonce` or `bpfn_realtime_nonce` nonce and confirms the notification belongs to the current member before marking it read.
 
 ## Requirements
 

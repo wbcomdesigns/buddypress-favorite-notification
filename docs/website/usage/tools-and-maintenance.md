@@ -16,11 +16,15 @@ The migration is a one-time step. New favourites are written to the table automa
 
 Old read notifications are removed automatically so they do not pile up in the database.
 
-- **Automatic cleanup** is on by default and runs monthly through WP-Cron.
-- **Retention period**: choose how long read notifications are kept. The minimum is 7 days; the default is 30 days.
-- You can disable the automatic cleanup, and see the last cleanup result and the next scheduled run.
+- **Automatic cleanup** is off for new installs. Tick **Enable automatic monthly cleanup** and save to turn it on. It then runs monthly through WP-Cron.
+- Sites upgraded from before 2.2.0 keep it on, unless you had saved it off.
+- **Retention period**: choose 7, 15, 30, 60 or 90 days. The default is 30 days. Any other stored value falls back to 30.
+- The first automatic run happens one month after you enable it, not immediately.
+- The tab shows the last cleanup result and the next scheduled run.
 
-Only **read** notifications older than the retention period are removed. Unread notifications are never deleted, so a member never loses a notification they have not seen.
+Only **read** notifications older than the retention period are removed. Unread notifications are never deleted, so a member never loses a notification they have not seen. The retention window is measured in UTC, so it does not depend on the MySQL server clock.
+
+If an automatic run fails, the Tools tab shows a warning, "Last automatic cleanup failed: ...", with the date and the error. It does not report a failed run as "deleted 0".
 
 ## Manual cleanup
 

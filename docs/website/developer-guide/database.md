@@ -12,7 +12,7 @@ Per-member notification preferences.
 | `user_id` | bigint | The member. |
 | `notification_type` | varchar(50) | Preference key, for example `activity_post`, `activity_comment`. |
 | `is_enabled` | tinyint(1), default 1 | Web channel on/off. |
-| `email_enabled` | tinyint(1), default 1 | Email channel on/off. |
+| `email_enabled` | tinyint(1), default 1 | Email channel on/off. Kept in step with BuddyPress's `favorite_activity` and `favorite_activity_comment` user meta. |
 | `realtime_enabled` | tinyint(1), default 1 | Realtime channel on/off. |
 | `created_at` | datetime | Row created. |
 | `updated_at` | datetime | Row updated (auto). |
@@ -30,7 +30,7 @@ Favourite tracking, used for the "who liked this" display and the admin statisti
 | `id` | bigint, auto-increment | Primary key. |
 | `activity_id` | bigint | The favourited activity. |
 | `user_id` | bigint | The member who favourited. |
-| `favorited_at` | datetime | When the favourite happened. |
+| `favorited_at` | datetime | When the favourite happened, stored in UTC. |
 
 Keys: primary key on `id`, index on `activity_id`, index on `user_id`, unique key on (`activity_id`, `user_id`).
 

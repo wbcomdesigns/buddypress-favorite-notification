@@ -15,13 +15,20 @@ Check, in order:
 
 ## Emails are not arriving
 
-1. **Email channel preference.** The author may have the email channel off for that type, or answered "No" on the BuddyPress **Settings > Notifications** favourites row. The on-screen notification can still appear while email is off.
-2. **Site mail delivery.** Emails are sent with `wp_mail()`. If your site cannot send mail generally, favourite emails will not arrive either. Install and configure an SMTP plugin and test with any WordPress email.
-3. **Template not found.** If a custom template override path is wrong, the plugin falls back to a built-in inline message rather than failing, so a broken override does not stop delivery, but it does replace your layout. Verify the theme override path is `your-theme/buddypress/bp-favorite-notification/emails/`.
+1. **Email preference.** The author may have answered "No" on the favourites rows of BuddyPress **Settings > Email**, or clicked the unsubscribe link in an earlier email. The on-screen notification can still appear while email is off.
+2. **Self-favourite.** A member is never emailed for favouriting their own content. Test with two different accounts.
+3. **Email missing or edited.** Check **Dashboard > Emails** for the two favourite emails. If one is missing or broken, use **BuddyPress > Tools > Reinstall emails** to recreate them. That resets every BuddyPress email to its default text.
+4. **Site mail delivery.** Emails go through BuddyPress and WordPress mail. If your site cannot send mail generally, favourite emails will not arrive either. Install and configure an SMTP plugin and test with any WordPress email.
+
+The email does not depend on web notifications. It is sent even if the member turned web notifications off.
+
+## The Email tab or Favorite Notifications tab looks wrong
+
+The plugin's own tab is **Settings > Favorite Notifications** (slug `favorite-notifications`). It holds the Web and Real-time switches only. Email alerts are on BuddyPress's own **Settings > Email** tab. Before 2.2.0 the plugin tab wrongly replaced the Email tab. Update to 2.2.0 or later to restore it.
 
 ## The "who liked this" line does not appear
 
-1. **Logged-in only.** The line is shown to logged-in members only, by design. Logged-out visitors never see it.
+1. **Logged-in only.** The line is shown to logged-in members only, by design. Logged-out visitors never see it. The member list is also refused for activities the member cannot read, such as hidden group activity.
 2. **No favourites yet.** The line renders only when an activity has at least one favourite.
 3. **Theme hooks.** The line renders on both a BuddyX/Reign theme action and the core `bp_activity_entry_content` action, so it should appear on any BuddyPress-compatible theme. If a theme heavily customises the activity entry template and drops the core action, the line may not render there.
 
@@ -39,10 +46,16 @@ The notice links to the Tools tab. Run the migration there. Dismissing the notic
 
 ## The automatic cleanup never runs
 
-The cleanup runs on WP-Cron on a custom "monthly" schedule the plugin registers. If your site has WP-Cron disabled or relies on a real system cron, ensure the `bpfn_auto_cleanup_notifications` event can fire. You can always run the cleanup manually from the Tools tab.
+1. **Switched off.** Automatic cleanup is off for new installs. Tick **Enable automatic monthly cleanup** on the Tools tab and save.
+2. **First run.** The first automatic run happens one month after you enable it, not immediately.
+3. **WP-Cron.** The cleanup runs on a custom "monthly" schedule the plugin registers. If your site has WP-Cron disabled or relies on a real system cron, ensure the `bpfn_auto_cleanup_notifications` event can fire.
+4. **Failed run.** The Tools tab shows "Last automatic cleanup failed: ..." with the error when a run fails.
+
+You can always run the cleanup manually from the Tools tab.
 
 ## Realtime popups do not show
 
-1. **Realtime preference.** A member who has turned realtime off for every type receives no popups by design.
-2. **Heartbeat.** Popups rely on the WordPress Heartbeat API (or its AJAX fallback). A plugin or host configuration that blocks `admin-ajax.php` or Heartbeat will prevent them.
-3. **Notifications component.** Realtime assets load only when the BuddyPress Notifications component is active.
+1. **Owner setting.** Popups are off for new installs. Switch them on under **WB Plugins > Favorite Notifications > Display**.
+2. **Realtime preference.** A member who has turned realtime off for every type receives no popups by design.
+3. **Heartbeat.** Popups rely on the WordPress Heartbeat API only. There is no fallback. A plugin or host configuration that blocks `admin-ajax.php` or Heartbeat will prevent them.
+4. **Notifications component.** Realtime assets load only when the BuddyPress Notifications component is active.

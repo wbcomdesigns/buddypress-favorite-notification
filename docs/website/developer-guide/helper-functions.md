@@ -20,7 +20,8 @@ The plugin exposes a procedural API in `includes/functions/`. All functions are 
 | `bpfn_get_user_settings( $user_id )` | array | Per-type, per-channel preferences, merged with defaults. |
 | `bpfn_save_user_settings( $user_id, $settings )` | bool | Write preferences to the plugin table. |
 | `bpfn_is_notification_enabled( $user_id, $type, $channel = 'web' )` | bool | Whether a member wants a notification for a type on a channel (`web`, `email`, `realtime`). |
-| `bpfn_get_activity_type( $activity_id )` | string | Map a BuddyPress activity to a preference key (`activity_post` or `activity_comment`). |
+| `bpfn_get_activity_type( $activity )` | string | Map a BuddyPress activity to a preference key (`activity_post` or `activity_comment`). Accepts an activity object or ID. |
+| `bpfn_email_meta_keys()` | array | The user-meta keys BuddyPress writes for the two email rows and the unsubscribe link: `activity_post` is `favorite_activity`, `activity_comment` is `favorite_activity_comment`. |
 
 ## Notifications
 
@@ -60,4 +61,18 @@ Get the module with `bpfn_get_module( 'favorite_display' )`:
 - `get_users_who_favorited( $activity_id, $limit = 3, $offset = 0 )`: paginated liker list with `users`, `total`, `remaining`.
 - `render_display( $activity_id )`: the full display markup, `wp_kses()`-filtered.
 - `get_display_modes()` / `get_icon_choices()`: the registered modes and icons (static).
-- `get_table_name()`: the favourites table name.
+- `get_saved_mode()` / `get_saved_icon()` (static): the saved display mode and icon, normalised to a registered value (defaults `inline` and `heart`).
+
+## Admin module methods
+
+Get the module with `bpfn_get_module( 'admin' )`, or call the static methods on `BPFN_Module_Admin`:
+
+- `BPFN_Module_Admin::get_retention_days( $days = null )`: the cleanup retention period. Returns 7, 15, 30, 60 or 90, and falls back to 30 for any other value. Null reads the saved option.
+- `BPFN_Module_Admin::is_auto_cleanup_enabled()`: whether the owner has switched automatic cleanup on. Off unless saved.
+
+## Realtime module methods
+
+Static methods on `BPFN_Module_Realtime`:
+
+- `BPFN_Module_Realtime::is_enabled()`: whether the owner has switched real-time popups on. Off unless saved.
+- `BPFN_Module_Realtime::get_interval( $seconds = null )`: the Heartbeat interval in seconds. Returns 30 or 60, and falls back to 30. Null reads the saved option.

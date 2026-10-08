@@ -38,4 +38,4 @@ Notification actions are named `fav_notify_{activity_id}` for activities and `fa
 
 ## Respecting member preferences
 
-Before creating a notification, the plugin checks the recipient's saved preference for that activity type and the "web" channel. If the member has turned favourite notifications off for that type, no notification is created. See [Member Notification Preferences](../usage/member-preferences.md).
+Before creating a notification, the plugin checks the recipient's saved preference for that activity type and the "web" channel. If the member has turned favourite notifications off for that type, no notification is created. Email and realtime popups check their own channels, so turning web off does not stop the email. See [Member Notification Preferences](../usage/member-preferences.md).
