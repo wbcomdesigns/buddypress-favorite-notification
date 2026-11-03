@@ -1,6 +1,5 @@
 === BuddyPress Favorite Notification ===
 Contributors: wbcomdesigns, vapvarun
-Donate link: https://wbcomdesigns.com/donate/
 Tags: buddypress, notifications, favorites, activity, realtime
 Requires at least: 6.5
 Tested up to: 7.1
@@ -76,7 +75,8 @@ Our support team is ready to help with setup, configuration, and troubleshooting
 
 = Documentation =
 
-* **[Documentation and Support](https://docs.wbcomdesigns.com/)** - Setup walkthrough and usage guides for every Wbcom plugin
+* **[Documentation](https://docs.wbcomdesigns.com/bp-family/buddypress-favourite-notification/)** - Setup, display settings, member preferences, and troubleshooting
+* **[Developer guide](https://docs.wbcomdesigns.com/bp-family/buddypress-favourite-notification/developer-guide/hooks-reference/)** - Every action and filter, with examples
 
 = Translations =
 
@@ -87,43 +87,25 @@ Our support team is ready to help with setup, configuration, and troubleshooting
 = Links =
 
 * [Plugin Homepage](https://wbcomdesigns.com/downloads/buddypress-favourite-notification/)
-* [Documentation](https://docs.wbcomdesigns.com/)
+* [Documentation](https://docs.wbcomdesigns.com/bp-family/buddypress-favourite-notification/)
 * [Support](https://wbcomdesigns.com/support/)
 * [Request Features](https://wbcomdesigns.com/contact/)
 
 = Compatibility =
 
 * WordPress 6.5 and higher
-* PHP 8.0 and higher
+* PHP 8.1 and higher
 * BuddyPress required - the plugin deactivates itself and explains why if BuddyPress is not active
 * Compatible with BuddyPress Nouveau and Legacy templates
 * Works with modern WordPress themes, including BuddyX and Reign
 
-= What's New in 2.1.0 =
+== More from Wbcom Designs ==
 
-The "who liked this" line is now yours to shape. A new Display tab lets you keep the familiar inline usernames, swap them for a compact icon and count, or make that count open the full list of members. You can also change the icon itself: a heart reads as the Like reaction to many members, so a star or bookmark keeps favorites visually distinct.
+Favorite notifications bring members back. These help give them a community worth coming back to:
 
-The full list now pages through with a Load more control instead of stopping at the first 50 members, which matters once an activity collects thousands of likes. Nothing changes on update unless you change the setting: existing sites keep inline usernames.
-
-= What's New in 2.0.1 =
-
-Member notification preferences now actually work. Until this release a member who turned favorite notifications off still received them on every channel: the check that was meant to read their choice returned "enabled" for any request made through admin-ajax, which is exactly how BuddyPress favoriting works. Two further paths ignored the preference as well. If your members have complained that switching notifications off does nothing, this is the release that fixes it.
-
-The admin is also rebuilt on the unified Wbcom card-panel interface under the shared "WB Plugins" menu, frontend colours follow your theme palette instead of fixed literals, and every surface mirrors correctly under RTL. The dead "Enhanced Notifications" toggle has been removed: BuddyPress strips notification markup down to a plain link, so the option could never change what members saw. German, Spanish, French, Italian and Portuguese (Brazil) translations are included, and the text domain is now registered so they load at all.
-
-== More Free Tools from Wbcom Designs ==
-
-Favorite Notification closes the loop the second a member's activity gets liked, turning small moments of appreciation into the real-time nudges that pull people back to your site. That retention loop pays off most when there is a community worth returning to, and these other free tools from Wbcom Designs help you build one:
-
-* **[BuddyX](https://wbcomdesigns.com/downloads/buddyx-theme/)** - A free, fast community theme for BuddyPress, BuddyBoss and PeepSo with a modern layout and dark mode.
-* **[BuddyNext](https://wbcomdesigns.com/downloads/buddynext/)** - Stand up a complete WordPress community with activity streams, member spaces, profiles, direct messaging, and built-in moderation.
-* **[Jetonomy](https://wbcomdesigns.com/downloads/jetonomy/)** - Add forums, question-and-answer boards, and idea spaces that stay tidy through trust-based auto-moderation even past 100,000 topics.
-* **[Mediaverse](https://wbcomdesigns.com/downloads/mediaverse/)** - Let members build photo and video albums, react, follow each other, and message privately while AI moderation keeps things clean.
-* **[Eventonomy](https://wbcomdesigns.com/downloads/eventonomy/)** - Run community events with RSVPs, calendars, and front-end submissions.
+* **[BuddyNext](https://buddynext.com/features/)** - A complete WordPress community with activity streams, member spaces, profiles, messaging, and moderation.
+* **[BuddyX](https://buddyxtheme.com/features/)** - A free, fast community theme for BuddyPress with a modern layout and dark mode.
 * **[WB Gamification](https://wbcomdesigns.com/downloads/wordpress-gamification-plugin/)** - Reward members with points, badges, and leaderboards to keep engagement high.
-* **[Listora](https://wbcomdesigns.com/downloads/listora/)** - Publish searchable directories across ten listing types with reviews, maps, and member-submitted entries from the front end.
-* **[WP Career Board](https://wbcomdesigns.com/downloads/wp-career-board/)** - Add a job board with front-end listings, applications, and employer profiles.
-* **[Learnomy](https://wbcomdesigns.com/downloads/learnomy/)** - Build and sell online courses, auto-grade quizzes, collect payments, and award certificates when learners finish.
 
 == Installation ==
 
@@ -152,12 +134,12 @@ To review what is happening on your site:
 1. Visit **WB Plugins > Favorite Notifications > Overview** for favorite statistics and trending activities
 2. Open the **Tools** tab to run the favorites migration, set the automatic cleanup retention period, or run a cleanup now
 3. Members can review their own notification preferences at **Settings > Favorite Notifications** in their BuddyPress profile
-4. See the [documentation](https://docs.wbcomdesigns.com/) for detailed instructions
+4. See the [documentation](https://docs.wbcomdesigns.com/bp-family/buddypress-favourite-notification/) for detailed instructions
 
 = Requirements =
 
 * WordPress 6.5 or higher
-* PHP 8.0 or higher
+* PHP 8.1 or higher
 * BuddyPress installed and active
 
 == Frequently Asked Questions ==
@@ -224,7 +206,7 @@ Yes. The plugin has a modular architecture and provides action and filter hooks 
 
 = Where can I get support? =
 
-* [Documentation](https://docs.wbcomdesigns.com/) - Free guides for every Wbcom plugin
+* [Documentation](https://docs.wbcomdesigns.com/bp-family/buddypress-favourite-notification/) - Setup and usage guides for this plugin
 * [Support](https://wbcomdesigns.com/support/) - Get help from our team
 * [Contact us](https://wbcomdesigns.com/contact/) - Report bugs and request features
 
@@ -234,15 +216,16 @@ No. The plugin does not collect, store, or share personal data outside your Word
 
 == Screenshots ==
 
-1. Admin dashboard with favorite and notification statistics.
-2. Tools tab - favorites migration and database maintenance options.
-3. Activity favorite (heart) control showing active and inactive states.
-4. Notifications screen listing a favorite notification.
-5. Discover - more free tools from Wbcom Designs.
+1. The "who favorited this" line under each activity in the stream.
+2. The full list of members who favorited an activity.
+3. Favorite notifications in a member's BuddyPress Notifications screen.
+4. Members choose web and real-time favorite notifications in their profile settings.
+5. Display tab - choose the display mode, the icon, and real-time popups.
+6. Overview tab - favorite statistics, recent favorites, and trending activities.
 
 == Changelog ==
 
-= 2.2.0 - October 2026 =
+= 2.2.0 - November 2026 =
 
 Site owners now control every behaviour that costs them data or server load, and emails move into BuddyPress Emails.
 
@@ -273,7 +256,10 @@ Site owners now control every behaviour that costs them data or server load, and
 * Security - Realtime popup text is escaped before it reaches the page.
 * Dev      - Removed the plugin email templates and the bpfn_email_templates, bpfn_email_template_key, bpfn_email_template_path, bpfn_email_data, bpfn_email_subject, bpfn_email_message, bpfn_email_headers, bpfn_email_from_name, and bpfn_email_from_email filters. Use Dashboard > Emails or the new bpfn_email_tokens filter.
 * Dev      - Removed the bpfn_log_event action, the bpfn_enable_logging filter, and the bpfn_check_notifications AJAX action.
+* Fix      - The plugin admin pages sat flush against the right edge of the screen on phones.
+* Fix      - The Documentation link in the plugin admin now opens this plugin's guide directly.
 * Dev      - Requires BuddyPress 12.0 or later.
+* Compat   - Requires PHP 8.1 or later and is tested up to WordPress 7.1.
 
 = 2.1.0 - July 2026 =
 
@@ -360,7 +346,7 @@ Major release with a favorite count display, an analytics dashboard, an indexed 
 == Upgrade Notice ==
 
 = 2.2.0 =
-Emails move to Dashboard > Emails, realtime popups get an on/off switch, and several cleanup and time zone bugs are fixed. Custom email template files in your theme are no longer used; edit the emails in Dashboard > Emails instead. Requires BuddyPress 12.0.
+Emails move to Dashboard > Emails, realtime popups get an on/off switch, and several cleanup and time zone bugs are fixed. Custom email template files in your theme are no longer used; edit the emails in Dashboard > Emails instead. Requires BuddyPress 12.0 and PHP 8.1.
 
 = 2.1.0 =
 Adds a Display tab to choose how the favorite line renders (inline usernames, icon and count, or a count that opens the full list) and which icon it uses. The member list now pages instead of stopping at 50. Existing sites keep inline usernames until you change the setting.

@@ -114,7 +114,13 @@ module.exports = function(grunt) {
                     '!FAVORITE-COUNT-FEATURE-PLAN.md',
                     '!FAVORITE-COUNT-IMPLEMENTATION.md',
                     '!BUILD.md',
-                    '!*.log'
+                    '!*.log',
+                    // WordPress.org listing assets live in SVN /assets, not in the plugin zip.
+                    '!.wordpress-org/**',
+                    '!screenshot-*.png',
+                    '!.contract-audit-baseline.json',
+                    '!phpcs.xml.dist',
+                    '!**/*.map'
                 ],
                 dest: 'dist/<%= pkg.name %>/'
             }

@@ -765,8 +765,9 @@
 }
 
 @media (max-width: 640px) {
+	/* Mirror core's 10px #wpcontent start padding so cards are not flush to the edge. */
 	.bpfn-admin {
-		margin-inline-end: 0;
+		margin-inline-end: 10px;
 	}
 
 	.bpfn-page-header {
