@@ -2,12 +2,34 @@
 /**
  * Core functions for BuddyPress Favorite Notification.
  *
+ * Member preferences live in ONE store, {prefix}bp_favorite_notification_prefs.
+ * Everything that reads or writes them goes through bpfn_get_user_settings() /
+ * bpfn_save_user_settings().
+ *
  * @package BuddyPress_Favorite_Notification
  */
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
+}
+
+/**
+ * User-meta keys BuddyPress writes for our email rows and unsubscribe links,
+ * keyed by preference type.
+ *
+ * BuddyPress core saves the Settings > Notifications rows and handles email
+ * unsubscribe links by writing these keys to user meta. BPFN_Module_Settings
+ * mirrors those writes into the prefs table, and bpfn_save_user_settings()
+ * writes them back, so the two never disagree.
+ *
+ * @return array
+ */
+function bpfn_email_meta_keys() {
+	return array(
+		'activity_post'    => 'favorite_activity',
+		'activity_comment' => 'favorite_activity_comment',
+	);
 }
 
 /**
@@ -18,9 +40,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function bpfn_get_user_settings( $user_id ) {
 	global $wpdb;
-	$table_name = $wpdb->prefix . 'bp_favorite_notification_prefs';
 
-	// Default settings.
+	$user_id  = (int) $user_id;
 	$defaults = apply_filters(
 		'bpfn_default_user_settings',
 		array(
@@ -34,30 +55,25 @@ function bpfn_get_user_settings( $user_id ) {
 				'email_enabled'    => 1,
 				'realtime_enabled' => 1,
 			),
-			'activity_update'  => array(
-				'is_enabled'       => 1,
-				'email_enabled'    => 1,
-				'realtime_enabled' => 1,
-			),
 		)
 	);
 
-	// Get user settings from database.
-	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table query.
-	$results = $wpdb->get_results(
-		$wpdb->prepare(
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is safe.
-			"SELECT notification_type, is_enabled, email_enabled, realtime_enabled FROM {$table_name} WHERE user_id = %d",
-			$user_id
-		),
-		ARRAY_A
-	);
-
-	if ( empty( $results ) ) {
-		return $defaults;
+	// Read on every favorite, notification render and heartbeat, so cache per user.
+	$results = wp_cache_get( 'bpfn_user_settings_' . $user_id, 'bpfn' );
+	if ( false === $results ) {
+		$table_name = $wpdb->prefix . 'bp_favorite_notification_prefs';
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table, cached above.
+		$results = (array) $wpdb->get_results(
+			$wpdb->prepare(
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is safe.
+				"SELECT notification_type, is_enabled, email_enabled, realtime_enabled FROM {$table_name} WHERE user_id = %d",
+				$user_id
+			),
+			ARRAY_A
+		);
+		wp_cache_set( 'bpfn_user_settings_' . $user_id, $results, 'bpfn' );
 	}
 
-	// Merge with defaults.
 	$settings = $defaults;
 	foreach ( $results as $row ) {
 		$type = $row['notification_type'];
@@ -77,20 +93,19 @@ function bpfn_get_user_settings( $user_id ) {
  * Save user notification settings.
  *
  * @param int   $user_id  User ID.
- * @param array $settings Settings to save.
+ * @param array $settings Settings to save, keyed by preference type.
  * @return bool Success status.
  */
 function bpfn_save_user_settings( $user_id, $settings ) {
 	global $wpdb;
+
+	$user_id    = (int) $user_id;
 	$table_name = $wpdb->prefix . 'bp_favorite_notification_prefs';
-
-	// Allow filtering before save.
-	$settings = apply_filters( 'bpfn_before_save_user_settings', $settings, $user_id );
-
-	$success = true;
+	$settings   = apply_filters( 'bpfn_before_save_user_settings', $settings, $user_id );
+	$success    = true;
 
 	foreach ( $settings as $type => $options ) {
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table query.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table write; cache cleared below.
 		$result = $wpdb->replace(
 			$table_name,
 			array(
@@ -108,37 +123,39 @@ function bpfn_save_user_settings( $user_id, $settings ) {
 		}
 	}
 
-	// Clear any cached settings.
 	wp_cache_delete( 'bpfn_user_settings_' . $user_id, 'bpfn' );
 
-	// Allow actions after save.
+	// Keep BuddyPress's copy in step: its unsubscribe handler skips a member whose
+	// meta already reads "no", so a stale "no" would make a later unsubscribe a no-op.
+	foreach ( bpfn_email_meta_keys() as $type => $meta_key ) {
+		if ( isset( $settings[ $type ]['email_enabled'] ) ) {
+			bp_update_user_meta( $user_id, $meta_key, $settings[ $type ]['email_enabled'] ? 'yes' : 'no' );
+		}
+	}
+
 	do_action( 'bpfn_after_save_user_settings', $user_id, $settings, $success );
 
 	return $success;
 }
 
 /**
- * Get activity type.
+ * Map a BuddyPress activity onto a preference type (activity_post or activity_comment).
  *
- * @param int $activity_id Activity ID.
- * @return string Activity type.
+ * The single resolver used by notifications, emails and real-time, so the three
+ * channels always check the same preference key.
+ *
+ * @param BP_Activity_Activity|int $activity Activity object or ID.
+ * @return string Preference type.
  */
-function bpfn_get_activity_type( $activity_id ) {
-	$activity = new BP_Activity_Activity( $activity_id );
+function bpfn_get_activity_type( $activity ) {
+	if ( ! $activity instanceof BP_Activity_Activity ) {
+		$activity = new BP_Activity_Activity( (int) $activity );
+	}
 
 	if ( empty( $activity->id ) ) {
 		return 'activity_post';
 	}
 
-	// Map BuddyPress activity types onto the two preference keys the settings
-	// screen actually writes: activity_comment and activity_post.
-	//
-	// This map used to send 'activity_update' (a normal BuddyPress post, and the
-	// most common type there is) to an 'activity_update' preference key. That key
-	// exists in the defaults but the settings screen never renders or saves it, so
-	// the lookup always found the default 1 and email notifications ignored the
-	// member's choice. Web notifications were unaffected because
-	// BPFN_Module_Notifications resolves the type itself, to activity_post.
 	// Keep this map in step with BPFN_Module_Settings::get_notification_types().
 	$type_map = apply_filters(
 		'bpfn_activity_type_map',
@@ -152,44 +169,34 @@ function bpfn_get_activity_type( $activity_id ) {
 }
 
 /**
- * Check if user has notification type enabled.
+ * Check if a notification type is enabled for a user on a channel.
  *
  * @param int    $user_id User ID.
- * @param string $type    Notification type.
- * @param string $channel Notification channel (web, email, realtime).
- * @return bool Whether the notification is enabled.
+ * @param string $type    Preference type.
+ * @param string $channel web, email or realtime.
+ * @return bool Whether enabled.
  */
 function bpfn_is_notification_enabled( $user_id, $type, $channel = 'web' ) {
 	// NOTE: there used to be a `defined( 'DOING_AJAX' ) return true` short-circuit
-	// here, meant to "default to enabled during setup or testing". It made this
-	// function useless: BuddyPress favouriting always posts through admin-ajax, so
-	// DOING_AJAX is defined for essentially every favourite and every caller got
-	// true regardless of what the member had chosen. Do not reintroduce it.
+	// here. BuddyPress favouriting always posts through admin-ajax, so it made every
+	// caller ignore the member's choice. Do not reintroduce it.
 	$settings = bpfn_get_user_settings( $user_id );
 
-	// If no settings exist for this type, default to enabled.
 	if ( ! isset( $settings[ $type ] ) ) {
 		return true;
 	}
 
-	switch ( $channel ) {
-		case 'email':
-			$enabled = ! empty( $settings[ $type ]['email_enabled'] );
-			break;
-		case 'realtime':
-			$enabled = ! empty( $settings[ $type ]['realtime_enabled'] );
-			break;
-		case 'web':
-		default:
-			$enabled = ! empty( $settings[ $type ]['is_enabled'] );
-			break;
-	}
+	$keys = array(
+		'email'    => 'email_enabled',
+		'realtime' => 'realtime_enabled',
+	);
+	$key  = isset( $keys[ $channel ] ) ? $keys[ $channel ] : 'is_enabled';
 
-	return $enabled;
+	return ! empty( $settings[ $type ][ $key ] );
 }
 
 /**
- * Get notification count for user.
+ * Count of unread favorite notifications for a user.
  *
  * @param int   $user_id User ID.
  * @param array $args    Additional arguments.
@@ -200,19 +207,16 @@ function bpfn_get_notification_count( $user_id, $args = array() ) {
 		return 0;
 	}
 
-	global $bp;
-
-	$defaults = array(
-		'component_name' => isset( $bp->favorite_notifier ) ? $bp->favorite_notifier->id : 'favorite_notifier',
-		'is_new'         => 1,
+	$args            = wp_parse_args(
+		$args,
+		array(
+			'component_name' => 'favorite_notifier',
+			'is_new'         => 1,
+		)
 	);
-
-	$args            = wp_parse_args( $args, $defaults );
 	$args['user_id'] = $user_id;
 
-	$notifications = BP_Notifications_Notification::get( $args );
-
-	return count( $notifications );
+	return (int) BP_Notifications_Notification::get_total_count( $args );
 }
 
 /**
@@ -222,52 +226,22 @@ function bpfn_get_notification_count( $user_id, $args = array() ) {
  * @return array|false Formatted notification data.
  */
 function bpfn_format_notification_data( $notification ) {
-	global $bp;
-
-	// Check if component exists.
-	if ( ! isset( $bp->favorite_notifier ) || ! isset( $bp->favorite_notifier->notification_callback ) ) {
-		return false;
-	}
-
-	// Get base data from notification callback.
-	$data = call_user_func(
-		$bp->favorite_notifier->notification_callback,
+	$data = bpfn_compat_format_notifications(
 		$notification->component_action,
 		$notification->item_id,
 		$notification->secondary_item_id,
 		1,
-		'array'
+		'array',
+		$notification->id
 	);
 
 	if ( ! is_array( $data ) ) {
 		return false;
 	}
 
-	// Enhance with additional data.
 	$data['id']     = $notification->id;
 	$data['date']   = $notification->date_notified;
 	$data['is_new'] = $notification->is_new;
 
 	return apply_filters( 'bpfn_format_notification_data', $data, $notification );
-}
-
-/**
- * Log notification events.
- *
- * @param string $event Event type.
- * @param array  $data  Event data.
- */
-function bpfn_log_event( $event, $data = array() ) {
-	if ( ! apply_filters( 'bpfn_enable_logging', false ) ) {
-		return;
-	}
-
-	$log_data = array(
-		'event'     => $event,
-		'timestamp' => current_time( 'mysql' ),
-		'user_id'   => get_current_user_id(),
-		'data'      => $data,
-	);
-
-	do_action( 'bpfn_log_event', $log_data );
 }

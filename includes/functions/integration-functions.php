@@ -22,20 +22,22 @@ function bpfn_clear_old_notifications( $days = 30 ) {
 	if ( ! bp_is_active( 'notifications' ) ) {
 		return array(
 			'count' => 0,
-			'error' => 'Notifications component not active',
+			'error' => __( 'Notifications component not active', 'buddypress-favorite-notification' ),
 		);
 	}
 
 	if ( empty( $bp->notifications->table_name ) ) {
 		return array(
 			'count' => 0,
-			'error' => 'Notifications table is unavailable',
+			'error' => __( 'Notifications table is unavailable', 'buddypress-favorite-notification' ),
 		);
 	}
 
 	$table     = $bp->notifications->table_name;
 	$component = isset( $bp->favorite_notifier ) ? $bp->favorite_notifier->id : 'favorite_notifier';
 
+	// date_notified is GMT (bp_core_current_time()), so compare against
+	// UTC_TIMESTAMP(); NOW() is the MySQL server clock and skews by its offset.
 	// Read notifications only - `is_new = 0` is deliberate. Deleting unread ones
 	// destroys notifications the member has never seen. It also makes "0 cleared"
 	// a normal result on a quiet site, which is why the caller reports the rule
@@ -44,7 +46,7 @@ function bpfn_clear_old_notifications( $days = 30 ) {
 	$deleted = $wpdb->query(
 		$wpdb->prepare(
 			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name from BP.
-			"DELETE FROM {$table} WHERE component_name = %s AND is_new = 0 AND date_notified < DATE_SUB(NOW(), INTERVAL %d DAY)",
+			"DELETE FROM {$table} WHERE component_name = %s AND is_new = 0 AND date_notified < DATE_SUB(UTC_TIMESTAMP(), INTERVAL %d DAY)",
 			$component,
 			$days
 		)
@@ -55,7 +57,7 @@ function bpfn_clear_old_notifications( $days = 30 ) {
 	if ( false === $deleted ) {
 		return array(
 			'count' => 0,
-			'error' => 'Database error while clearing notifications',
+			'error' => __( 'Database error while clearing notifications', 'buddypress-favorite-notification' ),
 		);
 	}
 

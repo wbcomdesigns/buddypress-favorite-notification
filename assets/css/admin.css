@@ -149,6 +149,7 @@
 }
 
 .bpfn-settings-sidebar {
+	box-sizing: border-box; /* width: 100% below 1024px must include the 1px border. */
 	width: 240px;
 	flex-shrink: 0;
 	background: var(--bpfn-admin-white);
@@ -764,8 +765,9 @@
 }
 
 @media (max-width: 640px) {
+	/* Mirror core's 10px #wpcontent start padding so cards are not flush to the edge. */
 	.bpfn-admin {
-		margin-inline-end: 0;
+		margin-inline-end: 10px;
 	}
 
 	.bpfn-page-header {

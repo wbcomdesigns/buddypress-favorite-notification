@@ -7,17 +7,18 @@
 > - `audit/CODE_FLOWS.md` — trigger → handler → output pipelines (STALE: 2026-06-05)
 > - `audit/graph.html` — interactive manifest graph (STALE: 2026-06-05)
 > - `audit/wppqa-baseline-2026-06-05/SUMMARY.md` — superseded bug baseline; the live bug
->   list is `manifest.json` → `static_analysis` + "Known issues" below
+>   list is Basecamp; `manifest.json` → `static_analysis` is the audit snapshot
 >
-> `manifest.json` was fully rescanned against shipped code on **2026-07-16** and is current.
+> `manifest.json` was delta-updated for 2.2.0 on **2026-10-08** (hooks, AJAX, options, emails).
 > The other four artefacts still predate the 2.0.x admin migration — do not trust them on
 > admin pages, settings, modules, or hooks. Answer "what does X do / where is Y" from the
 > manifest, not a fresh scan.
 
 ## What this is
-Free Wbcom Designs BuddyPress addon. Sends BP + email + realtime notifications when a
-member's activity/comment is favorited, and renders a Facebook-style "X and N others liked
-this" display. Hard dependency on BuddyPress. Current version 2.1.0, released from `master`.
+Free Wbcom Designs BuddyPress addon. Sends a BP notification, a BuddyPress Email and (optionally)
+a realtime popup when a member's activity/comment is favorited, and renders a "X and N others
+liked this" line. Requires BuddyPress 12.0+ (URL API). Version 2.2.0, developed on
+`release/2.2.0`, released from `master`.
 
 ## Development skill — follow this
 All plugin work MUST follow **`/wp-plugin-development`** (canonical Wbcom plugin skill):
@@ -27,50 +28,60 @@ follows **`/ux-foundation`**; audit drift with **`/ux-audit`**. Onboarding artef
 `audit/` are owned by **`/wp-plugin-onboard`** — regenerate, never hand-edit entries.
 
 ## Architecture (90-second orientation)
-- Entry: `bp-favorite-notification.php` — singleton `BP_Favorite_Notification`, `BPFN_` constants,
-  creates 2 custom tables on activation, loads 7 modules on `bp_init`.
-- Modules (`includes/modules/class-*.php`): notifications, email, realtime, assets, admin,
-  settings, favorite_display.
-- BP pseudo-component `favorite_notifier` registered in `includes/compat/buddypress-compat.php`.
-- Procedural helpers in `includes/functions/` (api/core/template/integration).
-- Migration: `includes/migrations/class-favorites-migration.php` (usermeta → table, batched).
-- No REST, no blocks, no shortcodes, no CPTs, no `register_setting` (all verified 0 hits, 2026-07-16).
+- Entry: `bp-favorite-notification.php` - singleton `BP_Favorite_Notification`, `BPFN_` constants.
+  `check_dependencies()` (plugins_loaded 5) loads `includes/functions/*` and hooks `init()` only when
+  BuddyPress 12.0+ is active. `maybe_upgrade()` (activation + bp_init 20) runs once per version.
+- Modules (`includes/modules/class-*.php`, loaded on bp_init 5): notifications, email, realtime,
+  assets, admin, settings, favorite_display.
+- **One owner per job - do not add a second path:**
+  - Notification create/remove/format: `BPFN_Module_Notifications` only. BP reaches the formatter
+    through the component's `notification_callback` (`bpfn_compat_format_notifications()`).
+  - Email: `BPFN_Module_Email` hooks `bp_activity_add_user_favorite` itself (NOT
+    `bpfn_after_add_notification`, or email would depend on the web channel) and sends with
+    `bp_send_email()`. Types `bpfn-activity-favorited` / `bpfn-comment-favorited`, installed by
+    `BPFN_Module_Email::install()` (never overwrites an owner's edited post; re-run on BP's
+    `bp_core_install_emails`). Unsubscribe via `bp_email_get_unsubscribe_type_schema`.
+  - Preference type of an activity: `bpfn_get_activity_type()`; of a stored action:
+    `BPFN_Module_Notifications::get_type_for_action()`.
+  - Member preferences: ONE store, `{prefix}bp_favorite_notification_prefs`, via
+    `bpfn_get_user_settings()` / `bpfn_save_user_settings()` (object-cached per user).
+- `includes/compat/buddypress-compat.php` only registers the `favorite_notifier` pseudo-component.
+- Migration: `includes/migrations/class-favorites-migration.php` (usermeta -> table, batched).
+- No REST, no blocks, no shortcodes, no CPTs, no `register_setting`.
 
 ## Admin UI
 - ONE admin page: submenu **`bpfn-dashboard`** under the shared **WB Plugins hub**
-  (`wbcomplugins`), cap `manage_options`, rendered by `BPFN_Admin::render_page()`
-  (`includes/admin/class-bpfn-admin.php`) with the modern card-panel shell
-  (`includes/admin/views/shell.php` + `overview.php` / `display.php` / `tools.php` /
-  `discover.php`). Four tabs (`BPFN_Admin::get_tabs()`, filter `bpfn_admin_tabs`):
-  **Overview** (stats, trending, quick actions), **Display** (favorite display mode +
-  icon), **Tools** (migration, cleanup), **Discover** (ecosystem cards).
-- There is still NO Settings API options page — `register_setting()` is used nowhere.
-  The Display tab persists via a hand-rolled POST handler like Tools does:
-  `BPFN_Module_Admin::handle_display_settings_save()`, nonce `bpfn_display_settings`,
-  cap `manage_options`. Both values are validated against
-  `BPFN_Module_Favorite_Display::get_display_modes()` / `::get_icon_choices()` rather
-  than merely sanitized, so a crafted POST cannot persist a mode the renderer has no
-  branch for.
-- The former Settings tab's only field ("Enhanced Notifications", option `bpfn_options`)
-  was removed on branch 2.0.0: its enhanced template could never render — BuddyPress
-  kses-strips notification descriptions to `<a href class>` on every surface.
-- `BPFN_Module_Settings` (`includes/modules/class-settings.php`) is **front-end only**
-  and IS loaded: BP member **Settings → Favorite Notifications** subnav + per-user
-  save handler (template `templates/settings/notifications.php`, styles
-  `assets/css/settings.css`).
+  (`wbcomplugins`), cap `manage_options`, rendered by `BPFN_Admin::render_page()` with the
+  card-panel shell (`includes/admin/views/shell.php` + `overview.php` / `display.php` /
+  `tools.php` / `discover.php`). Tabs via `BPFN_Admin::get_tabs()` (filter `bpfn_admin_tabs`).
+  Activation redirects here once (transient `bpfn_activation_redirect`, skipped for bulk).
+- Both forms are hand-rolled POST handlers in `BPFN_Module_Admin` (no Settings API):
+  Display (`bpfn_display_settings` nonce) saves mode, icon, realtime switch + interval; Tools
+  (`bpfn_cleanup_settings`) saves cleanup switch + retention.
+- **Every option has ONE accessor that validates against its allowed set; the save handler, the
+  view and the runtime all call it.** Never read these options with a bare `get_option()`:
+  `BPFN_Module_Favorite_Display::get_saved_mode()` / `get_saved_icon()`,
+  `BPFN_Module_Realtime::is_enabled()` / `get_interval()` (30|60),
+  `BPFN_Module_Admin::is_auto_cleanup_enabled()` / `get_retention_days()` (7/15/30/60/90).
+- Flash notices are `.bpfn-notice ... notice is-dismissible inline` so core adds the close button
+  without moving them out of the shell.
 
 ## Settings / options
-- Standalone options: `bpfn_auto_cleanup_enabled`, `bpfn_auto_cleanup_days`,
-  `bpfn_last_auto_cleanup`, `bpfn_version`, `bpfn_show_migration_notice`,
-  `bpfn_favorites_migrated`, `bpfn_migration_status`, `bpfn_migration_log`,
-  `bpfn_display_mode` (default `inline`), `bpfn_favorite_icon` (default `heart`).
-- `bpfn_options` (group `bpfn_settings`) is RETIRED — never registered, written, or read.
-  The last stale reader (the `bpfn_get_diagnostics()` dump) went with the diagnostic
-  helpers; `integration-functions.php` is now 84 lines. Verified 0 `get_option('bpfn_options')`
-  calls across all non-vendor PHP (2026-07-30). Only explanatory comments remain.
-- There is NO `register_setting()` anywhere. The Tools tab persists its two options via a
-  hand-rolled POST handler (`class-admin.php:80-128`, nonce `bpfn_cleanup_settings`).
-- Per-user prefs: `{prefix}bp_favorite_notification_prefs` via `bpfn_get/save_user_settings`.
+- Owner options: `bpfn_display_mode` (inline), `bpfn_favorite_icon` (heart),
+  `bpfn_realtime_enabled` (unset = off), `bpfn_realtime_interval` (30),
+  `bpfn_auto_cleanup_enabled` (unset = off), `bpfn_auto_cleanup_days` (30),
+  `bpfn_last_auto_cleanup` (`date` + `deleted`/`remaining`, or `date` + `error`), `bpfn_version`,
+  migration options. Defaults for realtime/cleanup are OFF for new installs; `maybe_upgrade()`
+  writes 'yes' once for sites upgrading from < 2.2.0 (owner decision, 2026-10-08).
+- Member UI: BP **Settings > Email** gets two rows (`notifications[favorite_activity]`,
+  `notifications[favorite_activity_comment]`); BP saves them - and BP unsubscribe links - as user
+  meta, which `BPFN_Module_Settings::mirror_email_meta()` copies into the prefs table, and
+  `bpfn_save_user_settings()` writes back (keys in `bpfn_email_meta_keys()`). The plugin's own tab
+  is slug **`favorite-notifications`** (never `notifications` - that is BP's Email tab) with Web +
+  Real-time only; the Real-time column is hidden, and its stored value kept, while the owner switch
+  is off.
+- Timestamps: `favorited_at` and BP's `date_notified` are GMT. Compare with `UTC_TIMESTAMP()`,
+  never `NOW()` (MySQL server clock). Render with `wp_date()`.
 
 ## Frontend assets / design tokens
 - Shared `--bpfn-*` design tokens live in `assets/css/notifications.css` (the style
@@ -82,53 +93,15 @@ follows **`/ux-foundation`**; audit drift with **`/ux-audit`**. Onboarding artef
 - `assets/js/notifications.js` was deleted on 2.0.0 (100% dead: wrong selectors,
   AJAX actions without handlers). Frontend JS is favorite-display.js + realtime.js.
 
-## Known issues (updated 2026-07-16)
-All four baseline (2026-06-05) issues are FIXED on branch 2.0.0: (1) the settings
-module is loaded (front-end only), (2) native `confirm()` replaced by the
-`bpfnConfirm` modal, (3) `bpfn_dismiss_migration_notice` has a real handler in
-`BPFN_Admin`, (4) who-favorited/trending N+1 eliminated (batched, capped, cached).
-The 2026-07-03 audit's Blocker (dead "Enhanced Notifications" toggle) and Major
-findings (dead legacy admin.js + notifications.js, inline member-settings styles,
-untokenized realtime.css, Reign dark-mode contrast) are also fixed.
-
-**FIXED 2026-07-17 (branch 2.0.0) — the preference blocker.** All three causes were
-fixed together and verified on a pristine WP 7.0 + BP 14.5 install with `DOING_AJAX`
-defined, going through `bp_activity_add_user_favorite()` (preference ON -> 1
-notification; OFF -> web/email false, 0 notifications; compat-only ON -> 1, OFF -> 0):
-1. `bpfn_is_notification_enabled()` no longer short-circuits on `DOING_AJAX`. **Do not
-   reintroduce that branch** — BP favoriting always posts via admin-ajax, so it made the
-   function return true for every real favorite and the preference read below it was dead
-   code. There is a comment in place saying so.
-2. `bpfn_compat_add_notification()` (`buddypress-compat.php`, prio 15) now resolves the
-   type the same way `BPFN_Module_Notifications` does and honours the preference. It
-   still fires as a safety net when the module does not — verified both ways.
-3. `bpfn_get_activity_type()` mapped `activity_update` (a normal BP post, the most common
-   type) to an `activity_update` preference key that the settings screen never renders or
-   saves, so the lookup hit the default `1` and **email** ignored the member's choice. The
-   map now sends it to `activity_post`. **Keep `bpfn_get_activity_type()`'s map in step
-   with `BPFN_Module_Settings::get_notification_types()`** — they must agree, or a channel
-   silently checks a key nothing writes.
-- The two production-path `error_log()` calls in `core-functions.php` are removed. The one
-  at `class-notifications.php:104` remains: it only fires when the component failed to
-  initialise. `bpfn_compat_verify_registration()` is already `WP_DEBUG`-guarded.
-
-**FIXED 2026-07-30 (verified at the 2.1.0 release gate) — the dead-UI finding.** The
-BP notification-settings row is no longer decorative. `BPFN_Module_Settings::notification_settings()`
-still renders radios named `notifications[favorite_activity]`, but
-`save_bp_notification_settings()` (`class-settings.php:195`) now hooks
-`bp_core_notification_settings_after_save` (fired by BP core in
-`bp-settings/actions/notifications.php:52` since BP 1.5, after the core save and before the
-redirect) and mirrors the posted value into the plugin's own prefs table. Verified on a live
-BP 14.5.2 install: posting `no` sets `email_enabled` to 0, posting `yes` restores it to 1, and
-the web channel's `is_enabled` survives both saves. **Keep the read and the write on the same
-storage** — the row reads its checked state from the prefs table, so if a future change writes
-only user meta the surface goes decorative again.
-
-`audit/manifest.json`: structural sections are current as of the 2026-07-29 rescan; the
-`static_analysis` block was re-verified finding by finding on 2026-07-30 (it had still listed
-BPFN-PREF-01/02 and BPFN-DEADUI-01 as open blockers after 2.0.1 shipped their fixes).
-`CAPABILITIES.md` is the human roll-up. `AUDIT-VERDICT.md` still predates the 2.0.x removals —
-treat it as stale.
+## Things that look removable but are load-bearing
+- `bpfn_is_notification_enabled()` must never short-circuit on `DOING_AJAX`: BP favoriting always
+  posts through admin-ajax.
+- The two who-favorited AJAX endpoints are members-only and check `bp_activity_user_can_read()`;
+  `display_favorite_count()` renders nothing for visitors.
+- `realtime.js` concatenates server data into HTML; the server escapes it in
+  `BPFN_Module_Realtime::format_realtime_notification()`.
+- `bin/check-cleanup.php` (`wp eval-file`) is the regression check for the retention gate and the
+  GMT cleanup window. Not shipped (Gruntfile `!bin/**`), excluded from PHPStan.
 
 ## Favorite display (`includes/modules/class-favorite-display.php`)
 - **One renderer, two callers.** `render_display()` is the ONLY place the activity-stream
