@@ -153,6 +153,12 @@ class BPFN_Module_Notifications {
 	 * @return string|array|false The formatted notification.
 	 */
 	public function format_notification( $action, $item_id, $secondary_item_id, $total_items, $format = 'string', $id = 0 ) {
+		// Stored notifications outlive the Activity component; without it the
+		// activity class is not loaded, so render nothing instead of a fatal.
+		if ( ! bp_is_active( 'activity' ) ) {
+			return false;
+		}
+
 		$activity = new BP_Activity_Activity( $item_id );
 		if ( empty( $activity->id ) ) {
 			return false;

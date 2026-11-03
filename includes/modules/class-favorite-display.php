@@ -67,8 +67,11 @@ class BPFN_Module_Favorite_Display {
 
 		// AJAX handlers. Members only: display_favorite_count() renders nothing for
 		// visitors, so a logged-out endpoint would only be an unused public surface.
-		add_action( 'wp_ajax_bpfn_get_all_favorites', array( $this, 'ajax_get_all_favorites' ) );
-		add_action( 'wp_ajax_bpfn_refresh_favorite_display', array( $this, 'ajax_refresh_favorite_display' ) );
+		// Both handlers load activities, so they only exist with the Activity component.
+		if ( bp_is_active( 'activity' ) ) {
+			add_action( 'wp_ajax_bpfn_get_all_favorites', array( $this, 'ajax_get_all_favorites' ) );
+			add_action( 'wp_ajax_bpfn_refresh_favorite_display', array( $this, 'ajax_refresh_favorite_display' ) );
+		}
 	}
 
 	/**

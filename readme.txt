@@ -258,6 +258,7 @@ Site owners now control every behaviour that costs them data or server load, and
 * Dev      - Removed the bpfn_log_event action, the bpfn_enable_logging filter, and the bpfn_check_notifications AJAX action.
 * Fix      - The plugin admin pages sat flush against the right edge of the screen on phones.
 * Fix      - The Documentation link in the plugin admin now opens this plugin's guide directly.
+* Fix      - Sites with the BuddyPress Activity component turned off no longer crash on pages that show the notifications menu.
 * Dev      - Requires BuddyPress 12.0 or later.
 * Compat   - Requires PHP 8.1 or later and is tested up to WordPress 7.1.
 
