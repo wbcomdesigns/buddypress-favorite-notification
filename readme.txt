@@ -7,7 +7,7 @@ Requires PHP: 8.1
 Tested with BuddyPress: 14.5.2
 Requires BuddyPress: 12.0
 Requires Plugins: buddypress
-Stable tag: 2.2.0
+Stable tag: 2.2.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: buddypress-favorite-notification
@@ -225,6 +225,15 @@ No. The plugin does not collect, store, or share personal data outside your Word
 
 == Changelog ==
 
+= 2.2.1 - November 2026 =
+
+Login, speed and accessibility fixes for the member pages.
+
+* Fix      - A logged-out visitor opening Settings > Favorite Notifications now goes to the login screen, like the other Settings tabs, instead of a page-not-found error.
+* Fix      - Pressing Escape on the who-favorited list now returns focus to the button that opened it, even right after the page loads.
+* Improve  - Activity pages no longer send one extra request per favorited post after loading, so busy streams load faster.
+* Dev      - Renamed the admin layout file from shell.php to layout.php so the plugin zip installs on hosts whose firewalls block that file name.
+
 = 2.2.0 - November 2026 =
 
 Site owners now control every behaviour that costs them data or server load, and emails move into BuddyPress Emails.
@@ -345,6 +354,9 @@ Major release with a favorite count display, an analytics dashboard, an indexed 
 * New      - Initial release: favorite notifications, BuddyPress integration, and user preferences.
 
 == Upgrade Notice ==
+
+= 2.2.1 =
+Logged-out visitors reach the login screen from the Favorite Notifications tab, and activity pages load faster. Safe update, no settings change.
 
 = 2.2.0 =
 Emails move to Dashboard > Emails, realtime popups get an on/off switch, and several cleanup and time zone bugs are fixed. Custom email template files in your theme are no longer used; edit the emails in Dashboard > Emails instead. Requires BuddyPress 12.0 and PHP 8.1.

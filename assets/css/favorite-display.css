@@ -5,7 +5,7 @@
  * Consumes the shared --bpfn-* design tokens defined in notifications.css
  * (this stylesheet's registered dependency). The tokens are theme-aware
  * (BuddyX --bx-color-* vars) and carry dark-appropriate fallbacks under
- * [data-bx-mode="dark"] / auto + prefers-color-scheme, so the inline
+ * [data-bx-mode="dark"] (the theme's own toggle, never the OS setting), so the inline
  * display AND the "who liked this" modal follow the active color mode on
  * BuddyX AND on Reign (which sets the mode attribute without defining the
  * --bx-color-* variables).

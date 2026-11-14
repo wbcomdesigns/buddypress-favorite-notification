@@ -2,7 +2,7 @@
 /**
  * Discover tab: ecosystem cross-promotion (read-only display view).
  *
- * Rendered inside shell.php. Pure presentation — product cards with
+ * Rendered inside layout.php. Pure presentation — product cards with
  * outbound links to other free Wbcom Designs tools. No forms, no settings,
  * no options, no AJAX.
  *

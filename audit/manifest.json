@@ -3,7 +3,7 @@
   "plugin": {
     "slug": "buddypress-favorite-notification",
     "name": "BuddyPress Favorite Notification",
-    "version": "2.1.0",
+    "version": "2.2.1",
     "namespace": "(none, BPFN_ prefix)",
     "main_file": "bp-favorite-notification.php",
     "text_domain": "buddypress-favorite-notification",
@@ -102,7 +102,7 @@
       "registered_at": "includes/admin/class-bpfn-admin.php:106-113 (add_submenu_page)",
       "hook_suffix": "*_page_bpfn-dashboard",
       "renderer": "BPFN_Admin::render_page (class-bpfn-admin.php:233)",
-      "shell": "includes/admin/views/shell.php",
+      "shell": "includes/admin/views/layout.php",
       "tabs": [
         "overview",
         "display",

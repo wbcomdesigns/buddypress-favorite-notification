@@ -61,11 +61,13 @@ class BPFN_Module_Settings {
 	 * Setup BuddyPress navigation.
 	 */
 	public function setup_nav() {
-		if ( ! bp_is_active( 'settings' ) || ! is_user_logged_in() ) {
+		if ( ! bp_is_active( 'settings' ) ) {
 			return;
 		}
 
-		// Add sub-nav item under Settings.
+		// Registered for everyone, like BuddyPress's own Settings tabs:
+		// user_has_access hides the tab and makes BuddyPress send a logged-out
+		// visitor to the login screen instead of a 404.
 		bp_core_new_subnav_item(
 			array(
 				'name'            => esc_html__( 'Favorite Notifications', 'buddypress-favorite-notification' ),
