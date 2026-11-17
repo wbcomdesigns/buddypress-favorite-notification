@@ -101,7 +101,7 @@ $bpfn_mode_help = array(
 					<?php
 					$bpfn_icon_entity = isset( $bpfn_icons[ $bpfn_icon ]['entity'] ) ? $bpfn_icons[ $bpfn_icon ]['entity'] : '';
 					if ( '' !== $bpfn_icon_entity ) {
-						echo '<span class="bpfn-preview-icon">' . esc_html( html_entity_decode( $bpfn_icon_entity, ENT_QUOTES, 'UTF-8' ) ) . '</span>';
+						echo '<span class="bpfn-preview-icon" aria-hidden="true">' . wp_kses( $bpfn_icon_entity, BPFN_Module_Favorite_Display::get_allowed_display_html() ) . '</span>';
 					}
 					if ( 'inline' === $bpfn_mode ) {
 						echo '<span class="bpfn-preview-text">' . esc_html__( 'John, Mary and 2 others', 'buddypress-favorite-notification' ) . '</span>';

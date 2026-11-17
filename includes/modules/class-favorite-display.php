@@ -528,7 +528,7 @@ class BPFN_Module_Favorite_Display {
 	 *
 	 * @return array wp_kses allow list.
 	 */
-	private function get_allowed_display_html() {
+	public static function get_allowed_display_html() {
 		$attrs = array(
 			'href'             => array(),
 			'class'            => array(),
