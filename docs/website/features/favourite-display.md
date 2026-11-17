@@ -14,7 +14,7 @@ Only the modal mode and the inline "N others" link open the full list. The count
 
 ## Favourite icon
 
-You can choose the icon that precedes the display, stored in the `bpfn_favorite_icon` option: **heart**, **star**, **bookmark**, **thumbs up**, or **none**. A heart reads as the Like reaction to many members, so a star or bookmark helps keep favourites visually distinct. The icon applies to this line only. The BuddyPress Favorite button keeps the icon that BuddyPress and your theme give it.
+You can choose the icon that precedes the display, stored in the `bpfn_favorite_icon` option: **heart**, **star**, **bookmark**, **thumbs up**, or **none**. Until you choose one, the icon matches the like button your members already see: a thumbs-up on Reign, BuddyX and BuddyX Pro, a star on other themes. Sites upgrading from a version before 2.2.1 keep the heart they already showed. Developers can change the default with the `bpfn_default_favorite_icon` filter. The icon applies to this line only. The BuddyPress Favorite button keeps the icon that BuddyPress and your theme give it.
 
 ## The "View all" list
 

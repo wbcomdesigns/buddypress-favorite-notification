@@ -15,16 +15,16 @@ Because it uses the core favourite action, the plugin works with all BuddyPress 
 
 The text depends on the activity type and how many members favourited the same item:
 
-- Single favourite of an activity: "{name} favorited your activity".
-- Single favourite of a comment: "{name} favorited your comment".
-- Several favourites of the same activity: "{N} people favorited your activity".
-- Several favourites of the same comment: "{N} people favorited your comment".
+- Single favourite of an activity: "{name} liked your activity".
+- Single favourite of a comment: "{name} liked your comment".
+- Several favourites of the same activity: "{N} people liked your activity".
+- Several favourites of the same comment: "{N} people liked your comment".
 
 The notification links to the favourited activity. Opening it marks the notification read, because the link carries the notification id as an `rid` parameter that BuddyPress core uses to clear the entry.
 
 ## Grouping
 
-Grouping is per activity. All favourites of one activity share a single grouped notification, so a popular post produces one "N people favorited your activity" entry rather than one entry per member. If a single member favourites several different activities of yours, you get a separate notification for each activity.
+Grouping is per activity. All favourites of one activity share a single grouped notification, so a popular post produces one "N people liked your activity" entry rather than one entry per member. If a single member favourites several different activities of yours, you get a separate notification for each activity.
 
 ## No self-notifications
 
