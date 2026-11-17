@@ -129,6 +129,18 @@
           "file": "troubleshooting/troubleshooting.md"
         }
       ]
+    },
+    {
+      "name": "What's New",
+      "folder": "whats-new",
+      "description": "What changed in each release, newest first.",
+      "pages": [
+        {
+          "slug": "whats-new-in-2-2-1",
+          "title": "What's New in 2.2.1",
+          "file": "whats-new/whats-new-in-2-2-1.md"
+        }
+      ]
     }
   ]
 }

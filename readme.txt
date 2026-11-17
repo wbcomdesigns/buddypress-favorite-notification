@@ -227,12 +227,18 @@ No. The plugin does not collect, store, or share personal data outside your Word
 
 = 2.2.1 - November 2026 =
 
-Login, speed and accessibility fixes for the member pages.
+Login, speed and accessibility fixes for the member pages, and wording that matches the Like button.
 
+* Improve  - Notifications, emails and pop-ups now say "liked" instead of "favorited", matching the Like button members click.
+* Improve  - The default icon in the liked-by line matches the theme's Like button: a thumbs-up on Reign, BuddyX and BuddyX Pro, a star elsewhere. Sites updating from an earlier version keep their heart icon.
+* Improve  - Activity pages no longer send one extra request per liked post after loading, so busy streams load faster.
+* Improve  - Screen readers announce "Liked by" before the names, and the liked-by list is announced by its heading.
+* Improve  - The real-time pop-up's close button is larger and no longer covers the message.
 * Fix      - A logged-out visitor opening Settings > Favorite Notifications now goes to the login screen, like the other Settings tabs, instead of a page-not-found error.
-* Fix      - Pressing Escape on the who-favorited list now returns focus to the button that opened it, even right after the page loads.
-* Improve  - Activity pages no longer send one extra request per favorited post after loading, so busy streams load faster.
+* Fix      - Pressing Escape on the liked-by list now returns focus to the button that opened it, even right after the page loads.
+* Dev      - New filter `bpfn_default_favorite_icon` sets the default icon.
 * Dev      - Renamed the admin layout file from shell.php to layout.php so the plugin zip installs on hosts whose firewalls block that file name.
+* Dev      - All five bundled languages updated for the new wording.
 
 = 2.2.0 - November 2026 =
 
