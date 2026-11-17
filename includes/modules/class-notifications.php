@@ -49,9 +49,9 @@ class BPFN_Module_Notifications {
 			'activity_post'    => array(
 				'labels'        => array(
 					/* translators: %s: User display name. */
-					'single'   => __( '%s favorited your activity', 'buddypress-favorite-notification' ),
+					'single'   => __( '%s liked your activity', 'buddypress-favorite-notification' ),
 					/* translators: %d: Number of people. */
-					'multiple' => _n_noop( '%d person favorited your activity', '%d people favorited your activity', 'buddypress-favorite-notification' ),
+					'multiple' => _n_noop( '%d person liked your activity', '%d people liked your activity', 'buddypress-favorite-notification' ),
 				),
 				'action_prefix' => 'fav_notify',
 				'css_type'      => 'favorite',
@@ -59,9 +59,9 @@ class BPFN_Module_Notifications {
 			'activity_comment' => array(
 				'labels'        => array(
 					/* translators: %s: User display name. */
-					'single'   => __( '%s favorited your comment', 'buddypress-favorite-notification' ),
+					'single'   => __( '%s liked your comment', 'buddypress-favorite-notification' ),
 					/* translators: %d: Number of people. */
-					'multiple' => _n_noop( '%d person favorited your comment', '%d people favorited your comment', 'buddypress-favorite-notification' ),
+					'multiple' => _n_noop( '%d person liked your comment', '%d people liked your comment', 'buddypress-favorite-notification' ),
 				),
 				'action_prefix' => 'fav_comment_notify',
 				'css_type'      => 'favorite_comment',

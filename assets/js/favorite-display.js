@@ -322,6 +322,13 @@
                 '</div>' +
             '</div>');
 
+            // Name the dialog by its "N Likes" heading (absent while loading).
+            var $title = $modal.find('.bpfn-modal h3').first();
+            if ($title.length) {
+                $title.attr('id', 'bpfn-modal-title');
+                $modal.find('.bpfn-modal').attr('aria-labelledby', 'bpfn-modal-title');
+            }
+
             $('body').append($modal);
 
             // Fade in animation.

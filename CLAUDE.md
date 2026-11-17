@@ -66,7 +66,7 @@ follows **`/ux-foundation`**; audit drift with **`/ux-audit`**. Onboarding artef
   without moving them out of the shell.
 
 ## Settings / options
-- Owner options: `bpfn_display_mode` (inline), `bpfn_favorite_icon` (heart),
+- Owner options: `bpfn_display_mode` (inline), `bpfn_favorite_icon` (unset = `default_icon()`: thumb on Reign/BuddyX, star elsewhere; filter `bpfn_default_favorite_icon`; sites upgraded from < 2.2.1 get 'heart' written once),
   `bpfn_realtime_enabled` (unset = off), `bpfn_realtime_interval` (30),
   `bpfn_auto_cleanup_enabled` (unset = off), `bpfn_auto_cleanup_days` (30),
   `bpfn_last_auto_cleanup` (`date` + `deleted`/`remaining`, or `date` + `error`), `bpfn_version`,

@@ -28,6 +28,12 @@
 	line-height: 1;
 }
 
+/* Thumb / bookmark line icons: text-sized, sitting on the baseline like a glyph. */
+.bpfn-favorite-icon .bpfn-line-icon {
+	display: inline-block;
+	vertical-align: -0.125em;
+}
+
 .bpfn-favorite-text {
 	flex: 1;
 }

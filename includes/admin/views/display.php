@@ -89,7 +89,7 @@ $bpfn_mode_help = array(
 							<?php endforeach; ?>
 						</select>
 						<p class="description">
-							<?php esc_html_e( 'The icon shown in the "favorited by" line under each activity. A heart can read as the "Like" reaction, so a star or bookmark keeps favorites distinct. The Favorite button itself is drawn by BuddyPress and your theme.', 'buddypress-favorite-notification' ); ?>
+							<?php esc_html_e( 'The icon shown in the "liked by" line under each activity. Until you pick one it matches the like button your members see: a thumbs-up on Reign and BuddyX, a star elsewhere. The button itself is drawn by BuddyPress and your theme.', 'buddypress-favorite-notification' ); ?>
 						</p>
 					</td>
 				</tr>

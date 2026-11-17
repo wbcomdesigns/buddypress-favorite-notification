@@ -273,6 +273,12 @@ class BP_Favorite_Notification {
 			add_option( 'bpfn_realtime_enabled', 'yes' );
 		}
 
+		// 2.2.1 picks the default icon from the theme. Sites that ran an older
+		// version and never saved one keep the heart they already show.
+		if ( $installed && version_compare( $installed, '2.2.1', '<' ) ) {
+			add_option( 'bpfn_favorite_icon', 'heart' );
+		}
+
 		// activate() runs after plugins_loaded, so check_dependencies() never loaded these.
 		require_once BPFN_INCLUDES_PATH . 'functions/core-functions.php';
 		require_once BPFN_INCLUDES_PATH . 'modules/class-email.php';

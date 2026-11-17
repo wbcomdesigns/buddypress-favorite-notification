@@ -94,19 +94,19 @@ class BPFN_Module_Email {
 		return array(
 			'bpfn-activity-favorited' => array(
 				/* translators: do not remove {} brackets or translate its contents. */
-				'post_title'   => __( '[{{{site.name}}}] {{favoriter.name}} favorited your update', 'buddypress-favorite-notification' ),
+				'post_title'   => __( '[{{{site.name}}}] {{favoriter.name}} liked your update', 'buddypress-favorite-notification' ),
 				/* translators: do not remove {} brackets or translate its contents. */
-				'post_content' => __( "<a href=\"{{{favoriter.url}}}\">{{favoriter.name}}</a> favorited your update:\n\n<blockquote>&quot;{{activity.content}}&quot;</blockquote>\n\n<a href=\"{{{activity.url}}}\">View the update</a>.", 'buddypress-favorite-notification' ),
+				'post_content' => __( "<a href=\"{{{favoriter.url}}}\">{{favoriter.name}}</a> liked your update:\n\n<blockquote>&quot;{{activity.content}}&quot;</blockquote>\n\n<a href=\"{{{activity.url}}}\">View the update</a>.", 'buddypress-favorite-notification' ),
 				/* translators: do not remove {} brackets or translate its contents. */
-				'post_excerpt' => __( "{{favoriter.name}} favorited your update:\n\n\"{{activity.content}}\"\n\nView the update: {{{activity.url}}}", 'buddypress-favorite-notification' ),
+				'post_excerpt' => __( "{{favoriter.name}} liked your update:\n\n\"{{activity.content}}\"\n\nView the update: {{{activity.url}}}", 'buddypress-favorite-notification' ),
 			),
 			'bpfn-comment-favorited'  => array(
 				/* translators: do not remove {} brackets or translate its contents. */
-				'post_title'   => __( '[{{{site.name}}}] {{favoriter.name}} favorited your comment', 'buddypress-favorite-notification' ),
+				'post_title'   => __( '[{{{site.name}}}] {{favoriter.name}} liked your comment', 'buddypress-favorite-notification' ),
 				/* translators: do not remove {} brackets or translate its contents. */
-				'post_content' => __( "<a href=\"{{{favoriter.url}}}\">{{favoriter.name}}</a> favorited your comment:\n\n<blockquote>&quot;{{activity.content}}&quot;</blockquote>\n\n<a href=\"{{{activity.url}}}\">View the conversation</a>.", 'buddypress-favorite-notification' ),
+				'post_content' => __( "<a href=\"{{{favoriter.url}}}\">{{favoriter.name}}</a> liked your comment:\n\n<blockquote>&quot;{{activity.content}}&quot;</blockquote>\n\n<a href=\"{{{activity.url}}}\">View the conversation</a>.", 'buddypress-favorite-notification' ),
 				/* translators: do not remove {} brackets or translate its contents. */
-				'post_excerpt' => __( "{{favoriter.name}} favorited your comment:\n\n\"{{activity.content}}\"\n\nView the conversation: {{{activity.url}}}", 'buddypress-favorite-notification' ),
+				'post_excerpt' => __( "{{favoriter.name}} liked your comment:\n\n\"{{activity.content}}\"\n\nView the conversation: {{{activity.url}}}", 'buddypress-favorite-notification' ),
 			),
 		);
 	}
