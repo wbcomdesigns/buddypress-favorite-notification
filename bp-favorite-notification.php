@@ -3,7 +3,7 @@
  * Plugin Name: BuddyPress Favorite Notification
  * Plugin URI: http://www.wbcomdesigns.com/
  * Description: Adds notification for the activity Favorite for the activity user.
- * Version: 2.2.0
+ * Version: 2.2.1
  * Requires at least: 6.5
  * Requires PHP: 8.1
  * Requires Plugins: buddypress
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants.
-define( 'BPFN_VERSION', '2.2.0' );
+define( 'BPFN_VERSION', '2.2.1' );
 define( 'BPFN_PLUGIN_FILE', __FILE__ );
 define( 'BPFN_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'BPFN_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
@@ -271,6 +271,12 @@ class BP_Favorite_Notification {
 		if ( $installed && version_compare( $installed, '2.2.0', '<' ) ) {
 			add_option( 'bpfn_auto_cleanup_enabled', 'yes' );
 			add_option( 'bpfn_realtime_enabled', 'yes' );
+		}
+
+		// 2.2.1 picks the default icon from the theme. Sites that ran an older
+		// version and never saved one keep the heart they already show.
+		if ( $installed && version_compare( $installed, '2.2.1', '<' ) ) {
+			add_option( 'bpfn_favorite_icon', 'heart' );
 		}
 
 		// activate() runs after plugins_loaded, so check_dependencies() never loaded these.

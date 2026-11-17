@@ -1,6 +1,6 @@
 <?php
 /**
- * Overview dashboard partial: rendered inside shell.php.
+ * Overview dashboard partial: rendered inside layout.php.
  *
  * Reskins the legacy postbox dashboard (stats + recent + trending) into the
  * card-panel layout. Carries over the same stat queries from the old

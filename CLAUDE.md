@@ -17,8 +17,7 @@
 ## What this is
 Free Wbcom Designs BuddyPress addon. Sends a BP notification, a BuddyPress Email and (optionally)
 a realtime popup when a member's activity/comment is favorited, and renders a "X and N others
-liked this" line. Requires BuddyPress 12.0+ (URL API). Version 2.2.0, developed on
-`release/2.2.0`, released from `master`.
+liked this" line. Requires BuddyPress 12.0+ (URL API). One development branch per release (2.2.1 is on `2.2.1`), released from `master`.
 
 ## Development skill — follow this
 All plugin work MUST follow **`/wp-plugin-development`** (canonical Wbcom plugin skill):
@@ -52,7 +51,7 @@ follows **`/ux-foundation`**; audit drift with **`/ux-audit`**. Onboarding artef
 ## Admin UI
 - ONE admin page: submenu **`bpfn-dashboard`** under the shared **WB Plugins hub**
   (`wbcomplugins`), cap `manage_options`, rendered by `BPFN_Admin::render_page()` with the
-  card-panel shell (`includes/admin/views/shell.php` + `overview.php` / `display.php` /
+  card-panel shell (`includes/admin/views/layout.php` + `overview.php` / `display.php` /
   `tools.php` / `discover.php`). Tabs via `BPFN_Admin::get_tabs()` (filter `bpfn_admin_tabs`).
   Activation redirects here once (transient `bpfn_activation_redirect`, skipped for bulk).
 - Both forms are hand-rolled POST handlers in `BPFN_Module_Admin` (no Settings API):
@@ -67,7 +66,7 @@ follows **`/ux-foundation`**; audit drift with **`/ux-audit`**. Onboarding artef
   without moving them out of the shell.
 
 ## Settings / options
-- Owner options: `bpfn_display_mode` (inline), `bpfn_favorite_icon` (heart),
+- Owner options: `bpfn_display_mode` (inline), `bpfn_favorite_icon` (unset = `default_icon()`: thumb on Reign/BuddyX, star elsewhere; filter `bpfn_default_favorite_icon`; sites upgraded from < 2.2.1 get 'heart' written once),
   `bpfn_realtime_enabled` (unset = off), `bpfn_realtime_interval` (30),
   `bpfn_auto_cleanup_enabled` (unset = off), `bpfn_auto_cleanup_days` (30),
   `bpfn_last_auto_cleanup` (`date` + `deleted`/`remaining`, or `date` + `error`), `bpfn_version`,
@@ -87,7 +86,7 @@ follows **`/ux-foundation`**; audit drift with **`/ux-audit`**. Onboarding artef
 - Shared `--bpfn-*` design tokens live in `assets/css/notifications.css` (the style
   dependency of favorite-display.css, realtime.css, and settings.css). Light values
   consume BuddyX `--bx-color-*` vars with light fallbacks; `[data-bx-mode="dark"]`
-  and the `auto` + `prefers-color-scheme: dark` blocks redeclare them with
+  (theme toggle only - never `prefers-color-scheme`, owner rule) redeclares them with
   DARK-appropriate fallback literals because **Reign 8.0.3 sets `data-bx-mode` but
   does not define `--bx-color-*`** — the fallback literal is what renders there.
 - `assets/js/notifications.js` was deleted on 2.0.0 (100% dead: wrong selectors,

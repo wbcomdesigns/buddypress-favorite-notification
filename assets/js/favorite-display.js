@@ -37,20 +37,10 @@
         bindEvents: function() {
             var self = this;
 
-            // Listen for BuddyPress heartbeat updates.
-            $(document).on('heartbeat-tick', function(event, data) {
-                if (data.bp_activity_latest_update) {
-                    self.checkForUpdates();
-                }
-            });
-
-            // Listen for page-loaded event from BuddyPress.
-            $(document).on('bp_ajax_request', function() {
-                // Activity stream AJAX loaded.
-                setTimeout(function() {
-                    self.updateAllDisplays();
-                }, 500);
-            });
+            // No refresh on BuddyPress list loads (bp_ajax_request): the entries
+            // arrive server-rendered with their display already current, and a
+            // per-item refresh cost one admin-ajax request per favorited item and
+            // replaced the counter a member may already be focused on.
 
             // Deterministic refresh: BuddyPress (Legacy and Nouveau templates)
             // posts `activity_mark_fav` / `activity_mark_unfav` through
@@ -206,21 +196,6 @@
             });
         },
 
-        updateAllDisplays: function() {
-            var self = this;
-            $('.bpfn-favorite-display').each(function() {
-                var activityId = $(this).data('activity-id');
-                if (activityId) {
-                    self.updateDisplay(activityId);
-                }
-            });
-        },
-
-        checkForUpdates: function() {
-            // Placeholder for future real-time updates via heartbeat.
-            // Currently updates happen on button click.
-        },
-
         showAllFavorites: function(e) {
             e.preventDefault();
             var $target = $(e.currentTarget);
@@ -346,6 +321,13 @@
                     html +
                 '</div>' +
             '</div>');
+
+            // Name the dialog by its "N Likes" heading (absent while loading).
+            var $title = $modal.find('.bpfn-modal h3').first();
+            if ($title.length) {
+                $title.attr('id', 'bpfn-modal-title');
+                $modal.find('.bpfn-modal').attr('aria-labelledby', 'bpfn-modal-title');
+            }
 
             $('body').append($modal);
 

@@ -209,7 +209,7 @@
                     '<a class="bpfn-realtime-link" href="' + (data.link || '#') + '">' +
                         (data.user_avatar ? '<span class="bpfn-realtime-avatar">' + data.user_avatar + '</span>' : '') +
                         '<span class="bpfn-realtime-message">' +
-                            (data.text || strings.default_message || 'Someone favorited your activity') +
+                            (data.text || strings.default_message || 'Someone liked your activity') +
                             '<span class="bpfn-realtime-time">' + timeAgo + '</span>' +
                         '</span>' +
                     '</a>' +

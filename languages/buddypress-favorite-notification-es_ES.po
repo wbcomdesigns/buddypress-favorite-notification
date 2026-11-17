@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BuddyPress Favorite Notification 2.0.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/buddypress-favorite-notification\n"
-"POT-Creation-Date: 2026-10-08T13:36:59+00:00\n"
+"POT-Creation-Date: 2026-11-17T11:36:36+00:00\n"
 "PO-Revision-Date: 2026-07-16T11:32:19+00:00\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -59,8 +59,8 @@ msgstr "Herramientas"
 msgid "Discover"
 msgstr "Descubrir"
 
-#: includes/admin/class-bpfn-admin.php:137 includes/admin/views/shell.php:56
-#: includes/modules/class-settings.php:71
+#: includes/admin/class-bpfn-admin.php:137 includes/admin/views/layout.php:56
+#: includes/modules/class-settings.php:73
 msgid "Favorite Notifications"
 msgstr "Notificaciones de Favoritos"
 
@@ -176,23 +176,23 @@ msgid "A free service marketplace with vendor dashboards, an 11-status order flo
 msgstr "Un mercado de servicios gratuito con paneles de vendedores, un flujo de pedidos de 11 estados e integración nativa con Stripe o PayPal."
 
 #. translators: %s: company name "Wbcom Designs".
-#: includes/admin/views/discover.php:95
+#: includes/admin/views/discover.php:96
 #, php-format
 msgid "More Free Tools from %s"
 msgstr "Más herramientas gratuitas de %s"
 
 #. translators: 1: plugin name "Favorite Notification", 2: company name "Wbcom Designs".
-#: includes/admin/views/discover.php:99
+#: includes/admin/views/discover.php:102
 #, php-format
 msgid "%1$s keeps members coming back when their activity gets liked. These free %2$s plugins give them more worth coming back to: the theme and network itself, forums, media, events, gamification, directories, jobs, courses, and services."
 msgstr "%1$s hace que los miembros vuelvan cuando su actividad recibe me gusta. Estos plugins gratuitos de %2$s les dan más motivos para volver: el tema y la propia red, foros, medios, eventos, gamificación, directorios, empleos, cursos y servicios."
 
-#: includes/admin/views/discover.php:112
+#: includes/admin/views/discover.php:116
 msgid "Get it free"
 msgstr "Obtenerlo gratis"
 
 #. translators: %s: product name.
-#: includes/admin/views/discover.php:117
+#: includes/admin/views/discover.php:121
 #, php-format
 msgid "%s (opens in a new tab)"
 msgstr "%s (se abre en una pestaña nueva)"
@@ -234,8 +234,8 @@ msgid "Favorite Icon"
 msgstr "Icono de favorito"
 
 #: includes/admin/views/display.php:92
-msgid "The icon shown in the \"favorited by\" line under each activity. A heart can read as the \"Like\" reaction, so a star or bookmark keeps favorites distinct. The Favorite button itself is drawn by BuddyPress and your theme."
-msgstr "El icono que se muestra en la línea \"favorito de\" bajo cada actividad. Un corazón puede leerse como la reacción \"Me gusta\", así que una estrella o un marcador distinguen los favoritos. El botón Favorito lo dibujan BuddyPress y tu tema."
+msgid "The icon shown in the \"liked by\" line under each activity. Until you pick one it matches the like button your members see: a thumbs-up on Reign and BuddyX, a star elsewhere. The button itself is drawn by BuddyPress and your theme."
+msgstr "El icono que se muestra en la línea \"le gusta a\" bajo cada actividad. Mientras no elijas uno, coincide con el botón de me gusta que ven tus miembros: un pulgar arriba en Reign y BuddyX, una estrella en los demás. El botón lo dibujan BuddyPress y tu tema."
 
 #: includes/admin/views/display.php:99
 msgid "Current appearance"
@@ -295,36 +295,64 @@ msgstr[0] "%1$d plugin de %2$s activo en este sitio."
 msgstr[1] "%1$d plugins de %2$s activos en este sitio."
 
 #. translators: %s: brand name "Wbcom".
-#: includes/admin/views/hub.php:85
+#: includes/admin/views/hub.php:86
 #, php-format
 msgid "No %s plugins attached to this hub yet"
 msgstr "Todavía no hay plugins de %s conectados a este hub"
 
 #. translators: %s: brand name "Wbcom".
-#: includes/admin/views/hub.php:90
+#: includes/admin/views/hub.php:92
 #, php-format
 msgid "Activate one or more %s plugins and they will appear here automatically."
 msgstr "Activa uno o más plugins de %s y aparecerán aquí automáticamente."
 
-#: includes/admin/views/hub.php:106
+#: includes/admin/views/hub.php:108
 msgid "Open settings"
 msgstr "Abrir configuración"
 
 #. translators: %s: hub menu name "WB Plugins".
-#: includes/admin/views/hub.php:118
+#: includes/admin/views/hub.php:121
 #, php-format
 msgid "About %s"
 msgstr "Acerca de %s"
 
 #. translators: %s: company name "Wbcom Designs".
-#: includes/admin/views/hub.php:125
+#: includes/admin/views/hub.php:129
 #, php-format
 msgid "This hub is the single entry point for every %s plugin installed on your site. Each plugin lives on its own page under this menu and keeps its own settings and data."
 msgstr "Este hub es el punto de entrada único para cada plugin de %s instalado en tu sitio. Cada plugin tiene su propia página en este menú y conserva sus propios ajustes y datos."
 
-#: includes/admin/views/hub.php:130
+#: includes/admin/views/hub.php:134
 msgid "Visit wbcomdesigns.com for more plugins and themes →"
 msgstr "Visita wbcomdesigns.com para más complementos y temas →"
+
+#: includes/admin/views/layout.php:28
+msgid "Notify members when their activity is favorited, with email, real-time, and a \"X and N others liked this\" display."
+msgstr "Notifica a los miembros cuando su actividad recibe un favorito, con correo electrónico, tiempo real y una pantalla \"X y N otros dieron like a esto\"."
+
+#: includes/admin/views/layout.php:57
+msgid "Plugin"
+msgstr "Complemento"
+
+#: includes/admin/views/layout.php:60
+msgid "Favorite Notification navigation"
+msgstr "Navegación de Notificación de Favoritos"
+
+#: includes/admin/views/layout.php:64
+msgid "Configuration"
+msgstr "Configuración"
+
+#: includes/admin/views/layout.php:85
+msgid "Resources"
+msgstr "Recursos"
+
+#: includes/admin/views/layout.php:88
+msgid "Documentation"
+msgstr "Documentación"
+
+#: includes/admin/views/layout.php:90
+msgid "(opens in a new tab)"
+msgstr "(se abre en una pestaña nueva)"
 
 #: includes/admin/views/overview.php:174
 msgid "Total Favorites"
@@ -407,7 +435,7 @@ msgid "Rank"
 msgstr "Clasificación"
 
 #: includes/admin/views/overview.php:313
-#: includes/modules/class-settings.php:221
+#: includes/modules/class-settings.php:223
 msgid "Favorites"
 msgstr "Favoritos"
 
@@ -442,34 +470,6 @@ msgstr "Acciones Rápidas"
 #: includes/admin/views/overview.php:377
 msgid "Tools & Maintenance"
 msgstr "Herramientas y Mantenimiento"
-
-#: includes/admin/views/shell.php:28
-msgid "Notify members when their activity is favorited, with email, real-time, and a \"X and N others liked this\" display."
-msgstr "Notifica a los miembros cuando su actividad recibe un favorito, con correo electrónico, tiempo real y una pantalla \"X y N otros dieron like a esto\"."
-
-#: includes/admin/views/shell.php:57
-msgid "Plugin"
-msgstr "Complemento"
-
-#: includes/admin/views/shell.php:60
-msgid "Favorite Notification navigation"
-msgstr "Navegación de Notificación de Favoritos"
-
-#: includes/admin/views/shell.php:64
-msgid "Configuration"
-msgstr "Configuración"
-
-#: includes/admin/views/shell.php:85
-msgid "Resources"
-msgstr "Recursos"
-
-#: includes/admin/views/shell.php:88
-msgid "Documentation"
-msgstr "Documentación"
-
-#: includes/admin/views/shell.php:90
-msgid "(opens in a new tab)"
-msgstr "(se abre en una pestaña nueva)"
 
 #: includes/admin/views/tools.php:41
 msgid "Migrate Favorites"
@@ -608,7 +608,7 @@ msgid "No favorites found to migrate"
 msgstr "No se encontraron favoritos para migrar"
 
 #. translators: %d: number of favorites copied into the favorites table.
-#: includes/migrations/class-favorites-migration.php:355
+#: includes/migrations/class-favorites-migration.php:350
 #, php-format
 msgid "Migration complete. %d favorite was added."
 msgid_plural "Migration complete. %d favorites were added."
@@ -672,24 +672,24 @@ msgid "just now"
 msgstr "hace poco"
 
 #: includes/modules/class-assets.php:146
-msgid "Someone favorited your activity"
-msgstr "Alguien marcó tu actividad como favorita"
+msgid "Someone liked your activity"
+msgstr "Alguien dio me gusta a tu actividad"
 
 #. translators: do not remove {} brackets or translate its contents.
 #: includes/modules/class-email.php:97
-msgid "[{{{site.name}}}] {{favoriter.name}} favorited your update"
-msgstr "[{{{site.name}}}] {{favoriter.name}} dio favorito a tu publicación"
+msgid "[{{{site.name}}}] {{favoriter.name}} liked your update"
+msgstr "[{{{site.name}}}] {{favoriter.name}} dio me gusta a tu publicación"
 
 #. translators: do not remove {} brackets or translate its contents.
 #: includes/modules/class-email.php:99
 msgid ""
-"<a href=\"{{{favoriter.url}}}\">{{favoriter.name}}</a> favorited your update:\n"
+"<a href=\"{{{favoriter.url}}}\">{{favoriter.name}}</a> liked your update:\n"
 "\n"
 "<blockquote>&quot;{{activity.content}}&quot;</blockquote>\n"
 "\n"
 "<a href=\"{{{activity.url}}}\">View the update</a>."
 msgstr ""
-"<a href=\"{{{favoriter.url}}}\">{{favoriter.name}}</a> dio favorito a tu publicación:\n"
+"<a href=\"{{{favoriter.url}}}\">{{favoriter.name}}</a> dio me gusta a tu publicación:\n"
 "\n"
 "<blockquote>&quot;{{activity.content}}&quot;</blockquote>\n"
 "\n"
@@ -698,13 +698,13 @@ msgstr ""
 #. translators: do not remove {} brackets or translate its contents.
 #: includes/modules/class-email.php:101
 msgid ""
-"{{favoriter.name}} favorited your update:\n"
+"{{favoriter.name}} liked your update:\n"
 "\n"
 "\"{{activity.content}}\"\n"
 "\n"
 "View the update: {{{activity.url}}}"
 msgstr ""
-"{{favoriter.name}} dio favorito a tu publicación:\n"
+"{{favoriter.name}} dio me gusta a tu publicación:\n"
 "\n"
 "\"{{activity.content}}\"\n"
 "\n"
@@ -712,19 +712,19 @@ msgstr ""
 
 #. translators: do not remove {} brackets or translate its contents.
 #: includes/modules/class-email.php:105
-msgid "[{{{site.name}}}] {{favoriter.name}} favorited your comment"
-msgstr "[{{{site.name}}}] {{favoriter.name}} dio favorito a tu comentario"
+msgid "[{{{site.name}}}] {{favoriter.name}} liked your comment"
+msgstr "[{{{site.name}}}] {{favoriter.name}} dio me gusta a tu comentario"
 
 #. translators: do not remove {} brackets or translate its contents.
 #: includes/modules/class-email.php:107
 msgid ""
-"<a href=\"{{{favoriter.url}}}\">{{favoriter.name}}</a> favorited your comment:\n"
+"<a href=\"{{{favoriter.url}}}\">{{favoriter.name}}</a> liked your comment:\n"
 "\n"
 "<blockquote>&quot;{{activity.content}}&quot;</blockquote>\n"
 "\n"
 "<a href=\"{{{activity.url}}}\">View the conversation</a>."
 msgstr ""
-"<a href=\"{{{favoriter.url}}}\">{{favoriter.name}}</a> dio favorito a tu comentario:\n"
+"<a href=\"{{{favoriter.url}}}\">{{favoriter.name}}</a> dio me gusta a tu comentario:\n"
 "\n"
 "<blockquote>&quot;{{activity.content}}&quot;</blockquote>\n"
 "\n"
@@ -733,13 +733,13 @@ msgstr ""
 #. translators: do not remove {} brackets or translate its contents.
 #: includes/modules/class-email.php:109
 msgid ""
-"{{favoriter.name}} favorited your comment:\n"
+"{{favoriter.name}} liked your comment:\n"
 "\n"
 "\"{{activity.content}}\"\n"
 "\n"
 "View the conversation: {{{activity.url}}}"
 msgstr ""
-"{{favoriter.name}} dio favorito a tu comentario:\n"
+"{{favoriter.name}} dio me gusta a tu comentario:\n"
 "\n"
 "\"{{activity.content}}\"\n"
 "\n"
@@ -762,80 +762,84 @@ msgid "You will no longer receive emails when someone favorites your comments."
 msgstr "Ya no recibirás correos cuando alguien dé favorito a tus comentarios."
 
 #. translators: 1: one or more linked member names, 2: the last linked name or an "N others" link.
-#: includes/modules/class-favorite-display.php:265
-#: includes/modules/class-favorite-display.php:318
-#: includes/modules/class-favorite-display.php:328
+#: includes/modules/class-favorite-display.php:268
+#: includes/modules/class-favorite-display.php:321
+#: includes/modules/class-favorite-display.php:331
 #, php-format
 msgid "%1$s and %2$s"
 msgstr "%1$s y %2$s"
 
 #. translators: %s: Number of additional people who favorited.
-#: includes/modules/class-favorite-display.php:306
+#: includes/modules/class-favorite-display.php:309
 #, php-format
 msgid "%s other"
 msgid_plural "%s others"
 msgstr[0] "%s otro"
 msgstr[1] "%s otros"
 
-#: includes/modules/class-favorite-display.php:353
+#: includes/modules/class-favorite-display.php:356
 msgid "Inline usernames"
 msgstr "Nombres de usuario en línea"
 
-#: includes/modules/class-favorite-display.php:354
+#: includes/modules/class-favorite-display.php:357
 msgid "Icon and count only"
 msgstr "Solo icono y número"
 
-#: includes/modules/class-favorite-display.php:355
+#: includes/modules/class-favorite-display.php:358
 msgid "Icon and count, opens the full list"
 msgstr "Icono y número, abre la lista completa"
 
-#: includes/modules/class-favorite-display.php:380
+#: includes/modules/class-favorite-display.php:383
 msgid "Heart"
 msgstr "Corazón"
 
-#: includes/modules/class-favorite-display.php:384
+#: includes/modules/class-favorite-display.php:387
 msgid "Star"
 msgstr "Estrella"
 
-#: includes/modules/class-favorite-display.php:388
+#: includes/modules/class-favorite-display.php:393
 msgid "Bookmark"
 msgstr "Marcador"
 
-#: includes/modules/class-favorite-display.php:392
+#: includes/modules/class-favorite-display.php:397
 msgid "Thumbs up"
 msgstr "Pulgar arriba"
 
-#: includes/modules/class-favorite-display.php:396
+#: includes/modules/class-favorite-display.php:401
 msgid "No icon"
 msgstr "Sin icono"
 
+#: includes/modules/class-favorite-display.php:630
+msgid "Liked by:"
+msgstr "Le gusta a:"
+
 #. translators: %s: Number of people who favorited.
-#: includes/modules/class-favorite-display.php:627
+#: includes/modules/class-favorite-display.php:681
 #, php-format
 msgid "%s person liked this"
 msgid_plural "%s people liked this"
 msgstr[0] "A %s persona le gusta esto"
 msgstr[1] "A %s personas les gusta esto"
 
-#: includes/modules/class-favorite-display.php:697
-#: includes/modules/class-favorite-display.php:916
+#: includes/modules/class-favorite-display.php:751
+#: includes/modules/class-favorite-display.php:970
 msgid "Invalid activity ID"
 msgstr "ID de actividad inválido"
 
 #. translators: %s: Number of likes.
-#: includes/modules/class-favorite-display.php:778
+#: includes/modules/class-favorite-display.php:832
 #, php-format
 msgid "%s Like"
 msgid_plural "%s Likes"
 msgstr[0] "%s Me gusta"
 msgstr[1] "%s Me gusta"
 
-#: includes/modules/class-favorite-display.php:795
+#: includes/modules/class-favorite-display.php:849
 msgid "Load more"
 msgstr "Cargar más"
 
 #. translators: %s: Number of additional users who favorited.
-#: includes/modules/class-favorite-display.php:804
+#: includes/modules/class-favorite-display.php:858
 #, php-format
 msgid "+%s more"
 msgid_plural "+%s more"
@@ -843,34 +847,34 @@ msgstr[0] "+%s más"
 msgstr[1] "+%s más"
 
 #. translators: %s: User display name.
-#: includes/modules/class-notifications.php:38
+#: includes/modules/class-notifications.php:52
 #, php-format
-msgid "%s favorited your activity"
-msgstr "%s dio favorito a tu actividad"
+msgid "%s liked your activity"
+msgstr "%s dio me gusta a tu actividad"
 
 #. translators: %d: Number of people.
-#: includes/modules/class-notifications.php:40
+#: includes/modules/class-notifications.php:54
 #, php-format
-msgid "%d person favorited your activity"
-msgid_plural "%d people favorited your activity"
-msgstr[0] "%d persona dio favorito a tu actividad"
-msgstr[1] "%d personas dieron favorito a tu actividad"
+msgid "%d person liked your activity"
+msgid_plural "%d people liked your activity"
+msgstr[0] "%d persona dio me gusta a tu actividad"
+msgstr[1] "%d personas dieron me gusta a tu actividad"
 
 #. translators: %s: User display name.
-#: includes/modules/class-notifications.php:48
+#: includes/modules/class-notifications.php:62
 #, php-format
-msgid "%s favorited your comment"
-msgstr "%s dio favorito a tu comentario"
+msgid "%s liked your comment"
+msgstr "%s dio me gusta a tu comentario"
 
 #. translators: %d: Number of people.
-#: includes/modules/class-notifications.php:50
+#: includes/modules/class-notifications.php:64
 #, php-format
-msgid "%d person favorited your comment"
-msgid_plural "%d people favorited your comment"
-msgstr[0] "%d persona dio favorito a tu comentario"
-msgstr[1] "%d personas dieron favorito a tu comentario"
+msgid "%d person liked your comment"
+msgid_plural "%d people liked your comment"
+msgstr[0] "%d persona dio me gusta a tu comentario"
+msgstr[1] "%d personas dieron me gusta a tu comentario"
 
-#: includes/modules/class-notifications.php:152
+#: includes/modules/class-notifications.php:170
 msgid "Someone"
 msgstr "Alguien"
 
@@ -898,57 +902,57 @@ msgstr "Notificación descartada"
 msgid "Failed to dismiss notification"
 msgstr "Error al descartar notificación"
 
-#: includes/modules/class-settings.php:103
+#: includes/modules/class-settings.php:105
 msgid "Favorite Notification Settings"
 msgstr "Configuración de Notificación de Favoritos"
 
-#: includes/modules/class-settings.php:167
+#: includes/modules/class-settings.php:169
 msgid "Settings saved successfully."
 msgstr "Configuración guardada exitosamente."
 
-#: includes/modules/class-settings.php:169
+#: includes/modules/class-settings.php:171
 msgid "There was a problem saving your settings."
 msgstr "Hubo un problema al guardar tu configuración."
 
-#: includes/modules/class-settings.php:222
+#: includes/modules/class-settings.php:224
 msgid "Yes"
 msgstr "Sí"
 
-#: includes/modules/class-settings.php:223
+#: includes/modules/class-settings.php:225
 msgid "No"
 msgstr "No"
 
-#: includes/modules/class-settings.php:230
+#: includes/modules/class-settings.php:232
 msgid "A member favorites your activity"
 msgstr "Un miembro da favorito a tu actividad"
 
-#: includes/modules/class-settings.php:234
-#: includes/modules/class-settings.php:251
+#: includes/modules/class-settings.php:236
+#: includes/modules/class-settings.php:253
 msgid "Yes, send email"
 msgstr "Sí, enviar correo"
 
-#: includes/modules/class-settings.php:240
-#: includes/modules/class-settings.php:257
+#: includes/modules/class-settings.php:242
+#: includes/modules/class-settings.php:259
 msgid "No, do not send email"
 msgstr "No, no enviar correo"
 
-#: includes/modules/class-settings.php:247
+#: includes/modules/class-settings.php:249
 msgid "A member favorites your comment"
 msgstr "Un miembro da favorito a tu comentario"
 
-#: includes/modules/class-settings.php:278
+#: includes/modules/class-settings.php:280
 msgid "Activity post favorites"
 msgstr "Favoritos de publicaciones de actividad"
 
-#: includes/modules/class-settings.php:279
+#: includes/modules/class-settings.php:281
 msgid "Notify me when someone favorites my activity posts"
 msgstr "Notifícame cuando alguien de favorito a mis publicaciones de actividad"
 
-#: includes/modules/class-settings.php:282
+#: includes/modules/class-settings.php:284
 msgid "Comment favorites"
 msgstr "Favoritos de comentarios"
 
-#: includes/modules/class-settings.php:283
+#: includes/modules/class-settings.php:285
 msgid "Notify me when someone favorites my comments"
 msgstr "Notifícame cuando alguien de favorito a mis comentarios"
 

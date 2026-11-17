@@ -11,12 +11,13 @@ Reshape the "who liked this" line.
 | `bpfn_display_modes` | 2.1.0 | Filter the available display modes: `array( slug => label )`. |
 | `bpfn_favorite_icons` | 2.1.0 | Filter the selectable icons: `array( slug => array( 'label', 'entity' ) )`. |
 | `bpfn_favorite_display_format` | 2.1.0 | Override the mode for one activity. Args: `$mode, $activity_id, $count, $users_data`. |
+| `bpfn_default_favorite_icon` | 2.2.1 | The icon slug used while the site owner has not chosen one. Default `thumb` on Reign, BuddyX and BuddyX Pro, otherwise `star`. Args: `$icon`. |
 | `bpfn_favorite_icon_html` | 2.1.0 | Override the icon markup. Return an empty string for no icon. Args: `$entity, $activity_id, $count`. |
 | `bpfn_favorite_display_html` | 2.1.0 | Return a non-empty string to replace the entire display markup. Args: `$html, $activity_id, $count, $users_data`. The return value is passed through `wp_kses()` with the plugin's allow list. |
 | `bpfn_favorites_modal_per_page` | 2.1.0 | Members loaded per page in the "View all" modal. Default 20. Args: `$per_page, $activity_id`. |
 | `bpfn_who_favorited_limit` | 2.1.0 | Hard ceiling on how many members the modal will ever load. Default 0 (no limit). Args: `$ceiling, $activity_id`. |
 
-Any markup a `bpfn_favorite_display_html` callback returns is filtered through `wp_kses()`. The allow list permits `div`, `span`, `a`, and `button` with a fixed set of attributes (`href`, `class`, `title`, `type`, `role`, `data-activity-id`, `aria-hidden`, `aria-haspopup`, `aria-label`). Any other tag or attribute is stripped.
+Any markup a `bpfn_favorite_display_html` callback returns is filtered through `wp_kses()`. The allow list permits `div`, `span`, `a`, and `button` with a fixed set of attributes (`href`, `class`, `title`, `type`, `role`, `data-activity-id`, `aria-hidden`, `aria-haspopup`, `aria-label`), plus `svg` and `path` for the built-in line icons (`svg`: `class`, `xmlns`, `width`, `height`, `viewBox`, `fill`, `stroke`, `stroke-width`, `stroke-linecap`, `stroke-linejoin`, `focusable`, `aria-hidden`; `path`: `d`). Any other tag or attribute is stripped.
 
 ## Notification filters
 

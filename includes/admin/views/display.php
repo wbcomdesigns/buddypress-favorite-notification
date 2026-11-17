@@ -89,7 +89,7 @@ $bpfn_mode_help = array(
 							<?php endforeach; ?>
 						</select>
 						<p class="description">
-							<?php esc_html_e( 'The icon shown in the "favorited by" line under each activity. A heart can read as the "Like" reaction, so a star or bookmark keeps favorites distinct. The Favorite button itself is drawn by BuddyPress and your theme.', 'buddypress-favorite-notification' ); ?>
+							<?php esc_html_e( 'The icon shown in the "liked by" line under each activity. Until you pick one it matches the like button your members see: a thumbs-up on Reign and BuddyX, a star elsewhere. The button itself is drawn by BuddyPress and your theme.', 'buddypress-favorite-notification' ); ?>
 						</p>
 					</td>
 				</tr>
@@ -101,7 +101,7 @@ $bpfn_mode_help = array(
 					<?php
 					$bpfn_icon_entity = isset( $bpfn_icons[ $bpfn_icon ]['entity'] ) ? $bpfn_icons[ $bpfn_icon ]['entity'] : '';
 					if ( '' !== $bpfn_icon_entity ) {
-						echo '<span class="bpfn-preview-icon">' . esc_html( html_entity_decode( $bpfn_icon_entity, ENT_QUOTES, 'UTF-8' ) ) . '</span>';
+						echo '<span class="bpfn-preview-icon" aria-hidden="true">' . wp_kses( $bpfn_icon_entity, BPFN_Module_Favorite_Display::get_allowed_display_html() ) . '</span>';
 					}
 					if ( 'inline' === $bpfn_mode ) {
 						echo '<span class="bpfn-preview-text">' . esc_html__( 'John, Mary and 2 others', 'buddypress-favorite-notification' ) . '</span>';

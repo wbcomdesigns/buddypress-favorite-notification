@@ -14,7 +14,7 @@ No. A member is never notified for favouriting their own content.
 
 ## Are notifications grouped?
 
-Yes, per activity. When several members favourite the same activity, the entries collapse into one "N people favorited your activity" notification. If one member favourites several different activities of yours, you get a separate notification for each activity.
+Yes, per activity. When several members favourite the same activity, the entries collapse into one "N people liked your activity" notification. If one member favourites several different activities of yours, you get a separate notification for each activity.
 
 ## Can members control their notifications?
 
@@ -46,7 +46,7 @@ The full list pages through with a **Load more** control, loading 20 members at 
 
 ## Can I change how the favourite line looks?
 
-Yes, on the **Display** tab. Choose inline usernames, an icon with the count, or an icon and count that opens the full list, and pick the icon (heart, star, bookmark, thumbs up, or none). The icon applies to the "favorited by" line only, not the BuddyPress Favorite button. See [Display Settings](../usage/display-settings.md).
+Yes, on the **Display** tab. Choose inline usernames, an icon with the count, or an icon and count that opens the full list, and pick the icon (heart, star, bookmark, thumbs up, or none). Until you pick one it matches your theme's like button (a thumbs-up on Reign and BuddyX, a star elsewhere). The icon applies to the "liked by" line only, not the BuddyPress Favorite button. See [Display Settings](../usage/display-settings.md).
 
 ## Will old notifications pile up in my database?
 

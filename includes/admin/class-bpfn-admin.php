@@ -272,7 +272,7 @@ class BPFN_Admin {
 		$view = isset( $view_map[ $active ] ) ? $view_map[ $active ] : 'overview';
 
 		$view_path = BPFN_INCLUDES_PATH . 'admin/views/' . $view . '.php';
-		$shell     = BPFN_INCLUDES_PATH . 'admin/views/shell.php';
+		$shell     = BPFN_INCLUDES_PATH . 'admin/views/layout.php';
 
 		include $shell;
 	}

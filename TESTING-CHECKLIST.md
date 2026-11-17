@@ -274,7 +274,7 @@
 
 - WordPress 5.0+
 - PHP 7.4+
-- BuddyPress 5.0+
+- BuddyPress 12.0+
 - Active theme supporting BuddyPress
 - Multiple test users (10+ recommended)
 - Test activities with varying favorite counts (0, 1, 2, 5, 10+)

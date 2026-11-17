@@ -12,8 +12,10 @@ An email does not depend on the web notification. If the author turned web notif
 
 Go to **Dashboard > Emails**. Two email types are registered:
 
-- **Activity favourited** (`bpfn-activity-favorited`). Subject: `[{{{site.name}}}] {{favoriter.name}} favorited your update`.
-- **Comment favourited** (`bpfn-comment-favorited`). Subject: `[{{{site.name}}}] {{favoriter.name}} favorited your comment`.
+- **Activity favourited** (`bpfn-activity-favorited`). Subject: `[{{{site.name}}}] {{favoriter.name}} liked your update`.
+- **Comment favourited** (`bpfn-comment-favorited`). Subject: `[{{{site.name}}}] {{favoriter.name}} liked your comment`.
+
+These are the texts a new install creates. BuddyPress keeps email texts once they exist, so a site that installed an earlier version keeps its "favorited" wording until you edit the email or reset it under **Tools > BuddyPress > Reinstall emails**.
 
 Edit the subject and body there like any other BuddyPress email. The messages use your site's BuddyPress email template and From settings.
 

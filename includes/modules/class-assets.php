@@ -143,7 +143,7 @@ class BPFN_Module_Assets {
 					// `time_ago` / `text` of its own. Previously JS-only literals,
 					// so they stayed English on every locale.
 					'just_now'        => esc_html__( 'just now', 'buddypress-favorite-notification' ),
-					'default_message' => esc_html__( 'Someone favorited your activity', 'buddypress-favorite-notification' ),
+					'default_message' => esc_html__( 'Someone liked your activity', 'buddypress-favorite-notification' ),
 				),
 			)
 		);

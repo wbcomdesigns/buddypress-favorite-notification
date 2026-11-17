@@ -387,13 +387,15 @@ class BPFN_Module_Favorite_Display {
 					'label'  => __( 'Star', 'buddypress-favorite-notification' ),
 					'entity' => '&#9733;',
 				),
+				// Bookmark and thumb have no text-style glyph (the code points render
+				// as colour emoji), so they are Lucide line icons in currentColor.
 				'bookmark' => array(
 					'label'  => __( 'Bookmark', 'buddypress-favorite-notification' ),
-					'entity' => '&#128278;',
+					'entity' => self::line_icon( '<path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>' ),
 				),
 				'thumb'    => array(
 					'label'  => __( 'Thumbs up', 'buddypress-favorite-notification' ),
-					'entity' => '&#128077;',
+					'entity' => self::line_icon( '<path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/>' ),
 				),
 				'none'     => array(
 					'label'  => __( 'No icon', 'buddypress-favorite-notification' ),
@@ -415,14 +417,44 @@ class BPFN_Module_Favorite_Display {
 	}
 
 	/**
-	 * The saved icon, normalised to a registered one (default heart).
+	 * The saved icon, normalised to a registered one (default: see default_icon()).
 	 *
 	 * @param mixed $icon Raw value. Null reads the stored option.
 	 * @return string
 	 */
 	public static function get_saved_icon( $icon = null ) {
-		$icon = null === $icon ? get_option( 'bpfn_favorite_icon', 'heart' ) : sanitize_key( $icon );
-		return isset( self::get_icon_choices()[ $icon ] ) ? $icon : 'heart';
+		$icon = null === $icon ? get_option( 'bpfn_favorite_icon', self::default_icon() ) : sanitize_key( $icon );
+		return isset( self::get_icon_choices()[ $icon ] ) ? $icon : self::default_icon();
+	}
+
+	/**
+	 * Icon used until the owner picks one: match the like button members see.
+	 * Reign and BuddyX draw it as a thumbs-up; BuddyPress's own button is a star.
+	 * Sites upgraded from before 2.2.1 keep the old heart (maybe_upgrade()).
+	 *
+	 * @return string Icon slug.
+	 */
+	public static function default_icon() {
+		$icon = in_array( get_template(), array( 'reign-theme', 'buddyx', 'buddyx-pro' ), true ) ? 'thumb' : 'star';
+
+		/**
+		 * Filter the icon used when the owner has not chosen one.
+		 *
+		 * @since 2.2.1
+		 *
+		 * @param string $icon Icon slug.
+		 */
+		return (string) apply_filters( 'bpfn_default_favorite_icon', $icon );
+	}
+
+	/**
+	 * Wrap Lucide path markup in a currentColor line-icon SVG sized to the text.
+	 *
+	 * @param string $paths SVG child elements.
+	 * @return string SVG markup.
+	 */
+	private static function line_icon( $paths ) {
+		return '<svg class="bpfn-line-icon" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">' . $paths . '</svg>';
 	}
 
 	/**
@@ -496,7 +528,7 @@ class BPFN_Module_Favorite_Display {
 	 *
 	 * @return array wp_kses allow list.
 	 */
-	private function get_allowed_display_html() {
+	public static function get_allowed_display_html() {
 		$attrs = array(
 			'href'             => array(),
 			'class'            => array(),
@@ -514,6 +546,22 @@ class BPFN_Module_Favorite_Display {
 			'span'   => $attrs,
 			'a'      => $attrs,
 			'button' => $attrs,
+			// Line icons from line_icon().
+			'svg'    => array(
+				'class'           => array(),
+				'xmlns'           => array(),
+				'width'           => array(),
+				'height'          => array(),
+				'viewbox'         => array(),
+				'fill'            => array(),
+				'stroke'          => array(),
+				'stroke-width'    => array(),
+				'stroke-linecap'  => array(),
+				'stroke-linejoin' => array(),
+				'focusable'       => array(),
+				'aria-hidden'     => array(),
+			),
+			'path'   => array( 'd' => array() ),
 		);
 	}
 
@@ -576,7 +624,10 @@ class BPFN_Module_Favorite_Display {
 		$icon = $this->get_icon_html( $activity_id, $count );
 
 		if ( 'inline' === $mode ) {
+			// The icon is aria-hidden, so without this a screen reader hears
+			// only "Zoe Campbell" with nothing saying what she did.
 			$body = '<span class="bpfn-favorite-text">'
+				. '<span class="bp-screen-reader-text">' . esc_html__( 'Liked by:', 'buddypress-favorite-notification' ) . ' </span>'
 				. $this->format_favorite_text( $users_data, $activity_id )
 				. '</span>';
 		} else {

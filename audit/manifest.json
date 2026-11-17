@@ -3,20 +3,20 @@
   "plugin": {
     "slug": "buddypress-favorite-notification",
     "name": "BuddyPress Favorite Notification",
-    "version": "2.1.0",
+    "version": "2.2.1",
     "namespace": "(none, BPFN_ prefix)",
     "main_file": "bp-favorite-notification.php",
     "text_domain": "buddypress-favorite-notification",
     "extends": null,
     "extension_hook_consumed": null,
     "extension_hook_fired": null,
-    "branch": "2.0.0",
+    "branch": "2.2.1",
     "type": "free BuddyPress addon",
     "requires": {
-      "wp": "6.1",
-      "php": "7.4",
-      "buddypress": "required (hard dependency)",
-      "header_source": "bp-favorite-notification.php:6-9 — Version 2.1.0, Requires at least 6.1, Requires PHP 7.4, Requires Plugins: buddypress. BPFN_VERSION = '2.1.0' at :26."
+      "wp": "6.5",
+      "php": "8.1",
+      "buddypress": "12.0 or later (hard dependency; bp-favorite-notification.php:110 refuses to load below it, header Requires Plugins: buddypress)",
+      "header_source": "bp-favorite-notification.php:6-9 and :26 - Version 2.2.1, Requires at least 6.5, Requires PHP 8.1, Requires Plugins: buddypress, BPFN_VERSION 2.2.1. readme.txt adds Requires BuddyPress: 12.0."
     }
   },
   "rest": {
@@ -30,7 +30,7 @@
       "nonce": "bpfn-admin-nonce",
       "capability": "manage_options",
       "purpose": "Manually delete read notifications older than bpfn_auto_cleanup_days.",
-      "registered_at": "includes/modules/class-admin.php:59-67 (loop over $ajax_actions)",
+      "registered_at": "includes/modules/class-admin.php:116 (loop over $ajax_actions)",
       "gate_at": "class-admin.php:134-138"
     },
     {
@@ -39,7 +39,7 @@
       "nonce": "bpfn-admin-nonce",
       "capability": "manage_options",
       "purpose": "Run / start usermeta->table favorites migration (background when >100 users).",
-      "registered_at": "includes/modules/class-admin.php:59-67",
+      "registered_at": "includes/modules/class-admin.php:116 (loop over $ajax_actions)",
       "gate_at": "class-admin.php:172-176"
     },
     {
@@ -48,7 +48,7 @@
       "nonce": "bpfn-admin-nonce",
       "capability": "manage_options",
       "purpose": "Poll background migration progress.",
-      "registered_at": "includes/modules/class-admin.php:59-67",
+      "registered_at": "includes/modules/class-admin.php:116 (loop over $ajax_actions)",
       "gate_at": "class-admin.php:214-218"
     },
     {
@@ -57,7 +57,7 @@
       "nonce": "bpfn-dismiss-notice",
       "capability": "manage_options",
       "purpose": "Persist migration-notice dismissal (deletes bpfn_show_migration_notice).",
-      "registered_at": "includes/admin/class-bpfn-admin.php:78",
+      "registered_at": "includes/admin/class-bpfn-admin.php:83",
       "gate_at": "class-bpfn-admin.php:332-336 (cap first, then nonce)"
     },
     {
@@ -66,7 +66,7 @@
       "nonce": "bpfn-nonce | bpfn_realtime_nonce",
       "capability": "logged-in + ownership check",
       "purpose": "Mark a realtime notification read; verifies ownership.",
-      "registered_at": "includes/modules/class-realtime.php:36",
+      "registered_at": "includes/modules/class-realtime.php:60",
       "gate_at": "class-realtime.php:125"
     },
     {
@@ -75,7 +75,7 @@
       "nonce": "bpfn-favorite-nonce",
       "capability": "logged-in member who can read the activity (bp_activity_user_can_read)",
       "purpose": "Return full list of users who favorited an activity (modal).",
-      "registered_at": "includes/modules/class-favorite-display.php:69-70",
+      "registered_at": "includes/modules/class-favorite-display.php:72 (members only, only when the Activity component is active)",
       "gate_at": "class-favorite-display.php:372",
       "note_2_2_0": "Members only since 2.2.0 (nopriv removed); hidden/private-group activity refused."
     },
@@ -85,13 +85,13 @@
       "nonce": "bpfn-favorite-nonce",
       "capability": "logged-in member who can read the activity (bp_activity_user_can_read)",
       "purpose": "Return refreshed favorite-count HTML for an activity.",
-      "registered_at": "includes/modules/class-favorite-display.php:71-72",
+      "registered_at": "includes/modules/class-favorite-display.php:73 (members only, only when the Activity component is active)",
       "gate_at": "class-favorite-display.php:473",
       "note_2_2_0": "Members only since 2.2.0 (nopriv removed); hidden/private-group activity refused."
     }
   ],
   "ajax_dead_listeners": [],
-  "ajax_notes": "8 distinct AJAX actions over 10 add_action registrations (the 2 favorite-display actions each register priv + nopriv). The nopriv registrations are effectively unreachable: BPFN_Module_Favorite_Display::display_favorite_count() returns early for logged-out visitors (class-favorite-display.php:315), so the markup that carries the nonce and triggers these endpoints is never printed for anonymous users. bpfn_get_stats (listed in the 2026-06-05 manifest) does NOT exist — class-admin.php:59-63 registers exactly three actions.",
+  "ajax_notes": "7 distinct AJAX actions, 7 add_action registrations, all wp_ajax_ (logged-in) only: the nopriv registrations of the two favorite-display actions were removed because display_favorite_count() renders nothing for visitors. The three class-admin.php actions are registered in a loop (BPFN_Module_Admin::register_ajax_handlers), so a literal grep for wp_ajax_bpfn_clear_old_notifications finds none. bpfn_get_stats does not exist.",
   "admin_pages": [
     {
       "title": "BuddyPress Favorite Notification",
@@ -102,7 +102,7 @@
       "registered_at": "includes/admin/class-bpfn-admin.php:106-113 (add_submenu_page)",
       "hook_suffix": "*_page_bpfn-dashboard",
       "renderer": "BPFN_Admin::render_page (class-bpfn-admin.php:233)",
-      "shell": "includes/admin/views/shell.php",
+      "shell": "includes/admin/views/layout.php",
       "tabs": [
         "overview",
         "display",
@@ -149,7 +149,7 @@
       "key": "bpfn_favorite_icon",
       "group": "(standalone option, custom POST handler)",
       "type": "string heart|star|bookmark|thumb|none",
-      "default": "heart",
+      "default": "theme-aware (2.2.1): thumb on Reign / BuddyX / BuddyX Pro, otherwise star, via BPFN_Module_Favorite_Display::default_icon() and the bpfn_default_favorite_icon filter. Sites upgraded from < 2.2.1 with no saved value are pinned to heart by maybe_upgrade().",
       "controls": "Display tab: which glyph precedes the favorite count",
       "written_at": "includes/modules/class-admin.php::handle_display_settings_save (nonce bpfn_display_settings)",
       "read_at": [
@@ -197,8 +197,10 @@
       "type": "string",
       "default": "BPFN_VERSION",
       "controls": "Installed version marker",
-      "written_at": "bp-favorite-notification.php:242",
-      "read_at": []
+      "written_at": "bp-favorite-notification.php:287 (BP_Favorite_Notification::maybe_upgrade, once per version change)",
+      "read_at": [
+        "bp-favorite-notification.php:266 (maybe_upgrade: decides which upgrade steps to run)"
+      ]
     },
     {
       "key": "bpfn_show_migration_notice",
@@ -288,7 +290,7 @@
       "validated_against": "BPFN_Module_Realtime::INTERVALS"
     }
   ],
-  "settings_notes": "There is NO register_setting() call anywhere in the plugin (verified: 0 hits across all non-vendor PHP). No Settings API page, no settings group, no sanitize callback. The Tools tab persists its two options through a hand-rolled POST handler (BPFN_Module_Admin::handle_cleanup_settings_save, class-admin.php:80-128, nonce `bpfn_cleanup_settings`, cap manage_options, redirects to ?page=bpfn-dashboard&tab=tools&settings_updated=true).",
+  "settings_notes": "There is NO register_setting() call anywhere in the plugin (verified: 0 hits across all non-vendor PHP). No Settings API page, no settings group, no sanitize callback. The Tools tab persists its two options through a hand-rolled POST handler (BPFN_Module_Admin::handle_cleanup_settings_save, class-admin.php (admin_init -> handle_cleanup_settings_save / handle_display_settings_save), nonce `bpfn_cleanup_settings`, cap manage_options, redirects to ?page=bpfn-dashboard&tab=tools&settings_updated=true).",
   "per_user_settings": {
     "storage": "{prefix}bp_favorite_notification_prefs table via bpfn_get_user_settings() / bpfn_save_user_settings() (includes/functions/core-functions.php)",
     "surface": "BuddyPress member Settings > Favorite Notifications subnav (slug 'notifications') + a row in the BP notification settings table",
@@ -676,15 +678,22 @@
       "args_count": 3,
       "where": "includes/modules/class-email.php::send",
       "consumed_by": []
+    },
+    {
+      "name": "bpfn_default_favorite_icon",
+      "type": "filter",
+      "args_count": 1,
+      "where": "includes/modules/class-favorite-display.php::default_icon (2.2.1: 'thumb' on Reign / BuddyX / BuddyX Pro, otherwise 'star'; sites that upgraded without a saved icon are pinned to 'heart' by maybe_upgrade)",
+      "consumed_by": []
     }
   ],
   "hooks_fired_count": {
-    "distinct": 38,
+    "distinct": 39,
     "actions": 16,
-    "filters": 22,
-    "call_sites": 38,
+    "filters": 23,
+    "call_sites": 39,
     "method": "Multiline-aware scan of do_action|apply_filters with a literal 'bpfn_*' first argument across all non-vendor PHP (includes/, templates/, bp-favorite-notification.php).",
-    "note": "This supersedes both the 2026-06-05 manifest's list and any 'over 20 hooks' / '38 hooks' claim. Hooks REMOVED since the 2026-06-05 manifest (no longer fired anywhere): bpfn_admin_init_settings, bpfn_sanitize_options, bpfn_after_notification_item, bpfn_notification_template, bpfn_use_enhanced_template, bpfn_is_feature_enabled. Hooks ADDED since: bpfn_admin_tabs, bpfn_dashboard_stats_ttl, bpfn_default_user_settings, bpfn_activity_type_map, bpfn_notification_icons, bpfn_who_favorited_limit. Targeted delta 2026-07-29 (2.1.0 display-mode work) ADDED: bpfn_display_modes, bpfn_favorite_icons, bpfn_favorite_display_format, bpfn_favorite_icon_html, bpfn_favorite_display_html, bpfn_favorites_modal_per_page. bpfn_who_favorited_limit changed meaning: default 0 (no ceiling) instead of 50, now bounding a paginated list. Run /wp-plugin-onboard --refresh at release for a full rescan. Delta 2026-10-08 (2.2.0) REMOVED: bpfn_email_templates, bpfn_email_template_key, bpfn_email_template_path, bpfn_email_data, bpfn_email_subject, bpfn_email_message, bpfn_email_headers, bpfn_email_from_name, bpfn_email_from_email, bpfn_email_social_links, bpfn_after_send_email, bpfn_log_event, bpfn_enable_logging (plus stale entries already gone: bpfn_diagnostics, bpfn_notification_stats, bpfn_user_comments_count, bpfn_user_comment_favorites_count). ADDED: bpfn_email_tokens."
+    "note": "This supersedes both the 2026-06-05 manifest's list and any 'over 20 hooks' / '38 hooks' claim. Hooks REMOVED since the 2026-06-05 manifest (no longer fired anywhere): bpfn_admin_init_settings, bpfn_sanitize_options, bpfn_after_notification_item, bpfn_notification_template, bpfn_use_enhanced_template, bpfn_is_feature_enabled. Hooks ADDED since: bpfn_admin_tabs, bpfn_dashboard_stats_ttl, bpfn_default_user_settings, bpfn_activity_type_map, bpfn_notification_icons, bpfn_who_favorited_limit. Targeted delta 2026-07-29 (2.1.0 display-mode work) ADDED: bpfn_display_modes, bpfn_favorite_icons, bpfn_favorite_display_format, bpfn_favorite_icon_html, bpfn_favorite_display_html, bpfn_favorites_modal_per_page. bpfn_who_favorited_limit changed meaning: default 0 (no ceiling) instead of 50, now bounding a paginated list. Run /wp-plugin-onboard --refresh at release for a full rescan. Delta 2026-10-08 (2.2.0) REMOVED: bpfn_email_templates, bpfn_email_template_key, bpfn_email_template_path, bpfn_email_data, bpfn_email_subject, bpfn_email_message, bpfn_email_headers, bpfn_email_from_name, bpfn_email_from_email, bpfn_email_social_links, bpfn_after_send_email, bpfn_log_event, bpfn_enable_logging (plus stale entries already gone: bpfn_diagnostics, bpfn_notification_stats, bpfn_user_comments_count, bpfn_user_comment_favorites_count). ADDED: bpfn_email_tokens. Delta 2026-11-17 (2.2.1) ADDED: bpfn_default_favorite_icon. Third-party hooks applied here (not counted): bp_core_template_plugin (class-settings.php), wbcom_hub_wrapper_helper_slugs (admin/views/hub.php)."
   },
   "hooks_consumed_external": {
     "buddypress": [
@@ -736,9 +745,9 @@
       "hook": "bpfn_auto_cleanup_notifications",
       "interval": "monthly (custom schedule)",
       "handler": "BPFN_Module_Admin::run_automatic_cleanup (class-admin.php:264-291)",
-      "listener_at": "includes/modules/class-admin.php:250-253 (setup_automatic_cleanup)",
-      "scheduled_at": "includes/modules/class-admin.php:257 (on load when enabled); includes/modules/class-admin.php:111 (on Tools-tab save)",
-      "unscheduled_at": "includes/modules/class-admin.php:113 (Tools-tab save, when disabled)",
+      "listener_at": "includes/modules/class-admin.php (setup_automatic_cleanup; cron_schedules filter at :96, register_cron_schedule :344)",
+      "scheduled_at": "includes/modules/class-admin.php:76 (setup_automatic_cleanup, when enabled), :362 (re-schedule guard)",
+      "unscheduled_at": "includes/modules/class-admin.php:203 (Tools-tab save, when disabled)",
       "gated_by": "bpfn_auto_cleanup_enabled === 'yes'",
       "purpose": "Delete read notifications older than bpfn_auto_cleanup_days (min 7, default 30); writes bpfn_last_auto_cleanup."
     },
@@ -746,17 +755,9 @@
       "hook": "bpfn_process_migration_batch",
       "interval": "single event (re-chains itself +5s per batch)",
       "handler": "BPFN_Favorites_Migration::process_migration_batch",
-      "scheduled_at": "includes/migrations/class-favorites-migration.php:54 (start), :154 (re-chain)",
+      "scheduled_at": "includes/migrations/class-favorites-migration.php:54 (start), :155 (re-chain)",
       "unscheduled_at": "includes/migrations/class-favorites-migration.php:401",
       "purpose": "Background batch migration of usermeta favorites -> {prefix}bp_activity_favorites (batch size 50; used when >100 users have favorites)."
-    },
-    {
-      "hook": "bpfn_cleanup_test_activity",
-      "interval": "single event (+60s)",
-      "handler": "closure at includes/functions/integration-functions.php:572-583",
-      "scheduled_at": "includes/functions/integration-functions.php:304",
-      "purpose": "Delete the throwaway activity created by the diagnostic test-notification helper.",
-      "note": "Diagnostic path only; not reachable from the shipped admin UI."
     }
   ],
   "cron_schedules_registered": [
@@ -872,11 +873,11 @@
   },
   "security": {
     "uploads_gate": "n/a",
-    "admin_ajax_gate": "check_ajax_referer('bpfn-admin-nonce','nonce') + current_user_can('manage_options') on all 3 class-admin.php handlers; check_ajax_referer('bpfn-dismiss-notice','nonce') + cap on class-bpfn-admin.php:330.",
-    "admin_post_gate": "wp_verify_nonce('bpfn_cleanup_settings') + current_user_can('manage_options') (class-admin.php:86-93).",
-    "public_ajax_gate": "check_ajax_referer('bpfn-favorite-nonce','nonce') only (read-only favorite display, registered priv + nopriv).",
+    "admin_ajax_gate": "check_ajax_referer('bpfn-admin-nonce','nonce') + current_user_can('manage_options') on all 3 class-admin.php handlers (:224, :279, :321); check_ajax_referer('bpfn-dismiss-notice','nonce') + cap on class-bpfn-admin.php:357.",
+    "admin_post_gate": "wp_verify_nonce on bpfn_cleanup_nonce (class-admin.php:179) and bpfn_display_nonce (:139) + current_user_can('manage_options').",
+    "public_ajax_gate": "check_ajax_referer('bpfn-favorite-nonce','nonce') (class-favorite-display.php:745, :964); logged-in only (priv registrations only since 2.2.1).",
     "realtime_ajax_gate": "wp_verify_nonce('bpfn-nonce' | 'bpfn_realtime_nonce') + ownership check on dismiss.",
-    "notes": "wppqa nonce-no-cap flags on the favorite-display AJAX handlers are FALSE POSITIVES — both endpoints are read-only and registered with wp_ajax_nopriv_, so no capability is appropriate. In practice the nopriv registrations are unreachable anyway (display_favorite_count() returns early for logged-out users, class-favorite-display.php:315), meaning anonymous callers never receive the nonce these handlers require."
+    "notes": "wppqa nonce-no-cap flags on the favorite-display AJAX handlers are false positives: both are read-only and nonce-gated. The nopriv registrations that this note used to defend were removed."
   },
   "ci_guards": {
     "script": null,
@@ -979,13 +980,11 @@
         "resolved_in": "2.0.1",
         "severity": "major (historic)",
         "title": "Unconditional error_log() calls on the live notification path.",
-        "detail": "The hot-path calls are gone. core-functions.php no longer logs at all (the call that fired on EVERY enabled-check is removed), and the ~20 calls in integration-functions.php went with the diagnostic helpers - that file is now 84 lines. Two error_log() calls remain in includes/, both failure-only: buddypress-compat.php:231 is explicitly wrapped in `if ( defined('WP_DEBUG') && WP_DEBUG )` at :228, and class-notifications.php:104 fires only when the BP component failed to initialise. Neither can grow the log on a healthy production install.",
+        "detail": "The hot-path calls are gone and, as of 2.2.1, so are the last two: includes/, templates/ and the main file contain 0 error_log() calls. Verified by grep 2026-11-17.",
         "evidence": [
-          "includes/compat/buddypress-compat.php:228-232 (WP_DEBUG-guarded; logs a genuine registration failure only)",
-          "includes/modules/class-notifications.php:104 (unguarded, but reached only when $bp->favorite_notifier is missing after a recovery attempt)"
+          "grep -rn error_log includes templates bp-favorite-notification.php -> 0 hits"
         ],
-        "action": "Optional cleanup: guard the class-notifications.php:104 call for symmetry. Not a release blocker.",
-        "verified_at": "2026-07-30 (2.1.0 release gate; confirmed against a live BuddyPress install - debug.log carried zero BPFN entries across a full favorite/notification/modal journey)"
+        "verified_at": "2026-11-17 (2.2.1 refresh)"
       }
     ],
     "orphan_keys": [
@@ -1010,30 +1009,12 @@
         "severity": "major (historic)",
         "detail": "See BPFN-DEADUI-01. The plugin now mirrors the posted value into its own prefs table on the same save, so the value BP writes to user meta is no longer the only copy.",
         "verified_at": "2026-07-30 (2.1.0 release gate)"
-      },
-      {
-        "key": "bpfn_version",
-        "kind": "option",
-        "read_at": "NONE (by design)",
-        "written_at": "bp-favorite-notification.php:253 (activation / upgrade)",
-        "verdict": "intentional",
-        "severity": "info",
-        "detail": "Schema stamp written so a future release can detect the installed version and run a data migration. Nothing reads it yet by design. Baselined in .contract-audit-baseline.json.",
-        "verified_at": "2026-07-30 (2.1.0 release gate)"
       }
     ],
     "dead_listeners": [],
     "dead_modules": [],
     "n_plus_one_risks": [],
-    "unreachable_registrations": [
-      {
-        "what": "wp_ajax_nopriv_bpfn_get_all_favorites / wp_ajax_nopriv_bpfn_refresh_favorite_display",
-        "where": "includes/modules/class-favorite-display.php:70,72",
-        "verdict": "harmless_dead_code",
-        "severity": "low",
-        "detail": "Registered for logged-out callers, but BPFN_Module_Favorite_Display::display_favorite_count() returns early at class-favorite-display.php:315 when ! is_user_logged_in(), so the favorite-display markup (and the bpfn-favorite-nonce it carries) is never emitted anonymously. The nopriv path is therefore unreachable in practice. Not a security issue (read-only, nonce-gated); it just means the manifest's old 'public (priv + nopriv)' capability label overstated the real surface."
-      }
-    ],
+    "unreachable_registrations": [],
     "cap_context_mismatches": [],
     "extensibility_gaps": [],
     "js_only_activation": [],
@@ -1043,18 +1024,27 @@
     "hook_signature_drift": [],
     "suppressed_baseline_inventory": {
       "phpcs_excludes": {
-        "count": "many inline phpcs:ignore for direct DB queries on custom tables; 2 remaining inline phpcs:ignore for error_log()",
-        "action": "custom-table queries acceptable (object-cached); of the 2 remaining error_log ignores, one is additionally WP_DEBUG-guarded and the other is a component-init failure path - see BPFN-LOG-01."
+        "count": "many inline phpcs:ignore for direct DB queries on custom tables; 0 for error_log()",
+        "action": "custom-table queries acceptable (object-cached)."
       },
       "phpstan": {
         "level": "5",
         "baseline": "phpstan-baseline.neon present",
-        "status": "clean at 2.1.0 - `phpstan analyse` reports [OK] No errors; 6 baseline entries were dropped on this branch."
+        "status": "clean at 2.2.1 - phpstan analyse reports [OK] No errors (verified 2026-11-17)"
       },
       "contract_audit": {
         "baseline": ".contract-audit-baseline.json",
         "status": "0 errors, 0 warnings, 5 baselined - all 5 verified false positives (3 dynamically-registered wp_ajax_ hooks, 1 inline-JS caller printed from PHP, 1 intentional version stamp)."
       }
+    },
+    "stale_findings_removed": {
+      "at": "2026-11-17",
+      "removed": [
+        "unreachable_registrations: wp_ajax_nopriv_bpfn_get_all_favorites / wp_ajax_nopriv_bpfn_refresh_favorite_display (registrations removed; verified 0 wp_ajax_nopriv_ hits in includes/)",
+        "orphan_keys bpfn_version 'read_at NONE (by design)' (now read by maybe_upgrade at bp-favorite-notification.php:266)",
+        "phpcs_excludes: '2 remaining inline phpcs:ignore for error_log()' (verified 0 error_log calls remain in includes/, templates/ or the main file)"
+      ],
+      "kept": "The 5 resolved historic findings (BPFN-PREF-01/02, BPFN-DEADUI-01, BPFN-LOG-01, bpfn_options, favorite_activity) are still true; the DOING_AJAX short-circuit is still absent (core-functions.php:180 holds only the explanatory note)."
     }
   },
   "coverage_notes": {
@@ -1064,19 +1054,20 @@
       "{prefix}bp_favorite_notification_prefs": "FAIL — frontend (BP member Settings subnav) and a write path exist, but the values are never enforced (BPFN-PREF-01/02) and there is no backend/admin view of them at all. The store is effectively write-only."
     },
     "big_site_readiness": "Not re-verified in this structural refresh. The 2026-06-05 N+1 findings on get_users_who_favorited and render_trending_activities are recorded as FIXED in root CLAUDE.md (batched, capped, cached) — that claim was not independently re-tested here. The who-liked modal and the Overview trending list remain the rows-at-scale surfaces to re-check at release.",
-    "verification_scope": "STRUCTURAL ONLY. This refresh re-derived every section from a grep/glob rescan of shipped code at the file:line level. No browser run, no wppqa, no functional test. The bugs recorded under static_analysis are static findings backed by file:line evidence and need Basecamp cards — they were NOT fixed."
+    "verification_scope": "STRUCTURAL ONLY. This refresh re-derived every section from a grep/glob rescan of shipped code at the file:line level. No browser run, no wppqa, no functional test. The bugs recorded under static_analysis are static findings backed by file:line evidence and need Basecamp cards — they were NOT fixed.",
+    "refresh_2026_11_17": "Refresh 2026-11-17: nopriv AJAX removed, diagnostic cron removed, bpfn_default_favorite_icon added; per-line 'where' strings elsewhere in this file are anchored on method names, treat bare line numbers as hints."
   },
   "generated": {
-    "at": "2026-07-30T00:00:00+00:00",
-    "from": "2.1.0 release gate - targeted static_analysis delta, verified against shipped code",
-    "branch": "master (merged feature/favorite-display-modes)",
+    "at": "2026-11-17T20:00:00+05:30",
+    "from": "2.2.1 --refresh: targeted verification of every category against source, both directions; static_analysis re-verified finding by finding",
+    "branch": "2.2.1",
     "schema_version": "v2.2",
-    "scan_scope": "structural sections carried from the 2026-07-29 full rescan (accurate for 2.1.0); static_analysis re-verified finding by finding",
+    "scan_scope": "full re-verify: hooks fired and consumed, AJAX, cron, options, tables, requirements, static_analysis",
     "scan_path": ".",
-    "php_file_count": 25,
+    "php_file_count": 22,
     "size_class": "small",
-    "supersedes": "2026-07-16T10:31:51+00:00 manual structural rescan",
-    "note": "The 2026-07-16 static_analysis block predated the 2.0.1 fixes and still listed BPFN-PREF-01, BPFN-PREF-02 and BPFN-DEADUI-01 as open blockers after they had shipped fixed. Each finding was re-checked against the code on this branch and re-stated with its real verdict.",
-    "delta_2_2_0": "2026-10-08: manual delta, verified both ways against source (hooks, ajax, options, email, realtime)"
+    "supersedes": "2026-10-08 manual delta (2.2.0)",
+    "delta_2_2_0": "2026-10-08: manual delta, verified both ways against source (hooks, ajax, options, email, realtime)",
+    "delta_2_2_1": "2026-11-17: BuddyPress 12.0 minimum, Requires at least 6.5 / PHP 8.1, bpfn_default_favorite_icon filter (theme-aware default icon, upgrade pins heart), 'liked' wording in notifications and emails, nopriv favorite-display AJAX removed, diagnostic cron bpfn_cleanup_test_activity gone"
   }
 }
