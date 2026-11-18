@@ -23,7 +23,7 @@ There is no other transport. If Heartbeat is blocked, popups do not appear.
 
 ## What a popup shows
 
-Each popup carries the notification text, a relative timestamp ("5 mins ago"), and a link to the activity. Popups appear at the bottom-right of the screen, up to five at a time, and auto-dismiss after five seconds. A member can also dismiss a popup manually, which marks that notification read through the `bpfn_dismiss_notification` action.
+Each popup carries the notification text, a relative timestamp ("5 mins ago"), and a link to the activity. Popups appear at the bottom-right of the screen, at most two at a time (one on phones), and auto-dismiss after five seconds. A member can also dismiss a popup manually, which marks that notification read through the `bpfn_dismiss_notification` action.
 
 ## Per-member control
 
@@ -35,4 +35,4 @@ The heartbeat check verifies a nonce (`bpfn_realtime_nonce`) and confirms the me
 
 ## Requirements
 
-Realtime popups need the BuddyPress Notifications component active. If it is off, the realtime assets are not loaded and no popups run.
+Realtime popups need the BuddyPress Notifications component active. If it is off, the popup scripts are not loaded and no popups run.

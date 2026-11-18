@@ -22,7 +22,7 @@ $show_realtime      = ! empty( $show_realtime );
 	<div class="bpfn-settings-intro">
 		<p>
 			<?php
-			esc_html_e( 'Choose which favorite notifications you get on the site.', 'buddypress-favorite-notification' );
+			esc_html_e( 'Choose which like notifications you get on the site.', 'buddypress-favorite-notification' );
 			if ( bp_is_active( 'settings' ) ) {
 				echo ' ';
 				printf(

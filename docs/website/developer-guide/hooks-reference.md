@@ -63,6 +63,7 @@ add_filter( 'bpfn_email_tokens', function ( $tokens, $activity, $user_id ) {
 | Action | Fires | Args |
 | --- | --- | --- |
 | `bpfn_init` | Plugin initialised | `$plugin` |
+| `bpfn_compat_setup_globals` | After the `favorite_notifier` pseudo-component is registered on `bp_setup_globals` (only while the Notifications component is active) | none |
 | `bpfn_load_modules` | After modules load | `$plugin` |
 | `bpfn_after_add_notification` | After a favourite notification is created | `$notification_id, $data, $activity, $user_id` |
 | `bpfn_after_save_user_settings` | After member preferences are saved | `$user_id, $settings, $success` |

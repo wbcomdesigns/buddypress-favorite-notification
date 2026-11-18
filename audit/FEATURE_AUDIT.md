@@ -31,7 +31,7 @@
 ### F5 — Admin dashboard / tools (single page)
 - Module: `BPFN_Module_Admin` (class-admin.php). Top-level menu `bpfn-dashboard` (cap `manage_options`, dashicons-heart).
 - One page, three sections: Overview (stats cards, recent + trending activities), Settings (Settings API `bpfn_options`), Tools (migration + cleanup).
-- Admin AJAX (nonce `bpfn-admin-nonce`, cap `manage_options`): `bpfn_clear_old_notifications`, `bpfn_get_stats`, `bpfn_migrate_favorites`, `bpfn_migration_progress`.
+- Admin AJAX (nonce `bpfn-admin-nonce`, cap `manage_options`): `bpfn_clear_old_notifications`, `bpfn_migrate_favorites`, `bpfn_migration_progress`.
 
 ### F6 — Favorites migration (usermeta → table)
 - `BPFN_Favorites_Migration` (includes/migrations/). Sync (<100 users) or background batches of 50 via `bpfn_process_migration_batch` single-event re-chaining.

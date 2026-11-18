@@ -22,7 +22,7 @@ function bpfn_clear_old_notifications( $days = 30 ) {
 	if ( ! bp_is_active( 'notifications' ) ) {
 		return array(
 			'count' => 0,
-			'error' => __( 'Notifications component not active', 'buddypress-favorite-notification' ),
+			'error' => __( 'BuddyPress Notifications is turned off. Turn it on under Settings > BuddyPress > Components.', 'buddypress-favorite-notification' ),
 		);
 	}
 

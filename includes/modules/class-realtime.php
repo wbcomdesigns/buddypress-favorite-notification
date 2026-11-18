@@ -163,7 +163,7 @@ class BPFN_Module_Realtime {
 	 * @return bool
 	 */
 	public static function is_enabled_for_user( $user_id ) {
-		if ( ! $user_id || ! self::is_enabled() ) {
+		if ( ! $user_id || ! self::is_enabled() || ! bp_is_active( 'notifications' ) ) {
 			return false;
 		}
 		foreach ( bpfn_get_user_settings( $user_id ) as $options ) {

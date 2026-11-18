@@ -166,15 +166,15 @@ No. Members are not notified when they favorite their own content.
 
 = Are notifications grouped? =
 
-Yes, when several members favorite the same activity. Those favorites collapse into one notification that reads "%d people favorited your activity" instead of one entry per member. Grouping is per activity, so if one member favorites several different activities of yours, you get a separate notification for each of them.
+Yes, when several members favorite the same activity. Those favorites collapse into one notification that reads "3 people liked your activity" instead of one entry per member. Grouping is per activity, so if one member favorites several different activities of yours, you get a separate notification for each of them.
 
 = Can members control their notifications? =
 
-Yes. Emails are set in the BuddyPress **Settings > Email** tab, which has a row for favorited activities and one for favorited comments. Web notifications and realtime popups are set in **Settings > Favorite Notifications**. Everything is on by default; turning one off stops it.
+Yes. Emails are set in the BuddyPress **Settings > Email** tab, which has a row for likes on your activity and one for likes on your comments. Web notifications and realtime popups are set in **Settings > Favorite Notifications**. Everything is on by default; turning one off stops it.
 
 = Can I customize the emails? =
 
-Yes. Go to **Dashboard > Emails** and edit "favorited your update" or "favorited your comment" like any other BuddyPress email. They use your BuddyPress email design and sender settings, and your edits are kept when the plugin updates.
+Yes. Go to **Dashboard > Emails** and edit "liked your update" or "liked your comment" like any other BuddyPress email. They use your BuddyPress email design and sender settings, and your edits are kept when the plugin updates.
 
 = Who can see the "who liked this" display? =
 
@@ -234,8 +234,15 @@ Login, speed and accessibility fixes for the member pages, and wording that matc
 * Improve  - Activity pages no longer send one extra request per liked post after loading, so busy streams load faster.
 * Improve  - Screen readers announce "Liked by" before the names, and the liked-by list is announced by its heading.
 * Improve  - The real-time pop-up's close button is larger and no longer covers the message.
+* Improve  - With No icon, the liked-by count reads as text, for example "12 Likes", instead of a bare number.
+* Improve  - The Settings > Favorite Notifications tab shows a heart icon on Reign and BuddyX Pro instead of a generic one.
+* Improve  - Email unsubscribe messages, email descriptions and the member notification settings now say "likes" too.
 * Fix      - A logged-out visitor opening Settings > Favorite Notifications now goes to the login screen, like the other Settings tabs, instead of a page-not-found error.
 * Fix      - Pressing Escape on the liked-by list now returns focus to the button that opened it, even right after the page loads.
+* Fix      - Liking an activity no longer stops with an error when the BuddyPress Notifications component is off; emails still go out and the plugin screens explain what is paused.
+* Fix      - Sites updating from 2.2.0 now get the "liked" email wording too, unless you edited the email.
+* Fix      - Clear Old Notifications Now explains when the Notifications component is off instead of showing a generic failure, and stays disabled until it is on.
+* Fix      - Closing the liked-by list returns focus to its button even after a like or unlike refreshed it, and the list has a name while it loads.
 * Dev      - New filter `bpfn_default_favorite_icon` sets the default icon.
 * Dev      - Renamed the admin layout file from shell.php to layout.php so the plugin zip installs on hosts whose firewalls block that file name.
 * Dev      - All five bundled languages updated for the new wording.

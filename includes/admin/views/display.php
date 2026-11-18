@@ -89,7 +89,7 @@ $bpfn_mode_help = array(
 							<?php endforeach; ?>
 						</select>
 						<p class="description">
-							<?php esc_html_e( 'The icon shown in the "liked by" line under each activity. Until you pick one it matches the like button your members see: a thumbs-up on Reign and BuddyX, a star elsewhere. The button itself is drawn by BuddyPress and your theme.', 'buddypress-favorite-notification' ); ?>
+							<?php esc_html_e( 'The icon shown in the "liked by" line under each activity. Until you pick one it matches the like button your members see: a thumbs-up on Reign and BuddyX, a star elsewhere. With No icon, the count is shown as text, for example "12 Likes". The button itself is drawn by BuddyPress and your theme.', 'buddypress-favorite-notification' ); ?>
 						</p>
 					</td>
 				</tr>
@@ -105,8 +105,11 @@ $bpfn_mode_help = array(
 					}
 					if ( 'inline' === $bpfn_mode ) {
 						echo '<span class="bpfn-preview-text">' . esc_html__( 'John, Mary and 2 others', 'buddypress-favorite-notification' ) . '</span>';
+					} elseif ( '' === $bpfn_icon_entity ) {
+						/* translators: %s: Number of likes. */
+						echo '<span class="bpfn-preview-text">' . esc_html( sprintf( _n( '%s Like', '%s Likes', 12, 'buddypress-favorite-notification' ), number_format_i18n( 12 ) ) ) . '</span>';
 					} else {
-						echo '<span class="bpfn-preview-text">12</span>';
+						echo '<span class="bpfn-preview-text">' . esc_html( number_format_i18n( 12 ) ) . '</span>';
 					}
 					?>
 				</div>

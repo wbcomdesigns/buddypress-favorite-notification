@@ -112,6 +112,54 @@ class BPFN_Module_Email {
 	}
 
 	/**
+	 * The emails exactly as 2.2.0 installed them, before the wording moved to
+	 * "liked". Only used to tell an untouched email from one the owner edited.
+	 * Kept translatable so a site installed in another language matches the
+	 * translated text it was given.
+	 *
+	 * @return array Same shape as get_schema().
+	 */
+	private static function get_legacy_schema() {
+		return array(
+			'bpfn-activity-favorited' => array(
+				/* translators: Old 2.2.0 email subject, used only to detect unedited emails. Keep the existing translation. Do not remove {} brackets or translate its contents. */
+				'post_title'   => __( '[{{{site.name}}}] {{favoriter.name}} favorited your update', 'buddypress-favorite-notification' ),
+				/* translators: Old 2.2.0 email body, used only to detect unedited emails. Keep the existing translation. Do not remove {} brackets or translate its contents. */
+				'post_content' => __( "<a href=\"{{{favoriter.url}}}\">{{favoriter.name}}</a> favorited your update:\n\n<blockquote>&quot;{{activity.content}}&quot;</blockquote>\n\n<a href=\"{{{activity.url}}}\">View the update</a>.", 'buddypress-favorite-notification' ),
+				/* translators: Old 2.2.0 plain-text email, used only to detect unedited emails. Keep the existing translation. Do not remove {} brackets or translate its contents. */
+				'post_excerpt' => __( "{{favoriter.name}} favorited your update:\n\n\"{{activity.content}}\"\n\nView the update: {{{activity.url}}}", 'buddypress-favorite-notification' ),
+			),
+			'bpfn-comment-favorited'  => array(
+				/* translators: Old 2.2.0 email subject, used only to detect unedited emails. Keep the existing translation. Do not remove {} brackets or translate its contents. */
+				'post_title'   => __( '[{{{site.name}}}] {{favoriter.name}} favorited your comment', 'buddypress-favorite-notification' ),
+				/* translators: Old 2.2.0 email body, used only to detect unedited emails. Keep the existing translation. Do not remove {} brackets or translate its contents. */
+				'post_content' => __( "<a href=\"{{{favoriter.url}}}\">{{favoriter.name}}</a> favorited your comment:\n\n<blockquote>&quot;{{activity.content}}&quot;</blockquote>\n\n<a href=\"{{{activity.url}}}\">View the conversation</a>.", 'buddypress-favorite-notification' ),
+				/* translators: Old 2.2.0 plain-text email, used only to detect unedited emails. Keep the existing translation. Do not remove {} brackets or translate its contents. */
+				'post_excerpt' => __( "{{favoriter.name}} favorited your comment:\n\n\"{{activity.content}}\"\n\nView the conversation: {{{activity.url}}}", 'buddypress-favorite-notification' ),
+			),
+		);
+	}
+
+	/**
+	 * Whether a stored email post still holds the given default text.
+	 *
+	 * Whitespace is collapsed so line-ending changes made on save do not count
+	 * as an edit; any change to the words does.
+	 *
+	 * @param WP_Post $post    Email post.
+	 * @param array   $shipped Default title, content and excerpt.
+	 * @return bool
+	 */
+	private static function is_unedited( $post, $shipped ) {
+		foreach ( $shipped as $field => $text ) {
+			if ( preg_replace( '/\s+/', ' ', trim( (string) $post->$field ) ) !== preg_replace( '/\s+/', ' ', trim( $text ) ) ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
 	 * Descriptions and unsubscribe settings, in bp_email_get_type_schema() shape.
 	 *
 	 * The unsubscribe meta keys are the ones BPFN_Module_Settings mirrors into the
@@ -123,19 +171,19 @@ class BPFN_Module_Email {
 		$meta = bpfn_email_meta_keys();
 		return array(
 			'bpfn-activity-favorited' => array(
-				'description'      => __( 'A member favorited an activity update the recipient posted.', 'buddypress-favorite-notification' ),
+				'description'      => __( 'A member liked an activity update the recipient posted.', 'buddypress-favorite-notification' ),
 				'named_salutation' => true,
 				'unsubscribe'      => array(
 					'meta_key' => $meta['activity_post'], // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Schema key, not a query.
-					'message'  => __( 'You will no longer receive emails when someone favorites your updates.', 'buddypress-favorite-notification' ),
+					'message'  => __( 'You will no longer receive emails when someone likes your updates.', 'buddypress-favorite-notification' ),
 				),
 			),
 			'bpfn-comment-favorited'  => array(
-				'description'      => __( 'A member favorited an activity comment the recipient wrote.', 'buddypress-favorite-notification' ),
+				'description'      => __( 'A member liked an activity comment the recipient wrote.', 'buddypress-favorite-notification' ),
 				'named_salutation' => true,
 				'unsubscribe'      => array(
 					'meta_key' => $meta['activity_comment'], // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Schema key, not a query.
-					'message'  => __( 'You will no longer receive emails when someone favorites your comments.', 'buddypress-favorite-notification' ),
+					'message'  => __( 'You will no longer receive emails when someone likes your comments.', 'buddypress-favorite-notification' ),
 				),
 			),
 		);
@@ -152,8 +200,11 @@ class BPFN_Module_Email {
 	}
 
 	/**
-	 * Create any of our email posts that do not exist yet. Never touches an
-	 * existing one, so an owner's edits survive upgrades.
+	 * Create any of our email posts that do not exist yet, and bring an existing
+	 * one up to the current wording only while it still holds the old shipped
+	 * text. An email the owner edited is never touched.
+	 *
+	 * Runs on every version change (BP_Favorite_Notification::maybe_upgrade()).
 	 */
 	public static function install() {
 		if ( ! function_exists( 'bp_get_email' ) ) {
@@ -167,9 +218,15 @@ class BPFN_Module_Email {
 		}
 		$taxonomy = bp_get_email_tax_type();
 		$types    = self::get_type_schema();
+		$legacy   = self::get_legacy_schema();
 
 		foreach ( self::get_schema() as $email_type => $email ) {
-			if ( ! is_wp_error( bp_get_email( $email_type ) ) ) {
+			$existing = bp_get_email( $email_type );
+			if ( ! is_wp_error( $existing ) ) {
+				$post = $existing->get_post_object();
+				if ( isset( $legacy[ $email_type ] ) && self::is_unedited( $post, $legacy[ $email_type ] ) ) {
+					wp_update_post( wp_slash( array( 'ID' => $post->ID ) + $email ) );
+				}
 				continue;
 			}
 

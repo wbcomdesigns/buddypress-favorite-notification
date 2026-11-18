@@ -18,7 +18,7 @@ Yes, per activity. When several members favourite the same activity, the entries
 
 ## Can members control their notifications?
 
-Yes. Each member has two screens in their BuddyPress profile. **Settings > Email** has two rows, "A member favorites your activity" and "A member favorites your comment". **Settings > Favorite Notifications** has Web and Real-time switches per type (activity posts, comments). Everything is on by default; turning one off stops it.
+Yes. Each member has two screens in their BuddyPress profile. **Settings > Email** has two rows, "A member likes your activity" and "A member likes your comment". **Settings > Favorite Notifications** has Web and Real-time switches per type (activity posts, comments). Everything is on by default; turning one off stops it.
 
 ## How do realtime notifications work?
 

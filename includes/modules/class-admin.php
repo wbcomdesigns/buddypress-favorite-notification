@@ -241,7 +241,8 @@ class BPFN_Module_Admin {
 		// fail and silently reported DB/component errors as "0 cleared". Treat the
 		// presence of an 'error' key as the failure signal instead.
 		if ( ! empty( $result['error'] ) ) {
-			wp_send_json_error( array( 'message' => esc_html__( 'Failed to clear notifications', 'buddypress-favorite-notification' ) ) );
+			// Pass the real reason (component off, database error) through.
+			wp_send_json_error( array( 'message' => esc_html( $result['error'] ) ) );
 		}
 
 		$count     = (int) $result['count'];
@@ -368,7 +369,9 @@ class BPFN_Module_Admin {
 	 * Run automatic cleanup.
 	 */
 	public function run_automatic_cleanup() {
-		if ( ! self::is_auto_cleanup_enabled() ) {
+		// Nothing to clean while the Notifications component is off; skip quietly
+		// instead of recording a failed run every month.
+		if ( ! self::is_auto_cleanup_enabled() || ! bp_is_active( 'notifications' ) ) {
 			return;
 		}
 

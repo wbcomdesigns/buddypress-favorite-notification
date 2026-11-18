@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-17T11:36:36+00:00\n"
+"POT-Creation-Date: 2026-11-18T10:15:52+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: buddypress-favorite-notification\n"
@@ -59,7 +59,7 @@ msgstr ""
 
 #: includes/admin/class-bpfn-admin.php:137
 #: includes/admin/views/layout.php:56
-#: includes/modules/class-settings.php:73
+#: includes/modules/class-settings.php:75
 msgid "Favorite Notifications"
 msgstr ""
 
@@ -131,8 +131,8 @@ msgstr[1] ""
 
 #: includes/admin/class-bpfn-admin.php:354
 #: includes/modules/class-admin.php:227
-#: includes/modules/class-admin.php:282
-#: includes/modules/class-admin.php:324
+#: includes/modules/class-admin.php:283
+#: includes/modules/class-admin.php:325
 msgid "Insufficient permissions"
 msgstr ""
 
@@ -236,7 +236,7 @@ msgid "Favorite Icon"
 msgstr ""
 
 #: includes/admin/views/display.php:92
-msgid "The icon shown in the \"liked by\" line under each activity. Until you pick one it matches the like button your members see: a thumbs-up on Reign and BuddyX, a star elsewhere. The button itself is drawn by BuddyPress and your theme."
+msgid "The icon shown in the \"liked by\" line under each activity. Until you pick one it matches the like button your members see: a thumbs-up on Reign and BuddyX, a star elsewhere. With No icon, the count is shown as text, for example \"12 Likes\". The button itself is drawn by BuddyPress and your theme."
 msgstr ""
 
 #: includes/admin/views/display.php:99
@@ -247,44 +247,54 @@ msgstr ""
 msgid "John, Mary and 2 others"
 msgstr ""
 
-#: includes/admin/views/display.php:114
+#. translators: %s: Number of likes.
+#: includes/admin/views/display.php:110
+#: includes/modules/class-favorite-display.php:688
+#: includes/modules/class-favorite-display.php:837
+#, php-format
+msgid "%s Like"
+msgid_plural "%s Likes"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/admin/views/display.php:117
 msgid "Save to apply, then reload an activity stream to see the change."
 msgstr ""
 
-#: includes/admin/views/display.php:123
-#: includes/admin/views/display.php:130
+#: includes/admin/views/display.php:126
+#: includes/admin/views/display.php:133
 msgid "Real-time Popups"
 msgstr ""
 
-#: includes/admin/views/display.php:124
+#: includes/admin/views/display.php:127
 msgid "Tell members the moment their activity is favorited, without a page refresh."
 msgstr ""
 
-#: includes/admin/views/display.php:135
+#: includes/admin/views/display.php:138
 msgid "Show members a popup when their activity is favorited, without a page refresh"
 msgstr ""
 
-#: includes/admin/views/display.php:137
+#: includes/admin/views/display.php:140
 msgid "While a page is open, each logged-in member's browser checks the server at the interval below. Members can still turn popups off in their own settings."
 msgstr ""
 
-#: includes/admin/views/display.php:142
+#: includes/admin/views/display.php:145
 msgid "Check Every"
 msgstr ""
 
 #. translators: %d: number of seconds.
-#: includes/admin/views/display.php:150
+#: includes/admin/views/display.php:153
 #, php-format
 msgid "%d second"
 msgid_plural "%d seconds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/admin/views/display.php:155
+#: includes/admin/views/display.php:158
 msgid "A longer interval puts less load on a busy site."
 msgstr ""
 
-#: includes/admin/views/display.php:162
+#: includes/admin/views/display.php:165
 #: includes/admin/views/tools.php:130
 #: templates/settings/notifications.php:100
 msgid "Save Settings"
@@ -356,6 +366,16 @@ msgstr ""
 
 #: includes/admin/views/layout.php:90
 msgid "(opens in a new tab)"
+msgstr ""
+
+#. translators: %s: link to the BuddyPress Components screen.
+#: includes/admin/views/layout.php:110
+#, php-format
+msgid "BuddyPress Notifications is turned off, so on-site and real-time like alerts are paused. Emails and the liked-by line still work. Turn it on under %s."
+msgstr ""
+
+#: includes/admin/views/layout.php:111
+msgid "Settings > BuddyPress > Components"
 msgstr ""
 
 #: includes/admin/views/overview.php:174
@@ -443,7 +463,6 @@ msgid "Rank"
 msgstr ""
 
 #: includes/admin/views/overview.php:313
-#: includes/modules/class-settings.php:223
 msgid "Favorites"
 msgstr ""
 
@@ -597,7 +616,7 @@ msgid "Clear Old Notifications Now"
 msgstr ""
 
 #: includes/functions/integration-functions.php:25
-msgid "Notifications component not active"
+msgid "BuddyPress Notifications is turned off. Turn it on under Settings > BuddyPress > Components."
 msgstr ""
 
 #: includes/functions/integration-functions.php:32
@@ -636,51 +655,51 @@ msgstr[1] ""
 msgid "Function not available"
 msgstr ""
 
-#: includes/modules/class-admin.php:244
-msgid "Failed to clear notifications"
-msgstr ""
-
 #. translators: 1: number cleared, 2: retention period in days, 3: number remaining.
-#: includes/modules/class-admin.php:255
+#: includes/modules/class-admin.php:256
 #, php-format
 msgid "Cleared %1$d notification. Only read notifications older than %2$d days are removed; %3$d remain."
 msgid_plural "Cleared %1$d notifications. Only read notifications older than %2$d days are removed; %3$d remain."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/modules/class-admin.php:312
+#: includes/modules/class-admin.php:313
 msgid "Migration failed"
 msgstr ""
 
-#: includes/modules/class-admin.php:348
+#: includes/modules/class-admin.php:349
 msgid "Once Monthly"
 msgstr ""
 
-#: includes/modules/class-assets.php:101
+#: includes/modules/class-assets.php:102
 msgid "Loading…"
 msgstr ""
 
-#: includes/modules/class-assets.php:102
-msgid "Failed to load favorites list."
-msgstr ""
-
 #: includes/modules/class-assets.php:103
-msgid "An error occurred while loading favorites."
+msgid "Could not load the list of likes."
 msgstr ""
 
 #: includes/modules/class-assets.php:104
+msgid "An error occurred while loading the list of likes."
+msgstr ""
+
+#: includes/modules/class-assets.php:105
 msgid "Close"
 msgstr ""
 
-#: includes/modules/class-assets.php:141
+#: includes/modules/class-assets.php:106
+msgid "People who liked this"
+msgstr ""
+
+#: includes/modules/class-assets.php:143
 msgid "Dismiss"
 msgstr ""
 
-#: includes/modules/class-assets.php:145
+#: includes/modules/class-assets.php:147
 msgid "just now"
 msgstr ""
 
-#: includes/modules/class-assets.php:146
+#: includes/modules/class-assets.php:148
 msgid "Someone liked your activity"
 msgstr ""
 
@@ -734,20 +753,70 @@ msgid ""
 "View the conversation: {{{activity.url}}}"
 msgstr ""
 
+#. translators: Old 2.2.0 email subject, used only to detect unedited emails. Keep the existing translation. Do not remove {} brackets or translate its contents.
 #: includes/modules/class-email.php:126
-msgid "A member favorited an activity update the recipient posted."
+msgid "[{{{site.name}}}] {{favoriter.name}} favorited your update"
 msgstr ""
 
+#. translators: Old 2.2.0 email body, used only to detect unedited emails. Keep the existing translation. Do not remove {} brackets or translate its contents.
+#: includes/modules/class-email.php:128
+msgid ""
+"<a href=\"{{{favoriter.url}}}\">{{favoriter.name}}</a> favorited your update:\n"
+"\n"
+"<blockquote>&quot;{{activity.content}}&quot;</blockquote>\n"
+"\n"
+"<a href=\"{{{activity.url}}}\">View the update</a>."
+msgstr ""
+
+#. translators: Old 2.2.0 plain-text email, used only to detect unedited emails. Keep the existing translation. Do not remove {} brackets or translate its contents.
 #: includes/modules/class-email.php:130
-msgid "You will no longer receive emails when someone favorites your updates."
+msgid ""
+"{{favoriter.name}} favorited your update:\n"
+"\n"
+"\"{{activity.content}}\"\n"
+"\n"
+"View the update: {{{activity.url}}}"
 msgstr ""
 
+#. translators: Old 2.2.0 email subject, used only to detect unedited emails. Keep the existing translation. Do not remove {} brackets or translate its contents.
 #: includes/modules/class-email.php:134
-msgid "A member favorited an activity comment the recipient wrote."
+msgid "[{{{site.name}}}] {{favoriter.name}} favorited your comment"
 msgstr ""
 
+#. translators: Old 2.2.0 email body, used only to detect unedited emails. Keep the existing translation. Do not remove {} brackets or translate its contents.
+#: includes/modules/class-email.php:136
+msgid ""
+"<a href=\"{{{favoriter.url}}}\">{{favoriter.name}}</a> favorited your comment:\n"
+"\n"
+"<blockquote>&quot;{{activity.content}}&quot;</blockquote>\n"
+"\n"
+"<a href=\"{{{activity.url}}}\">View the conversation</a>."
+msgstr ""
+
+#. translators: Old 2.2.0 plain-text email, used only to detect unedited emails. Keep the existing translation. Do not remove {} brackets or translate its contents.
 #: includes/modules/class-email.php:138
-msgid "You will no longer receive emails when someone favorites your comments."
+msgid ""
+"{{favoriter.name}} favorited your comment:\n"
+"\n"
+"\"{{activity.content}}\"\n"
+"\n"
+"View the conversation: {{{activity.url}}}"
+msgstr ""
+
+#: includes/modules/class-email.php:174
+msgid "A member liked an activity update the recipient posted."
+msgstr ""
+
+#: includes/modules/class-email.php:178
+msgid "You will no longer receive emails when someone likes your updates."
+msgstr ""
+
+#: includes/modules/class-email.php:182
+msgid "A member liked an activity comment the recipient wrote."
+msgstr ""
+
+#: includes/modules/class-email.php:186
+msgid "You will no longer receive emails when someone likes your comments."
 msgstr ""
 
 #. translators: 1: one or more linked member names, 2: the last linked name or an "N others" link.
@@ -810,25 +879,17 @@ msgid_plural "%s people liked this"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/modules/class-favorite-display.php:751
-#: includes/modules/class-favorite-display.php:970
+#: includes/modules/class-favorite-display.php:756
+#: includes/modules/class-favorite-display.php:975
 msgid "Invalid activity ID"
 msgstr ""
 
-#. translators: %s: Number of likes.
-#: includes/modules/class-favorite-display.php:832
-#, php-format
-msgid "%s Like"
-msgid_plural "%s Likes"
-msgstr[0] ""
-msgstr[1] ""
-
-#: includes/modules/class-favorite-display.php:849
+#: includes/modules/class-favorite-display.php:854
 msgid "Load more"
 msgstr ""
 
 #. translators: %s: Number of additional users who favorited.
-#: includes/modules/class-favorite-display.php:858
+#: includes/modules/class-favorite-display.php:863
 #, php-format
 msgid "+%s more"
 msgid_plural "+%s more"
@@ -863,7 +924,7 @@ msgid_plural "%d people liked your comment"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/modules/class-notifications.php:170
+#: includes/modules/class-notifications.php:179
 msgid "Someone"
 msgstr ""
 
@@ -891,62 +952,66 @@ msgstr ""
 msgid "Failed to dismiss notification"
 msgstr ""
 
-#: includes/modules/class-settings.php:105
+#: includes/modules/class-settings.php:107
 msgid "Favorite Notification Settings"
 msgstr ""
 
-#: includes/modules/class-settings.php:169
+#: includes/modules/class-settings.php:171
 msgid "Settings saved successfully."
 msgstr ""
 
-#: includes/modules/class-settings.php:171
+#: includes/modules/class-settings.php:173
 msgid "There was a problem saving your settings."
 msgstr ""
 
-#: includes/modules/class-settings.php:224
+#: includes/modules/class-settings.php:225
+msgid "Likes"
+msgstr ""
+
+#: includes/modules/class-settings.php:226
 msgid "Yes"
 msgstr ""
 
-#: includes/modules/class-settings.php:225
+#: includes/modules/class-settings.php:227
 msgid "No"
 msgstr ""
 
-#: includes/modules/class-settings.php:232
-msgid "A member favorites your activity"
+#: includes/modules/class-settings.php:234
+msgid "A member likes your activity"
 msgstr ""
 
-#: includes/modules/class-settings.php:236
-#: includes/modules/class-settings.php:253
+#: includes/modules/class-settings.php:238
+#: includes/modules/class-settings.php:255
 msgid "Yes, send email"
 msgstr ""
 
-#: includes/modules/class-settings.php:242
-#: includes/modules/class-settings.php:259
+#: includes/modules/class-settings.php:244
+#: includes/modules/class-settings.php:261
 msgid "No, do not send email"
 msgstr ""
 
-#: includes/modules/class-settings.php:249
-msgid "A member favorites your comment"
+#: includes/modules/class-settings.php:251
+msgid "A member likes your comment"
 msgstr ""
 
-#: includes/modules/class-settings.php:280
-msgid "Activity post favorites"
+#: includes/modules/class-settings.php:282
+msgid "Likes on my activity posts"
 msgstr ""
 
-#: includes/modules/class-settings.php:281
-msgid "Notify me when someone favorites my activity posts"
+#: includes/modules/class-settings.php:283
+msgid "Notify me when someone likes my activity posts"
 msgstr ""
 
-#: includes/modules/class-settings.php:284
-msgid "Comment favorites"
+#: includes/modules/class-settings.php:286
+msgid "Likes on my comments"
 msgstr ""
 
-#: includes/modules/class-settings.php:285
-msgid "Notify me when someone favorites my comments"
+#: includes/modules/class-settings.php:287
+msgid "Notify me when someone likes my comments"
 msgstr ""
 
 #: templates/settings/notifications.php:25
-msgid "Choose which favorite notifications you get on the site."
+msgid "Choose which like notifications you get on the site."
 msgstr ""
 
 #. translators: %s: link to the member's Email settings tab.

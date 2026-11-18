@@ -61,7 +61,7 @@ Get the module with `bpfn_get_module( 'favorite_display' )`:
 - `get_users_who_favorited( $activity_id, $limit = 3, $offset = 0 )`: paginated liker list with `users`, `total`, `remaining`.
 - `render_display( $activity_id )`: the full display markup, `wp_kses()`-filtered.
 - `get_display_modes()` / `get_icon_choices()`: the registered modes and icons (static).
-- `get_saved_mode()` / `get_saved_icon()` (static): the saved display mode and icon, normalised to a registered value (defaults `inline` and `heart`).
+- `get_saved_mode()` / `get_saved_icon()` (static): the saved display mode and icon, normalised to a registered value. The mode defaults to `inline`. The icon defaults to `default_icon()`: `thumb` on Reign, BuddyX and BuddyX Pro, `star` elsewhere (filter `bpfn_default_favorite_icon`). Sites upgraded from before 2.2.1 have `heart` saved.
 
 ## Admin module methods
 

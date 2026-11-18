@@ -57,9 +57,10 @@ class BPFN_Module_Assets {
 		// Favorite display assets.
 		$this->enqueue_favorite_display_assets();
 
-		// Member "Settings > Favorite Notifications" screen styles
-		// (templates/settings/notifications.php, BPFN_Module_Settings).
-		if ( function_exists( 'bp_is_settings_component' ) && bp_is_settings_component() && bp_is_current_action( 'favorite-notifications' ) ) {
+		// Member Settings screens: the Favorite Notifications screen
+		// (templates/settings/notifications.php) and the tab's nav icon, which
+		// shows on every Settings screen.
+		if ( function_exists( 'bp_is_settings_component' ) && bp_is_settings_component() ) {
 			wp_enqueue_style(
 				'bpfn-settings',
 				BPFN_ASSETS_URL . 'css/settings.css',
@@ -98,10 +99,11 @@ class BPFN_Module_Assets {
 				'ajax_url' => admin_url( 'admin-ajax.php' ),
 				'nonce'    => wp_create_nonce( 'bpfn-favorite-nonce' ),
 				'strings'  => array(
-					'loading'    => esc_html__( 'Loading…', 'buddypress-favorite-notification' ),
-					'loadFailed' => esc_html__( 'Failed to load favorites list.', 'buddypress-favorite-notification' ),
-					'loadError'  => esc_html__( 'An error occurred while loading favorites.', 'buddypress-favorite-notification' ),
-					'close'      => esc_attr__( 'Close', 'buddypress-favorite-notification' ),
+					'loading'     => esc_html__( 'Loading…', 'buddypress-favorite-notification' ),
+					'loadFailed'  => esc_html__( 'Could not load the list of likes.', 'buddypress-favorite-notification' ),
+					'loadError'   => esc_html__( 'An error occurred while loading the list of likes.', 'buddypress-favorite-notification' ),
+					'close'       => esc_attr__( 'Close', 'buddypress-favorite-notification' ),
+					'dialogLabel' => esc_attr__( 'People who liked this', 'buddypress-favorite-notification' ),
 				),
 			)
 		);
@@ -155,16 +157,9 @@ class BPFN_Module_Assets {
 	 * @return bool Whether to load assets.
 	 */
 	private function should_load_assets() {
-		// Don't load if user is not logged in.
-		if ( ! is_user_logged_in() ) {
-			return false;
-		}
-
-		// Don't load if notifications component is not active.
-		if ( ! bp_is_active( 'notifications' ) ) {
-			return false;
-		}
-
-		return true;
+		// The liked-by line only needs Activity, so it keeps its styles and dialog
+		// when the Notifications component is off. Real-time checks that itself
+		// (BPFN_Module_Realtime::is_enabled_for_user()).
+		return is_user_logged_in();
 	}
 }

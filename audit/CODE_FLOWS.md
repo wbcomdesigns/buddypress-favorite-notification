@@ -87,7 +87,6 @@ Migration nag dismiss → inline JS POST action 'bpfn_dismiss_migration_notice' 
 | Action | Nonce | Cap | Handler |
 |---|---|---|---|
 | bpfn_clear_old_notifications | bpfn-admin-nonce | manage_options | Admin::ajax_clear_old_notifications |
-| bpfn_get_stats | bpfn-admin-nonce | manage_options | Admin::ajax_get_stats |
 | bpfn_migrate_favorites | bpfn-admin-nonce | manage_options | Admin::ajax_migrate_favorites |
 | bpfn_migration_progress | bpfn-admin-nonce | manage_options | Admin::ajax_migration_progress |
 | bpfn_check_notifications | bpfn-nonce/realtime | logged-in | Realtime::ajax_check_notifications |

@@ -100,6 +100,22 @@ $version = defined( 'BPFN_VERSION' ) ? BPFN_VERSION : '';
 			 */
 			settings_errors();
 
+			if ( ! bp_is_active( 'notifications' ) ) :
+				?>
+				<div class="bpfn-notice bpfn-notice--warn">
+					<p>
+						<?php
+						printf(
+							/* translators: %s: link to the BuddyPress Components screen. */
+							esc_html__( 'BuddyPress Notifications is turned off, so on-site and real-time like alerts are paused. Emails and the liked-by line still work. Turn it on under %s.', 'buddypress-favorite-notification' ),
+							'<a href="' . esc_url( bp_get_admin_url( add_query_arg( 'page', 'bp-components', 'options-general.php' ) ) ) . '">' . esc_html__( 'Settings > BuddyPress > Components', 'buddypress-favorite-notification' ) . '</a>'
+						);
+						?>
+					</p>
+				</div>
+				<?php
+			endif;
+
 			if ( file_exists( $view_path ) ) {
 				include $view_path;
 			}

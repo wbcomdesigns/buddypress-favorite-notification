@@ -39,7 +39,8 @@ follows **`/ux-foundation`**; audit drift with **`/ux-audit`**. Onboarding artef
     `bpfn_after_add_notification`, or email would depend on the web channel) and sends with
     `bp_send_email()`. Types `bpfn-activity-favorited` / `bpfn-comment-favorited`, installed by
     `BPFN_Module_Email::install()` (never overwrites an owner's edited post; re-run on BP's
-    `bp_core_install_emails`). Unsubscribe via `bp_email_get_unsubscribe_type_schema`.
+    `bp_core_install_emails`; an existing post still holding the exact 2.2.0 "favorited" text is
+    refreshed to the current wording). Unsubscribe via `bp_email_get_unsubscribe_type_schema`.
   - Preference type of an activity: `bpfn_get_activity_type()`; of a stored action:
     `BPFN_Module_Notifications::get_type_for_action()`.
   - Member preferences: ONE store, `{prefix}bp_favorite_notification_prefs`, via
@@ -49,8 +50,9 @@ follows **`/ux-foundation`**; audit drift with **`/ux-audit`**. Onboarding artef
 - No REST, no blocks, no shortcodes, no CPTs, no `register_setting`.
 
 ## Admin UI
-- ONE admin page: submenu **`bpfn-dashboard`** under the shared **WB Plugins hub**
-  (`wbcomplugins`), cap `manage_options`, rendered by `BPFN_Admin::render_page()` with the
+- ONE plugin admin page: submenu **`bpfn-dashboard`** under the shared **WB Plugins hub**
+  (`wbcomplugins`; the plugin also registers that hub landing page when no other Wbcom plugin
+  has, so CAPABILITIES.md counts 2 pages), cap `manage_options`, rendered by `BPFN_Admin::render_page()` with the
   card-panel shell (`includes/admin/views/layout.php` + `overview.php` / `display.php` /
   `tools.php` / `discover.php`). Tabs via `BPFN_Admin::get_tabs()` (filter `bpfn_admin_tabs`).
   Activation redirects here once (transient `bpfn_activation_redirect`, skipped for bulk).
@@ -93,6 +95,10 @@ follows **`/ux-foundation`**; audit drift with **`/ux-audit`**. Onboarding artef
   AJAX actions without handlers). Frontend JS is favorite-display.js + realtime.js.
 
 ## Things that look removable but are load-bearing
+- The `bp_is_active( 'notifications' )` guards. BuddyPress loads `bp_notifications_add_notification()`
+  only while the component is on, so an unguarded call fatals the like request. With it off: likes,
+  emails and the liked-by line keep working; the member tab is hidden, real-time is off
+  (`is_enabled_for_user()`), the admin shell shows a notice and the cleanup button is disabled.
 - `bpfn_is_notification_enabled()` must never short-circuit on `DOING_AJAX`: BP favoriting always
   posts through admin-ajax.
 - The two who-favorited AJAX endpoints are members-only and check `bp_activity_user_can_read()`;
@@ -165,8 +171,10 @@ display that reverted on the first click.)
 ## Conventions
 - Prefix everything `bpfn_` / `BPFN_`. Text domain `buddypress-favorite-notification`.
 - Custom-table queries are deliberately direct (`$wpdb`) with object caching + inline
-  `phpcs:ignore`. Public favorite-display AJAX is `nopriv` by design (read-only).
+  `phpcs:ignore`. Every AJAX action is logged-in only (`wp_ajax_`); there are no `nopriv` handlers.
 - Commit/PR per global rules: branch off, no co-author/footer lines.
+- FAQ: `docs/website/faq/faq.md` is the full FAQ and the source of truth. The readme.txt FAQ is
+  the shorter WP.org subset; when an answer changes, change both and never let them disagree.
 
 ## Big-site checklist reminders (per global CLAUDE.md)
 - Who-liked modal and trending dashboard are the rows-at-scale surfaces — fix N+1 (batch
