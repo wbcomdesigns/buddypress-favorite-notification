@@ -57,9 +57,10 @@ class BPFN_Module_Assets {
 		// Favorite display assets.
 		$this->enqueue_favorite_display_assets();
 
-		// Member "Settings > Favorite Notifications" screen styles
-		// (templates/settings/notifications.php, BPFN_Module_Settings).
-		if ( function_exists( 'bp_is_settings_component' ) && bp_is_settings_component() && bp_is_current_action( 'favorite-notifications' ) ) {
+		// Member Settings screens: the Favorite Notifications screen
+		// (templates/settings/notifications.php) and the tab's nav icon, which
+		// shows on every Settings screen.
+		if ( function_exists( 'bp_is_settings_component' ) && bp_is_settings_component() ) {
 			wp_enqueue_style(
 				'bpfn-settings',
 				BPFN_ASSETS_URL . 'css/settings.css',
