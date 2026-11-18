@@ -155,16 +155,9 @@ class BPFN_Module_Assets {
 	 * @return bool Whether to load assets.
 	 */
 	private function should_load_assets() {
-		// Don't load if user is not logged in.
-		if ( ! is_user_logged_in() ) {
-			return false;
-		}
-
-		// Don't load if notifications component is not active.
-		if ( ! bp_is_active( 'notifications' ) ) {
-			return false;
-		}
-
-		return true;
+		// The liked-by line only needs Activity, so it keeps its styles and dialog
+		// when the Notifications component is off. Real-time checks that itself
+		// (BPFN_Module_Realtime::is_enabled_for_user()).
+		return is_user_logged_in();
 	}
 }

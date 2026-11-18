@@ -86,6 +86,11 @@ class BPFN_Module_Notifications {
 	 * @param int $user_id     The user who favorited.
 	 */
 	public function add_favorite_notification( $activity_id, $user_id ) {
+		// BuddyPress only loads its notifications API while the component is on.
+		if ( ! bp_is_active( 'notifications' ) ) {
+			return;
+		}
+
 		$activity = new BP_Activity_Activity( $activity_id );
 		if ( empty( $activity->id ) || (int) $activity->user_id === (int) $user_id ) {
 			return;
@@ -132,6 +137,10 @@ class BPFN_Module_Notifications {
 	 * @param int $user_id     The user who unfavorited.
 	 */
 	public function remove_favorite_notification( $activity_id, $user_id ) {
+		if ( ! bp_is_active( 'notifications' ) ) {
+			return;
+		}
+
 		BP_Notifications_Notification::delete(
 			array(
 				'item_id'           => $activity_id,

@@ -61,7 +61,9 @@ class BPFN_Module_Settings {
 	 * Setup BuddyPress navigation.
 	 */
 	public function setup_nav() {
-		if ( ! bp_is_active( 'settings' ) ) {
+		// The tab holds only the on-site (web) and real-time switches, and both need
+		// the Notifications component. Email choices stay on BuddyPress's Email tab.
+		if ( ! bp_is_active( 'settings' ) || ! bp_is_active( 'notifications' ) ) {
 			return;
 		}
 

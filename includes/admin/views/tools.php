@@ -194,7 +194,7 @@ $bpfn_last_date = isset( $bpfn_last_cleanup['date'] ) ? mysql2date( $bpfn_date_f
 	</div>
 	<div class="bpfn-card__body">
 		<div class="bpfn-save-bar">
-			<button type="button" class="bpfn-btn bpfn-btn-secondary" id="bpfn-clear-old-notifications">
+			<button type="button" class="bpfn-btn bpfn-btn-secondary" id="bpfn-clear-old-notifications" <?php disabled( ! bp_is_active( 'notifications' ) ); ?>>
 				<?php esc_html_e( 'Clear Old Notifications Now', 'buddypress-favorite-notification' ); ?>
 			</button>
 		</div>
