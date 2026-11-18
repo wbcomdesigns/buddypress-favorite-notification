@@ -682,7 +682,12 @@ class BPFN_Module_Favorite_Display {
 			number_format_i18n( $count )
 		);
 
-		$inner = $icon . '<span class="bpfn-favorite-count">' . esc_html( number_format_i18n( $count ) ) . '</span>';
+		// With "No icon" a bare number says nothing on screen, so spell it out.
+		$visible = '' === $icon
+			/* translators: %s: Number of likes. */
+			? sprintf( _n( '%s Like', '%s Likes', $count, 'buddypress-favorite-notification' ), number_format_i18n( $count ) )
+			: number_format_i18n( $count );
+		$inner = $icon . '<span class="bpfn-favorite-count">' . esc_html( $visible ) . '</span>';
 
 		// 'counter' is display-only. Only 'modal' is interactive, so only
 		// 'modal' gets a button — rendering a dead button in counter mode
