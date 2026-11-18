@@ -16,6 +16,12 @@
          */
         lastFocused: null,
 
+        /**
+         * Activity whose likers the open dialog lists. Used to find the opener
+         * again when the display was re-rendered while the dialog was open.
+         */
+        lastActivityId: null,
+
         init: function() {
             this.bindEvents();
         },
@@ -78,15 +84,15 @@
                 }
             });
 
-            // ESC key to close modal.
-            $(document).keyup(function(e) {
-                if (e.key === "Escape") {
-                    self.closeModal();
-                }
-            });
-
-            // Keep Tab inside the dialog while it is open.
+            // Escape closes; Tab stays inside the dialog while it is open. Scoped
+            // to the overlay (focus never leaves it: the dialog is focusable),
+            // so Escape pressed anywhere else on the page is left alone.
             $(document).on('keydown', '.bpfn-modal-overlay', function(e) {
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    self.closeModal();
+                    return;
+                }
                 if (e.key !== 'Tab') {
                     return;
                 }
@@ -207,8 +213,10 @@
 
             var self = this;
 
+            this.lastActivityId = activityId;
+
             // Show loading state.
-            this.showModal('<div class="bpfn-loading">' + this.str('loading', 'Loading…') + '</div>');
+            this.showModal('<div class="bpfn-loading">' + this.str('loading', 'Loading…') + '</div>', true);
 
             $.ajax({
                 url: bpfnFavorites.ajax_url,
@@ -298,7 +306,11 @@
             });
         },
 
-        showModal: function(html) {
+        /**
+         * @param {string}  html    Dialog content.
+         * @param {boolean} loading True for the placeholder shown while the list loads.
+         */
+        showModal: function(html, loading) {
             var $existing = $('.bpfn-modal-overlay');
 
             // Remember what opened the dialog so focus can be restored on close.
@@ -316,17 +328,24 @@
             $existing.remove();
 
             var $modal = $('<div class="bpfn-modal-overlay">' +
-                '<div class="bpfn-modal" role="dialog" aria-modal="true">' +
+                '<div class="bpfn-modal" role="dialog" aria-modal="true" tabindex="-1">' +
                     '<button class="bpfn-modal-close" aria-label="' + this.str('close', 'Close') + '">&times;</button>' +
                     html +
                 '</div>' +
             '</div>');
 
-            // Name the dialog by its "N Likes" heading (absent while loading).
-            var $title = $modal.find('.bpfn-modal h3').first();
+            // Name the dialog by its "N Likes" heading. The loading and error
+            // states have no heading, so they get a plain label instead.
+            var $dialog = $modal.find('.bpfn-modal');
+            var $title = $dialog.find('h3').first();
             if ($title.length) {
                 $title.attr('id', 'bpfn-modal-title');
-                $modal.find('.bpfn-modal').attr('aria-labelledby', 'bpfn-modal-title');
+                $dialog.attr('aria-labelledby', 'bpfn-modal-title');
+            } else {
+                $dialog.attr('aria-label', this.str('dialogLabel', 'People who liked this'));
+            }
+            if (loading) {
+                $dialog.attr('aria-busy', 'true');
             }
 
             $('body').append($modal);
@@ -351,11 +370,19 @@
             });
             $('body').removeClass('bpfn-modal-open');
 
-            // Return focus to the counter/link that opened the dialog.
+            // Return focus to the counter/link that opened the dialog. A like or
+            // unlike while the dialog was open re-renders that display, which
+            // detaches the saved element; find its replacement by activity id.
+            var $opener = $();
             if (this.lastFocused && document.body.contains(this.lastFocused)) {
-                $(this.lastFocused).trigger('focus');
+                $opener = $(this.lastFocused);
+            } else if (this.lastActivityId) {
+                $opener = $('.bpfn-favorite-display[data-activity-id="' + this.lastActivityId + '"]')
+                    .find('.bpfn-view-all-favorites, .bpfn-others-count').first();
             }
+            $opener.trigger('focus');
             this.lastFocused = null;
+            this.lastActivityId = null;
         }
     };
 
