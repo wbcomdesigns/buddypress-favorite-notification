@@ -171,19 +171,19 @@ class BPFN_Module_Email {
 		$meta = bpfn_email_meta_keys();
 		return array(
 			'bpfn-activity-favorited' => array(
-				'description'      => __( 'A member favorited an activity update the recipient posted.', 'buddypress-favorite-notification' ),
+				'description'      => __( 'A member liked an activity update the recipient posted.', 'buddypress-favorite-notification' ),
 				'named_salutation' => true,
 				'unsubscribe'      => array(
 					'meta_key' => $meta['activity_post'], // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Schema key, not a query.
-					'message'  => __( 'You will no longer receive emails when someone favorites your updates.', 'buddypress-favorite-notification' ),
+					'message'  => __( 'You will no longer receive emails when someone likes your updates.', 'buddypress-favorite-notification' ),
 				),
 			),
 			'bpfn-comment-favorited'  => array(
-				'description'      => __( 'A member favorited an activity comment the recipient wrote.', 'buddypress-favorite-notification' ),
+				'description'      => __( 'A member liked an activity comment the recipient wrote.', 'buddypress-favorite-notification' ),
 				'named_salutation' => true,
 				'unsubscribe'      => array(
 					'meta_key' => $meta['activity_comment'], // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Schema key, not a query.
-					'message'  => __( 'You will no longer receive emails when someone favorites your comments.', 'buddypress-favorite-notification' ),
+					'message'  => __( 'You will no longer receive emails when someone likes your comments.', 'buddypress-favorite-notification' ),
 				),
 			),
 		);

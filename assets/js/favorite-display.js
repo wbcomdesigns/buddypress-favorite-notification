@@ -222,11 +222,11 @@
                     if (response.success && response.data.html) {
                         self.showModal(response.data.html);
                     } else {
-                        self.showModal('<div class="bpfn-error">' + self.str('loadFailed', 'Failed to load favorites list.') + '</div>');
+                        self.showModal('<div class="bpfn-error">' + self.str('loadFailed', 'Could not load the list of likes.') + '</div>');
                     }
                 },
                 error: function() {
-                    self.showModal('<div class="bpfn-error">' + self.str('loadError', 'An error occurred while loading favorites.') + '</div>');
+                    self.showModal('<div class="bpfn-error">' + self.str('loadError', 'An error occurred while loading the list of likes.') + '</div>');
                 }
             });
         },

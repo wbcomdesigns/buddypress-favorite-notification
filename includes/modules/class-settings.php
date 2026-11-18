@@ -222,7 +222,7 @@ class BPFN_Module_Settings {
 			<thead>
 				<tr>
 					<th class="icon"></th>
-					<th class="title"><?php esc_html_e( 'Favorites', 'buddypress-favorite-notification' ); ?></th>
+					<th class="title"><?php esc_html_e( 'Likes', 'buddypress-favorite-notification' ); ?></th>
 					<th class="yes"><?php esc_html_e( 'Yes', 'buddypress-favorite-notification' ); ?></th>
 					<th class="no"><?php esc_html_e( 'No', 'buddypress-favorite-notification' ); ?></th>
 				</tr>
@@ -231,7 +231,7 @@ class BPFN_Module_Settings {
 			<tbody>
 				<tr id="favorite-notification-settings-activity">
 					<td></td>
-					<td><?php esc_html_e( 'A member favorites your activity', 'buddypress-favorite-notification' ); ?></td>
+					<td><?php esc_html_e( 'A member likes your activity', 'buddypress-favorite-notification' ); ?></td>
 					<td class="yes">
 						<input type="radio" id="notification-favorite-activity-yes" name="notifications[favorite_activity]" value="yes" <?php checked( $settings['activity_post']['email_enabled'], 1 ); ?> />
 						<label class="bp-screen-reader-text" for="notification-favorite-activity-yes">
@@ -248,7 +248,7 @@ class BPFN_Module_Settings {
 
 				<tr id="favorite-notification-settings-comment">
 					<td></td>
-					<td><?php esc_html_e( 'A member favorites your comment', 'buddypress-favorite-notification' ); ?></td>
+					<td><?php esc_html_e( 'A member likes your comment', 'buddypress-favorite-notification' ); ?></td>
 					<td class="yes">
 						<input type="radio" id="notification-favorite-comment-yes" name="notifications[favorite_activity_comment]" value="yes" <?php checked( $settings['activity_comment']['email_enabled'], 1 ); ?> />
 						<label class="bp-screen-reader-text" for="notification-favorite-comment-yes">
@@ -279,12 +279,12 @@ class BPFN_Module_Settings {
 			'bpfn_settings_notification_types',
 			array(
 				'activity_post'    => array(
-					'label'       => esc_html__( 'Activity post favorites', 'buddypress-favorite-notification' ),
-					'description' => esc_html__( 'Notify me when someone favorites my activity posts', 'buddypress-favorite-notification' ),
+					'label'       => esc_html__( 'Likes on my activity posts', 'buddypress-favorite-notification' ),
+					'description' => esc_html__( 'Notify me when someone likes my activity posts', 'buddypress-favorite-notification' ),
 				),
 				'activity_comment' => array(
-					'label'       => esc_html__( 'Comment favorites', 'buddypress-favorite-notification' ),
-					'description' => esc_html__( 'Notify me when someone favorites my comments', 'buddypress-favorite-notification' ),
+					'label'       => esc_html__( 'Likes on my comments', 'buddypress-favorite-notification' ),
+					'description' => esc_html__( 'Notify me when someone likes my comments', 'buddypress-favorite-notification' ),
 				),
 			)
 		);
