@@ -29,7 +29,7 @@
       "handler": "includes/modules/class-admin.php::ajax_clear_old_notifications",
       "nonce": "bpfn-admin-nonce",
       "capability": "manage_options",
-      "purpose": "Manually delete read notifications older than bpfn_auto_cleanup_days.",
+      "purpose": "Manually delete read notifications older than bpfn_auto_cleanup_days. Returns the real error from bpfn_clear_old_notifications() (component off / DB error); the Tools button is disabled while the Notifications component is off.",
       "registered_at": "includes/modules/class-admin.php:116 (loop over $ajax_actions)",
       "gate_at": "class-admin.php:134-138"
     },
@@ -257,13 +257,11 @@
       "key": "bpfn_options",
       "group": "(RETIRED — no group)",
       "type": "array",
-      "status": "ORPHAN_READ",
+      "status": "RETIRED",
       "controls": "(none — the 'Enhanced Notifications' toggle it backed was removed on 2.0.x)",
       "written_at": "NONE — no register_setting, no update_option anywhere.",
-      "read_at": [
-        "includes/functions/integration-functions.php:562 (bpfn_get_diagnostics dumps it into the diagnostics array)"
-      ],
-      "note": "Read-but-never-written. Harmless (diagnostics dump only, defaults to array()), but it is a stale key: the option can only be non-empty on sites upgraded from <=1.x. Root CLAUDE.md claims bpfn_options is 'no longer registered or read' — the 'or read' half is wrong; this line is the last reader."
+      "read_at": [],
+      "note": "No reader or writer remain (bpfn_get_diagnostics was removed). Only a leftover row on sites upgraded from <=1.x; not counted in CAPABILITIES.md options."
     },
     {
       "key": "bpfn_realtime_enabled",
@@ -293,7 +291,7 @@
   "settings_notes": "There is NO register_setting() call anywhere in the plugin (verified: 0 hits across all non-vendor PHP). No Settings API page, no settings group, no sanitize callback. The Tools tab persists its two options through a hand-rolled POST handler (BPFN_Module_Admin::handle_cleanup_settings_save, class-admin.php (admin_init -> handle_cleanup_settings_save / handle_display_settings_save), nonce `bpfn_cleanup_settings`, cap manage_options, redirects to ?page=bpfn-dashboard&tab=tools&settings_updated=true).",
   "per_user_settings": {
     "storage": "{prefix}bp_favorite_notification_prefs table via bpfn_get_user_settings() / bpfn_save_user_settings() (includes/functions/core-functions.php)",
-    "surface": "BuddyPress member Settings > Favorite Notifications subnav (slug 'notifications') + a row in the BP notification settings table",
+    "surface": "BuddyPress member Settings > Favorite Notifications subnav (slug 'favorite-notifications'; registered only while the Settings and Notifications components are active) + a row in the BP notification settings table",
     "owner": "BPFN_Module_Settings (includes/modules/class-settings.php) — IS loaded (bp-favorite-notification.php:179 module map). Front-end only as of 2.0.x; it no longer registers any admin page or Settings API option (documented class-settings.php:43-47).",
     "hooks": [
       "bp_setup_nav prio 100 -> setup_nav (class-settings.php:37)",
@@ -302,7 +300,7 @@
     ],
     "template": "templates/settings/notifications.php",
     "styles": "assets/css/settings.css",
-    "status": "NON_FUNCTIONAL — see static_analysis.preference_enforcement_broken and static_analysis.dead_ui. The UI renders and saves, but nothing reads the saved values on the notification path."
+    "status": "FUNCTIONAL — read on every channel: bpfn_is_notification_enabled() (core-functions.php) gates web (class-notifications.php add_favorite_notification), email (class-email.php send) and real-time (BPFN_Module_Realtime::is_enabled_for_user). The historic NON_FUNCTIONAL finding is resolved (static_analysis resolved list)."
   },
   "shortcodes": [],
   "blocks": [],
@@ -329,7 +327,7 @@
         "KEY user_id (user_id)"
       ],
       "created_at": "bp-favorite-notification.php:275-291 (dbDelta)",
-      "note": "Written by the member-settings save path; NOT consulted on the notification path — see static_analysis.preference_enforcement_broken."
+      "note": "Written by the member-settings save path and BP email-meta mirror; read through bpfn_get_user_settings() / bpfn_is_notification_enabled() on the web, email and real-time paths."
     },
     {
       "name": "{prefix}bp_activity_favorites",
@@ -517,9 +515,8 @@
       "type": "action",
       "args_count": 4,
       "where": "includes/modules/class-notifications.php:137; also includes/functions/integration-functions.php:299 (test/diagnostic path)",
-      "consumed_by": [
-        "BPFN_Module_Email::send_email_notification (class-email.php:58, prio 20)"
-      ]
+      "consumed_by": [],
+      "note": "No in-plugin consumer. Email hooks bp_activity_add_user_favorite itself (BPFN_Module_Email::send, prio 20) so it does not depend on the web channel."
     },
     {
       "name": "bpfn_after_save_user_settings",
@@ -748,7 +745,7 @@
       "listener_at": "includes/modules/class-admin.php (setup_automatic_cleanup; cron_schedules filter at :96, register_cron_schedule :344)",
       "scheduled_at": "includes/modules/class-admin.php:76 (setup_automatic_cleanup, when enabled), :362 (re-schedule guard)",
       "unscheduled_at": "includes/modules/class-admin.php:203 (Tools-tab save, when disabled)",
-      "gated_by": "bpfn_auto_cleanup_enabled === 'yes'",
+      "gated_by": "bpfn_auto_cleanup_enabled === 'yes' AND bp_is_active('notifications') (skips quietly while the component is off)",
       "purpose": "Delete read notifications older than bpfn_auto_cleanup_days (min 7, default 30); writes bpfn_last_auto_cleanup."
     },
     {
@@ -797,7 +794,7 @@
   "email": {
     "transport": "BuddyPress Emails: bp_send_email() with types bpfn-activity-favorited, bpfn-comment-favorited (includes/modules/class-email.php)",
     "trigger": "bp_activity_add_user_favorite prio 20 -> BPFN_Module_Email::send (independent of the web channel)",
-    "install": "BPFN_Module_Email::install() from BP_Favorite_Notification::maybe_upgrade() and on bp_core_install_emails; never overwrites an existing email post",
+    "install": "BPFN_Module_Email::install() from BP_Favorite_Notification::maybe_upgrade() and on bp_core_install_emails; never overwrites an edited email post. An existing post still holding the exact 2.2.0 'favorited' text (get_legacy_schema(), translated, whitespace-normalised compare in is_unedited()) is updated to the current get_schema() wording",
     "tokens": [
       "favoriter.name",
       "favoriter.url",
@@ -1051,7 +1048,7 @@
     "three_entry_points": {
       "rule": "Every custom data store needs frontend UX + backend admin UI + API (global CLAUDE.md).",
       "{prefix}bp_activity_favorites": "PASS — frontend (who-liked display on activity), backend (Overview stats + trending, Tools migration), API (bpfn_* helpers + AJAX). No REST by design.",
-      "{prefix}bp_favorite_notification_prefs": "FAIL — frontend (BP member Settings subnav) and a write path exist, but the values are never enforced (BPFN-PREF-01/02) and there is no backend/admin view of them at all. The store is effectively write-only."
+      "{prefix}bp_favorite_notification_prefs": "PARTIAL — frontend (BP member Settings subnav + Settings > Email rows) and enforcement on every channel exist (BPFN-PREF-01/02 resolved). No backend/admin view of per-member choices and no REST by design; members own these settings."
     },
     "big_site_readiness": "Not re-verified in this structural refresh. The 2026-06-05 N+1 findings on get_users_who_favorited and render_trending_activities are recorded as FIXED in root CLAUDE.md (batched, capped, cached) — that claim was not independently re-tested here. The who-liked modal and the Overview trending list remain the rows-at-scale surfaces to re-check at release.",
     "verification_scope": "STRUCTURAL ONLY. This refresh re-derived every section from a grep/glob rescan of shipped code at the file:line level. No browser run, no wppqa, no functional test. The bugs recorded under static_analysis are static findings backed by file:line evidence and need Basecamp cards — they were NOT fixed.",

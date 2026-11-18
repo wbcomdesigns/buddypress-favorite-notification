@@ -30,6 +30,8 @@ If an automatic run fails, the Tools tab shows a warning, "Last automatic cleanu
 
 The **Clear Old Notifications Now** button runs the cleanup on demand, using the same retention period as the automatic job. The result message states how many were cleared, the retention window applied, and how many remain. Because only read, past-retention notifications are removed, "cleared 0" is a normal result on a quiet site rather than a sign that the button did nothing. A genuine database error is reported as a failure rather than shown as zero.
 
+While the BuddyPress Notifications component is off there is nothing to clean: the button is disabled, the page shows a notice explaining why, and the automatic job skips its run instead of recording a failure.
+
 ## Capabilities and security
 
 Every Tools action requires the `manage_options` capability. The cleanup settings form is protected by the `bpfn_cleanup_settings` nonce, and the migration and cleanup AJAX actions each verify the `bpfn-admin-nonce` nonce.

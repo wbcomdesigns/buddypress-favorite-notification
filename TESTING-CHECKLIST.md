@@ -272,8 +272,8 @@
 
 ## Test Environment Requirements
 
-- WordPress 5.0+
-- PHP 7.4+
+- WordPress 6.5+
+- PHP 8.1+
 - BuddyPress 12.0+
 - Active theme supporting BuddyPress
 - Multiple test users (10+ recommended)

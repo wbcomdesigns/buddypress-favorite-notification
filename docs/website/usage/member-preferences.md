@@ -9,14 +9,14 @@ Favourite alerts are set in two places under **Settings** in the member's own Bu
 - **Settings > Email** is BuddyPress's own email tab. It holds the email switches.
 - **Settings > Favorite Notifications** is the plugin's tab (URL slug `favorite-notifications`). It holds the web and real-time switches, and links to the Email settings.
 
-The plugin tab needs the BuddyPress Settings component to be active. A member can only edit their own settings, or a moderator with the `bp_moderate` capability can edit any.
+The plugin tab needs the BuddyPress Settings and Notifications components to be active. While Notifications is off the tab is hidden, because web and real-time alerts cannot be delivered. A member can only edit their own settings, or a moderator with the `bp_moderate` capability can edit any.
 
 ## Email alerts
 
-On **Settings > Email**, the Favorites table has two rows, each with Yes and No:
+On **Settings > Email**, the Likes table has two rows, each with Yes and No:
 
-- **A member favorites your activity**
-- **A member favorites your comment**
+- **A member likes your activity**
+- **A member likes your comment**
 
 Choosing No stops that email. The unsubscribe link in each email does the same. See [Email Alerts](../features/email-alerts.md).
 
@@ -24,8 +24,8 @@ Choosing No stops that email. The unsubscribe link in each email does the same. 
 
 The **Settings > Favorite Notifications** tab has one row per notification type:
 
-- **Activity post favorites**: someone favourites the member's activity posts.
-- **Comment favorites**: someone favourites the member's comments.
+- **Likes on my activity posts**: someone likes the member's activity posts.
+- **Likes on my comments**: someone likes the member's comments.
 
 Each row has a switch per channel:
 

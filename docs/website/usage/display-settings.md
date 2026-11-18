@@ -22,6 +22,8 @@ Choose the icon shown before the display:
 - Thumbs up
 - No icon
 
+With **No icon**, the count in the two count modes is shown as text, for example "12 Likes", so it still reads as a like count. The **Current appearance** preview shows the same.
+
 Until you pick one, the icon matches the like button your members see: a thumbs-up on Reign, BuddyX and BuddyX Pro, a star on other themes. Sites upgrading from a version before 2.2.1 keep the heart they already showed. The choice is stored in the `bpfn_favorite_icon` option.
 
 The icon applies to the "liked by" line under each activity only. The BuddyPress Favorite button keeps the icon that BuddyPress and your theme give it.

@@ -32,7 +32,7 @@ A member is never notified for favouriting their own content. The plugin compare
 
 ## The favorite_notifier component
 
-Notifications are delivered through a lightweight BuddyPress pseudo-component named `favorite_notifier` (subnav slug `favorite_notification`). The plugin registers it during BuddyPress setup, adds it to the active and registered component lists, and re-registers it defensively on every request if it is ever missing. This is what lets BuddyPress route, format, and mark-as-read the plugin's notifications through its standard notification pipeline.
+Notifications are delivered through a lightweight BuddyPress pseudo-component named `favorite_notifier` (component slug `favorite_notification`). It has no screen of its own; the member settings tab is a separate subnav with the slug `favorite-notifications`. The plugin registers it during BuddyPress setup, adds it to the active and registered component lists, and re-registers it defensively on every request if it is ever missing. This is what lets BuddyPress route, format, and mark-as-read the plugin's notifications through its standard notification pipeline.
 
 Notification actions are named `fav_notify_{activity_id}` for activities and `fav_comment_notify_{activity_id}` for comments.
 

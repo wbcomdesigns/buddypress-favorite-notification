@@ -7,17 +7,17 @@ BuddyPress Favourite Notification is a BuddyPress add-on. It cannot run on its o
 | Requirement | Minimum |
 | --- | --- |
 | WordPress | 6.5 |
-| PHP | 8.0 |
+| PHP | 8.1 |
 | BuddyPress | 12.0 |
 
-The WordPress, PHP and `Requires Plugins: buddypress` values come from the plugin header and are enforced by WordPress at install time. The plugin does nothing on a BuddyPress version older than 12.0. The plugin has been tested up to WordPress 7.0.
+The WordPress, PHP and `Requires Plugins: buddypress` values come from the plugin header and are enforced by WordPress at install time. The plugin does nothing on a BuddyPress version older than 12.0. The plugin has been tested up to WordPress 7.1.
 
 ## BuddyPress components
 
 The plugin extends two BuddyPress components:
 
 - **Activity** is required. Favouriting happens on activity items, and the "who liked this" display renders inside the activity stream.
-- **Notifications** is required for the notification, realtime, and email surfaces. The plugin registers a pseudo-component named `favorite_notifier` during BuddyPress setup and only proceeds if the Notifications component is active. If Notifications is disabled, no notifications are created, the realtime popups do not run, and the front-end assets are not loaded.
+- **Notifications** is required for on-site notifications and realtime popups. The plugin registers a pseudo-component named `favorite_notifier` during BuddyPress setup only while the Notifications component is active. If Notifications is off, no on-site notifications are created, popups do not run, the member **Settings > Favorite Notifications** tab is hidden, and the plugin's admin screens show a notice saying so. Liking still works, emails are still sent, and the "liked by" line still shows.
 - **Settings** is used for the member preference screens, including the BuddyPress Email tab that holds the email switches. If the Settings component is off, the "Favorite Notifications" subnav is not added and members cannot change their preferences.
 
 Enable these under **BuddyPress > Settings > Components**.

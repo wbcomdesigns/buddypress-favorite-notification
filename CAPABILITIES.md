@@ -14,7 +14,7 @@
 | Admin pages | 2 (own submenu + the shared WB Plugins hub landing) |
 | Admin tabs | 4 (Overview, Display, Tools, Discover) |
 | AJAX actions | 7 (all logged-in only) |
-| Options | 13 (display mode and icon, 2 real-time, 2 cleanup, rest state) |
+| Options | 12 (display mode and icon, 2 real-time, 2 cleanup, 6 state: version, last cleanup, 4 migration) |
 | Custom DB tables | 2 |
 | Cron hooks | 2 (1 recurring monthly cleanup + 1 self-chaining migration batch) |
 | Public API functions | 10 (`includes/functions/api-functions.php`) |
