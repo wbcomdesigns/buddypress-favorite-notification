@@ -139,6 +139,11 @@
           "slug": "whats-new-in-2-2-1",
           "title": "What's New in 2.2.1",
           "file": "whats-new/whats-new-in-2-2-1.md"
+        },
+        {
+          "slug": "whats-new-in-2-2-0",
+          "title": "What's New in 2.2.0",
+          "file": "whats-new/whats-new-in-2-2-0.md"
         }
       ]
     }

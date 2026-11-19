@@ -1,6 +1,6 @@
 # Architecture
 
-BuddyPress Favourite Notification is a modular plugin built around a singleton and a set of feature modules. This page orients a developer before extending it.
+BuddyPress Favorite Notification is a modular plugin built around a singleton and a set of feature modules. This page orients a developer before extending it.
 
 ## Entry point
 

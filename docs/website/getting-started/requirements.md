@@ -1,6 +1,6 @@
 # Requirements
 
-BuddyPress Favourite Notification is a BuddyPress add-on. It cannot run on its own.
+BuddyPress Favorite Notification is a BuddyPress add-on. It cannot run on its own.
 
 ## Minimum versions
 
@@ -30,4 +30,4 @@ The "who liked this" line renders on two hooks so it appears on all themes: the 
 
 ## No dependencies beyond BuddyPress
 
-The plugin registers no external services, collects no personal data outside your WordPress install, and requires no API keys. Emails are sent through BuddyPress Emails and your site's configured mail system.
+The plugin registers no external services, sends no data outside your WordPress install, and requires no API keys. Emails are sent through BuddyPress Emails and your site's configured mail system.

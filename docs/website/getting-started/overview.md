@@ -1,6 +1,6 @@
 # Overview
 
-BuddyPress Favourite Notification closes the feedback loop in a BuddyPress community. When a member favourites (likes) another member's activity or comment, the author is told about it right away, and everyone browsing the stream can see who liked a post.
+BuddyPress Favorite Notification closes the feedback loop in a BuddyPress community. When a member favourites (likes) another member's activity or comment, the author is told about it right away, and everyone browsing the stream can see who liked a post.
 
 The plugin delivers this through four surfaces:
 
@@ -22,8 +22,9 @@ Site owners also get an admin dashboard under the shared **WB Plugins** menu wit
 
 - **Zero configuration to start.** Once BuddyPress and the plugin are active, favouriting notifies the author immediately. There is nothing to switch on.
 - **No self-notifications.** A member is never notified for favouriting their own content.
-- **Grouped notifications.** When several members favourite the same activity, the entries collapse into one "N people favourited your activity" notification.
+- **Grouped notifications.** When several members favourite the same activity, the entries collapse into one "N people liked your activity" notification.
 - **Members stay in control.** Each member has a per-type, per-channel preference screen in their BuddyPress profile settings.
+- **Your data stays on your site.** Favourites, member preferences and notifications are stored in your own database. See [Removing the plugin and your data](installation.md#removing-the-plugin-and-your-data).
 - **Built for scale.** Favourites live in a custom indexed table, counts and who-liked queries are object-cached, and the admin dashboard and who-liked modal are paginated and batch-fetched.
 
 BuddyPress 12.0 or later is a hard requirement. If BuddyPress is not active, the plugin does nothing and shows an admin notice explaining why.
