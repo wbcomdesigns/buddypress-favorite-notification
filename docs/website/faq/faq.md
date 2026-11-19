@@ -66,4 +66,4 @@ Yes. The plugin ships a POT file in `languages/` and includes German, Spanish, F
 
 ## Does the plugin collect any personal data?
 
-No. It does not collect, store, or share personal data outside your WordPress installation. Notification and favourite data is stored in your own database, and emails go through your site's configured mail system.
+It stores which member favourited which activity, each member's notification choices and the notifications themselves, all in your own database. It sends nothing to outside services, and emails go through your site's configured mail system. The plugin is not connected to the WordPress personal data Export and Erase tools. See [Removing the plugin and your data](../getting-started/installation.md#removing-the-plugin-and-your-data).

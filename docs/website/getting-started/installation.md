@@ -2,21 +2,16 @@
 
 Install BuddyPress 12.0 or later first and confirm its Activity and Notifications components are active. Then install this plugin.
 
-## Automatic installation
-
-1. Log in to your WordPress admin dashboard.
-2. Go to **Plugins > Add New**.
-3. Search for "BuddyPress Favorite Notification".
-4. Click **Install Now**, then **Activate**.
-
-Notifications start working immediately, with no configuration needed.
-
-## Manual installation
+## Install the plugin
 
 1. Download the plugin ZIP file.
 2. Go to **Plugins > Add New > Upload Plugin**.
 3. Choose the ZIP file and click **Install Now**.
 4. Click **Activate Plugin**.
+
+You can also unzip it and upload the `buddypress-favorite-notification` folder to `wp-content/plugins/` over SFTP.
+
+The plugin has no update checker of its own. To update, upload the newer ZIP on **Plugins > Add New > Upload Plugin** and choose **Replace current with uploaded**; your settings and data are kept.
 
 ## What activation does
 
@@ -25,6 +20,7 @@ On activation the plugin:
 - Creates two custom database tables, `{prefix}bp_favorite_notification_prefs` (member notification preferences) and `{prefix}bp_activity_favorites` (favourite tracking). See the [Database Tables](../developer-guide/database.md) page.
 - Creates the two BuddyPress emails if they are missing. It never overwrites an email you have edited.
 - Stores the current plugin version in the `bpfn_version` option.
+- Sends you once to the plugin's dashboard, at **WB Plugins > Favorite Notifications**, after you activate it. This is skipped when you activate several plugins at once.
 - Checks whether any pre-existing favourites need migrating into the new table, and if so raises an admin notice linking to the Tools tab. See [Tools and Maintenance](../usage/tools-and-maintenance.md).
 
 ## After activation
@@ -45,3 +41,17 @@ To review what is happening on your site:
 ## If BuddyPress is not active
 
 The plugin loads no functionality and shows an admin notice: "BuddyPress Favorite Notification is ineffective now as it requires BuddyPress to be installed and active." Activate BuddyPress to resolve it.
+
+## Removing the plugin and your data
+
+Deactivating or deleting the plugin does not remove anything. The two tables (`{prefix}bp_favorite_notification_prefs` and `{prefix}bp_activity_favorites`), the `bpfn_*` options and the scheduled cleanup event stay, so reinstalling restores your data. BuddyPress notifications already created stay in BuddyPress's own table. The two emails stay in **Dashboard > Emails**.
+
+To delete the data yourself, drop the two tables and delete the `bpfn_*` options, for example with WP-CLI, after you delete the plugin.
+
+## What the plugin stores about members
+
+- Which member favourited which activity, in `{prefix}bp_activity_favorites`.
+- Each member's web and real-time choices, in `{prefix}bp_favorite_notification_prefs`.
+- Notifications, in BuddyPress's notifications table, and email choices as BuddyPress user meta.
+
+The plugin does not add itself to the WordPress Export Personal Data and Erase Personal Data tools, so those tools do not include or remove this data.
