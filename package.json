@@ -4,11 +4,9 @@
   "description": "BuddyPress Favorite Notification - Send notifications when activities are favorited",
   "main": "bp-favorite-notification.php",
   "scripts": {
-    "build": "grunt build",
+    "build": "bash bin/build-release.sh",
     "makepot": "grunt makepot",
     "checktextdomain": "grunt checktextdomain",
-    "zip": "grunt compress",
-    "clean": "grunt clean",
     "watch": "grunt watch"
   },
   "repository": {
