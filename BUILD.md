@@ -1,5 +1,7 @@
 # Build Process for BuddyPress Favorite Notification
 
+> **Release zip:** run `bash bin/build-release.sh`. It writes `dist/bp-favorite-notification-<version>.zip` with the WordPress.org folder name. The Grunt `build`/`compress` zip tasks below were removed; Grunt now only runs the i18n tasks.
+
 ## Prerequisites
 
 - Node.js (v14 or higher)

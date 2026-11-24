@@ -1,0 +1,5 @@
+# Dev-only files kept out of the release zip (bin/build-release.sh).
+*.md
+.contract-audit-baseline.json
+.wbcom-i18n.json
+phpstan-baseline.neon
