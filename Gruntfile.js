@@ -69,81 +69,6 @@ module.exports = function(grunt) {
             }
         },
 
-        // Clean dist directory
-        clean: {
-            dist: ['dist'],
-            build: ['dist/<%= pkg.name %>']
-        },
-
-        // Copy files to dist
-        copy: {
-            build: {
-                src: [
-                    '**',
-                    // Dev-only tooling (PHPStan + stubs). Never ship these.
-                    '!vendor/**',
-                    '!composer.json',
-                    '!composer.lock',
-                    '!phpstan.neon',
-                    '!phpstan-baseline.neon',
-                    '!node_modules/**',
-                    '!audit/**',
-                    '!docs/**',
-                    '!marketing/**',
-                    '!**/*.md',
-                    '!*.md',
-                    '!.wbcom-i18n.json',
-                    '!vendor/**',
-                    '!dist/**',
-                    '!tests/**',
-                    '!bin/**',
-                    '!.git/**',
-                    '!.github/**',
-                    '!.gitignore',
-                    '!.gitattributes',
-                    '!Gruntfile.js',
-                    '!package.json',
-                    '!package-lock.json',
-                    '!composer.json',
-                    '!composer.lock',
-                    '!phpcs.xml',
-                    '!phpunit.xml',
-                    '!README.md',
-                    '!CHANGELOG.md',
-                    '!TESTING-CHECKLIST.md',
-                    '!FAVORITE-COUNT-FEATURE-PLAN.md',
-                    '!FAVORITE-COUNT-IMPLEMENTATION.md',
-                    '!BUILD.md',
-                    '!*.log',
-                    // WordPress.org listing assets live in SVN /assets, not in the plugin zip.
-                    '!.wordpress-org/**',
-                    '!screenshot-*.png',
-                    '!.contract-audit-baseline.json',
-                    '!phpcs.xml.dist',
-                    '!**/*.map'
-                ],
-                dest: 'dist/<%= pkg.name %>/'
-            }
-        },
-
-        // Create ZIP file for WordPress.org
-        compress: {
-            build: {
-                options: {
-                    archive: 'dist/<%= pkg.name %>-<%= pkg.version %>.zip',
-                    mode: 'zip'
-                },
-                files: [
-                    {
-                        expand: true,
-                        cwd: 'dist/<%= pkg.name %>/',
-                        src: ['**/*'],
-                        dest: '<%= pkg.name %>/'
-                    }
-                ]
-            }
-        },
-
         // Watch for changes
         watch: {
             php: {
@@ -160,9 +85,6 @@ module.exports = function(grunt) {
     // Load npm tasks
     grunt.loadNpmTasks('grunt-checktextdomain');
     grunt.loadNpmTasks('grunt-wp-i18n');
-    grunt.loadNpmTasks('grunt-contrib-clean');
-    grunt.loadNpmTasks('grunt-contrib-copy');
-    grunt.loadNpmTasks('grunt-contrib-compress');
 
     // Register tasks
     grunt.registerTask('default', ['checktextdomain', 'makepot']);
@@ -176,77 +98,5 @@ module.exports = function(grunt) {
         'makepot'
     ]);
 
-    // Release preflight.
-    //
-    // copy:build globs '**' from the WORKING DIRECTORY, so the zip is whatever is
-    // on disk - committed or not. On 2.0.1 that shipped ten source files that were
-    // never committed: the published zip contained fixes master did not have, and
-    // the next build from master would have silently regressed all of them.
-    //
-    // The zip is generated FROM the repo, so the repo has to BE the source of
-    // truth. Refuse to build from a dirty tree. If you genuinely need a scratch
-    // build, run the copy/compress tasks directly - but never ship that zip.
-    grunt.registerTask('preflight', 'Refuse to build unless the tree is clean', function () {
-        var done = this.async();
-        var exec = require('child_process').exec;
-
-        exec('git status --porcelain', { cwd: __dirname }, function (err, stdout) {
-            if (err) {
-                grunt.log.warn('Not a git checkout - skipping the cleanliness check.');
-                return done();
-            }
-
-            var dirty = stdout.trim();
-            if (dirty) {
-                grunt.log.error('Uncommitted changes in the working tree:');
-                grunt.log.error(dirty);
-                grunt.fail.fatal(
-                    'Refusing to build. The zip must be reproducible from the repo - ' +
-                    'commit (or stash) these first, or the release will ship code that ' +
-                    'exists nowhere but the zip.'
-                );
-                return done(false);
-            }
-
-            // Not fatal: a clean tree that has not been pushed still builds, but the
-            // tag would point at a commit nobody else can fetch.
-            exec('git log --oneline @{upstream}..HEAD', { cwd: __dirname }, function (upErr, ahead) {
-                if (!upErr && ahead.trim()) {
-                    grunt.log.warn('HEAD is ahead of its upstream - push before tagging:');
-                    grunt.log.warn(ahead.trim());
-                }
-                grunt.log.ok('Working tree clean - safe to build.');
-                done();
-            });
-        });
-    });
-
-    grunt.registerTask('build', [
-        'preflight',
-        'checktextdomain',
-        'clean:dist',
-        'copy:build',
-        'compress:build',
-        'clean:build',
-        'build-info'
-    ]);
-
-    // Custom task to display build info
-    grunt.registerTask('build-info', 'Display build information', function() {
-        grunt.log.writeln('');
-        grunt.log.writeln('========================================');
-        grunt.log.writeln('Build Complete!');
-        grunt.log.writeln('========================================');
-        grunt.log.writeln('Plugin: ' + grunt.config('pkg.name'));
-        grunt.log.writeln('Version: ' + grunt.config('pkg.version'));
-        grunt.log.writeln('Package: dist/' + grunt.config('pkg.name') + '-' + grunt.config('pkg.version') + '.zip');
-        grunt.log.writeln('========================================');
-        grunt.log.writeln('');
-    });
-
-    // build-info is the LAST step of `build` (see the task list above), not a
-    // module-scope call. It used to be queued here at load time, so it ran on every
-    // grunt invocation and printed "Build Complete!" before the real task had run -
-    // including when the build then failed, and even for `grunt check`. Announcing a
-    // successful build that did not happen is exactly how a bad zip gets shipped.
+    // Release zip: bin/build-release.sh (WordPress.org folder standard).
 };
